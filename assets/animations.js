@@ -3,6 +3,8 @@ const SCROLL_ANIMATION_OFFSCREEN_CLASSNAME = 'scroll-trigger--offscreen';
 const SCROLL_ZOOM_IN_TRIGGER_CLASSNAME = 'animate--zoom-in';
 const SCROLL_ANIMATION_CANCEL_CLASSNAME = 'scroll-trigger--cancel';
 
+const SCROLL_ANIMATION_REPEAT = document.documentElement.dataset.gadRevealRepeat === 'true';
+
 // Scroll in animation logic
 function onIntersection(elements, observer) {
   elements.forEach((element, index) => {
@@ -10,10 +12,9 @@ function onIntersection(elements, observer) {
       const elementTarget = element.target;
       if (elementTarget.classList.contains(SCROLL_ANIMATION_OFFSCREEN_CLASSNAME)) {
         elementTarget.classList.remove(SCROLL_ANIMATION_OFFSCREEN_CLASSNAME);
-        if (elementTarget.hasAttribute('data-cascade'))
-          elementTarget.setAttribute('style', `--animation-order: ${index};`);
+        if (elementTarget.hasAttribute('data-cascade')) elementTarget.style.setProperty('--animation-order', index);
       }
-      observer.unobserve(elementTarget);
+      if (!SCROLL_ANIMATION_REPEAT) observer.unobserve(elementTarget);
     } else {
       element.target.classList.add(SCROLL_ANIMATION_OFFSCREEN_CLASSNAME);
       element.target.classList.remove(SCROLL_ANIMATION_CANCEL_CLASSNAME);
@@ -32,8 +33,11 @@ function initializeScrollAnimationTrigger(rootEl = document, isDesignModeEvent =
     return;
   }
 
+  // Gadsden: el margen de disparo suma el alto de la barra de compra fija, si la página la tiene.
+  const stickyBar = document.querySelector('[data-gad-sticky-bar]');
+  const bottomMargin = 50 + (stickyBar ? stickyBar.offsetHeight : 0);
   const observer = new IntersectionObserver(onIntersection, {
-    rootMargin: '0px 0px -50px 0px',
+    rootMargin: `0px 0px -${bottomMargin}px 0px`,
   });
   animationTriggerElements.forEach((element) => observer.observe(element));
 }
@@ -92,7 +96,7 @@ function percentageSeen(element) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  initializeScrollAnimationTrigger();
+  initializeScrollAnimationTrigger(document, Shopify.designMode);
   initializeScrollZoomAnimationTrigger();
 });
 

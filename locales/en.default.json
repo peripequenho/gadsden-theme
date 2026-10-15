@@ -528,5 +528,15 @@
       "send_on": "YYYY-MM-DD",
       "send_on_label": "Send on (optional)"
     }
+  },
+  "gadsden": {
+    "carousel": {
+      "region": "Carousel",
+      "roledescription": "carousel",
+      "previous": "Previous slide",
+      "next": "Next slide",
+      "go_to": "Go to page {{ index }}",
+      "slide_of": "{{ index }} of {{ count }}"
+    }
   }
 }

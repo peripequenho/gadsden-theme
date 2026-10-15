@@ -1,0 +1,687 @@
+/* Gadsden: piezas globales que comparten las secciones (carrusel, enlaces, protección, anclas, efectos, íconos). */
+(function () {
+  const root = document.documentElement;
+  const designMode = !!(window.Shopify && window.Shopify.designMode);
+
+  window.Gadsden = window.Gadsden || {};
+  Gadsden.reduceMotion = () => root.classList.contains('gad-reduce');
+  Gadsden.designMode = designMode;
+
+  /* ---------- T07: enlaces a otros sitios en pestaña nueva ---------- */
+  const sameSite = new Set(
+    [location.hostname, root.dataset.gadPrimaryHost, root.dataset.gadPermanentHost].filter(Boolean)
+  );
+  const keepInTab = /(^|\.)(myshopify\.com|shopify\.com|shop\.app|shopifycs\.com)$/i;
+
+  function isExternal(a) {
+    if (!a || !a.href || a.hasAttribute('download')) return false;
+    if (!/^https?:$/.test(a.protocol)) return false;
+    if (sameSite.has(a.hostname) || keepInTab.test(a.hostname)) return false;
+    if (a.target && a.target !== '_self') return false;
+    return true;
+  }
+
+  function markExternal(a) {
+    a.target = '_blank';
+    const rel = new Set((a.rel || '').split(/\s+/).filter(Boolean));
+    rel.add('noopener');
+    rel.add('noreferrer');
+    a.rel = Array.from(rel).join(' ');
+  }
+
+  function markAllLinks(scope) {
+    (scope || document).querySelectorAll('a[href]').forEach((a) => {
+      if (isExternal(a)) markExternal(a);
+    });
+  }
+
+  document.addEventListener(
+    'click',
+    (e) => {
+      const a = e.target.closest && e.target.closest('a[href]');
+      if (a && isExternal(a)) markExternal(a);
+    },
+    true
+  );
+
+  /* ---------- T06: protección de contenido ---------- */
+  const editable = (el) =>
+    !!(el && el.closest && el.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"], .gad-selectable'));
+
+  if (root.classList.contains('gad-protect') && !designMode) {
+    document.addEventListener('contextmenu', (e) => {
+      if (!editable(e.target)) e.preventDefault();
+    });
+    document.addEventListener('dragstart', (e) => {
+      if (e.target && (e.target.tagName === 'IMG' || e.target.tagName === 'PICTURE' || e.target.tagName === 'A')) e.preventDefault();
+    });
+    document.addEventListener('selectstart', (e) => {
+      if (!editable(e.target)) e.preventDefault();
+    });
+    document.addEventListener('keydown', (e) => {
+      const k = (e.key || '').toLowerCase();
+      const mod = e.ctrlKey || e.metaKey;
+      const devtools =
+        k === 'f12' ||
+        (mod && e.shiftKey && ['i', 'j', 'c', 'k'].includes(k)) ||
+        (e.metaKey && e.altKey && ['i', 'j', 'c', 'u'].includes(k)) ||
+        (mod && !e.shiftKey && ['u', 's'].includes(k));
+      if (devtools) e.preventDefault();
+    });
+  }
+
+  /* ---------- T10: anclas de sección con scroll suave ---------- */
+  function headerOffset(goingUp) {
+    const sticky = document.querySelector('sticky-header');
+    if (!sticky) return 0;
+    const type = sticky.getAttribute('data-sticky-type');
+    if (type === 'always' || type === 'reduce-logo-size') return sticky.offsetHeight;
+    if (type === 'on-scroll-up' && goingUp) return sticky.offsetHeight;
+    return 0;
+  }
+  Gadsden.headerOffset = headerOffset;
+
+  Gadsden.scrollToTarget = function (target) {
+    if (!target) return;
+    const rectTop = target.getBoundingClientRect().top;
+    const top = rectTop + window.scrollY - headerOffset(rectTop < 0) - 8;
+    window.scrollTo({ top: Math.max(0, top), behavior: Gadsden.reduceMotion() ? 'auto' : 'smooth' });
+  };
+
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href*="#"]');
+    if (!a || e.defaultPrevented) return;
+    const url = new URL(a.href, location.href);
+    if (url.pathname !== location.pathname || !url.hash || url.hash.length < 2) return;
+    let target;
+    try {
+      target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+    } catch (err) {
+      return;
+    }
+    if (!target || !target.hasAttribute('data-gad-anchor')) return;
+    e.preventDefault();
+    Gadsden.scrollToTarget(target);
+    history.replaceState(null, '', url.hash);
+  });
+
+  /* ---------- T05: flecha de los botones (efecto "flecha") ---------- */
+  const arrowSvg =
+    '<svg viewBox="0 0 14 10" aria-hidden="true" focusable="false"><path d="M1 5h11M8.5 1.5 12 5 8.5 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function addButtonArrows(scope) {
+    const linkArrow = root.classList.contains('gad-fx-link-arrow');
+    const actionArrow = root.classList.contains('gad-fx-action-arrow');
+    if (!linkArrow && !actionArrow) return;
+    (scope || document).querySelectorAll('.button, .shopify-payment-button__button').forEach((btn) => {
+      if (btn.querySelector(':scope > .gad-btn-arrow') || btn.classList.contains('button--tertiary')) return;
+      const isLink = btn.tagName === 'A';
+      if ((isLink && !linkArrow) || (!isLink && !actionArrow)) return;
+      if (btn.closest('.drawer__close, .quantity, .gad-carousel__arrow')) return;
+      const span = document.createElement('span');
+      span.className = 'gad-btn-arrow';
+      span.innerHTML = arrowSvg;
+      btn.appendChild(span);
+    });
+  }
+
+  /* ---------- D01: íconos por nombre que no existen ---------- */
+  function checkIcons(scope) {
+    const run = () => {
+      (scope || document).querySelectorAll('.gad-icon.material-symbols-outlined:not(.gad-icon--checked)').forEach((el) => {
+        const size = parseFloat(getComputedStyle(el).fontSize) || 24;
+        el.classList.add('gad-icon--checked');
+        if (el.scrollWidth > size * 1.4) el.classList.add('gad-icon--missing');
+      });
+    };
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load('24px "Material Symbols Outlined"').then(run, run);
+    } else {
+      run();
+    }
+  }
+
+  /* ---------- T08: paneles de extensiones espía ---------- */
+  const spyPattern =
+    /(koala|ppspy|pp-spy|shophunter|shop-hunter|commerce-?inspector|shopify-?spy|shopspy|store-?spy|ali-?hunter|dropship-?(io|spy)|minea|ecomhunt|sell-?the-?trend|niche-?scraper|theme-?detector|store-?inspector|shopify-?inspector|spy-?tool|spybox|zikanalytics|winning-?hunter)/i;
+  const ownNode = /^(shopify|gad-|gadsden|MainContent|PBarNextFrame|preview-bar|admin-bar|web-pixels|shopify-chat|judgeme|jdgm)/i;
+
+  function looksLikeSpy(el) {
+    if (!el || el.nodeType !== 1) return false;
+    const id = el.id || '';
+    const cls = typeof el.className === 'string' ? el.className : '';
+    const tag = el.tagName.toLowerCase();
+    if (ownNode.test(id) || ownNode.test(tag)) return false;
+    return spyPattern.test(id) || spyPattern.test(cls) || spyPattern.test(tag);
+  }
+
+  function hideSpy(el) {
+    el.setAttribute('data-gad-hidden', '');
+    el.style.setProperty('display', 'none', 'important');
+  }
+
+  function sweepSpies() {
+    [document.body, root].forEach((parent) => {
+      if (!parent) return;
+      Array.from(parent.children).forEach((el) => {
+        if (looksLikeSpy(el)) hideSpy(el);
+      });
+    });
+  }
+
+  if (!designMode) {
+    const spyObserver = new MutationObserver((mutations) => {
+      mutations.forEach((m) =>
+        m.addedNodes.forEach((node) => {
+          if (looksLikeSpy(node)) hideSpy(node);
+        })
+      );
+    });
+    const startSpyWatch = () => {
+      sweepSpies();
+      spyObserver.observe(document.body, { childList: true });
+      spyObserver.observe(root, { childList: true });
+    };
+    if (document.body) startSpyWatch();
+    else document.addEventListener('DOMContentLoaded', startSpyWatch);
+  }
+
+  /* ---------- arranque y contenido que llega después ---------- */
+  function refresh(scope) {
+    markAllLinks(scope);
+    addButtonArrows(scope);
+    checkIcons(scope);
+  }
+  Gadsden.refresh = refresh;
+
+  document.addEventListener('DOMContentLoaded', () => refresh(document));
+  document.addEventListener('shopify:section:load', (e) => refresh(e.target));
+
+  if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS) {
+    subscribe(PUB_SUB_EVENTS.cartUpdate, () => setTimeout(() => refresh(document), 60));
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS) {
+        subscribe(PUB_SUB_EVENTS.cartUpdate, () => setTimeout(() => refresh(document), 60));
+      }
+    });
+  }
+})();
+
+/* ---------- T04: carrusel compartido ---------- */
+class GadCarousel extends HTMLElement {
+  connectedCallback() {
+    if (this._ready) return;
+    this._ready = true;
+    this.viewport = this.querySelector('.gad-carousel__viewport');
+    this.track = this.querySelector('.gad-carousel__track');
+    this.prevBtn = this.querySelector('.gad-carousel__arrow--prev');
+    this.nextBtn = this.querySelector('.gad-carousel__arrow--next');
+    this.dotsEl = this.querySelector('.gad-carousel__dots');
+    this.originals = Array.from(this.track.children).filter((el) => !/^(STYLE|SCRIPT|TEMPLATE)$/.test(el.tagName));
+    this.originals.forEach((el) => el.classList.add('gad-carousel__slide'));
+    this.type = this.dataset.type || 'classic';
+    this.drag = this.dataset.drag || 'on';
+    this.speed = parseFloat(this.dataset.autoplay) || 0;
+    this.cfg = { d: this.readCfg('d'), m: this.readCfg('m') };
+    this.index = 0;
+    this.x = 0;
+    this.paused = new Set();
+    this.mq = window.matchMedia('(min-width: 990px)');
+
+    this.onMq = () => this.setup();
+    this.mq.addEventListener('change', this.onMq);
+    this.prevBtn.addEventListener('click', () => this.move(-1, true));
+    this.nextBtn.addEventListener('click', () => this.move(1, true));
+    this.addEventListener('keydown', (e) => this.onKey(e));
+    this.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && this.pause('hover'));
+    this.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && this.resume('hover'));
+    this.addEventListener('focusin', () => this.pause('focus'));
+    this.addEventListener('focusout', (e) => {
+      if (!this.contains(e.relatedTarget)) this.resume('focus');
+    });
+    this.track.addEventListener('transitionend', (e) => {
+      if (e.target === this.track && e.propertyName === 'transform') this.normalize();
+    });
+    this.track.addEventListener('dragstart', (e) => e.preventDefault());
+    this.track.addEventListener(
+      'load',
+      () => {
+        if (this.isOn && this.c.ah) this.update();
+      },
+      true
+    );
+    this.viewport.addEventListener('pointerdown', (e) => this.onDown(e));
+    this.viewport.addEventListener('click', (e) => this.onClickCapture(e), true);
+
+    this.onVisibility = () => (document.hidden ? this.pause('hidden') : this.resume('hidden'));
+    document.addEventListener('visibilitychange', this.onVisibility);
+    this.io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => (entry.isIntersecting ? this.resume('offscreen') : this.pause('offscreen')));
+    });
+    this.io.observe(this);
+    this.ro = new ResizeObserver(() => {
+      if (!this.isOn) return;
+      cancelAnimationFrame(this._raf);
+      this._raf = requestAnimationFrame(() => this.layout());
+    });
+    this.ro.observe(this.viewport);
+
+    this.addEventListener('shopify:block:select', (e) => {
+      const i = this.originals.findIndex((el) => el.contains(e.target) || el === e.target);
+      if (i < 0) return;
+      this.pause('editor');
+      this.goTo(i, !Gadsden.reduceMotion());
+    });
+    this.addEventListener('shopify:block:deselect', () => this.resume('editor'));
+
+    this.setup();
+  }
+
+  disconnectedCallback() {
+    this.stopTimer();
+    if (this.mq) this.mq.removeEventListener('change', this.onMq);
+    document.removeEventListener('visibilitychange', this.onVisibility);
+    if (this.io) this.io.disconnect();
+    if (this.ro) this.ro.disconnect();
+    this._ready = false;
+  }
+
+  readCfg(prefix) {
+    try {
+      return JSON.parse(this.dataset[prefix]);
+    } catch (e) {
+      return { on: true, pv: 1, pm: 1, peek: 0, edge: false, ah: false };
+    }
+  }
+
+  get loop() {
+    return this.type === 'loop';
+  }
+
+  get fade() {
+    return this.type === 'fade';
+  }
+
+  setup() {
+    this.removeClones();
+    this.stopTimer();
+    this.c = this.mq.matches ? this.cfg.d : this.cfg.m;
+    this.n = this.originals.length;
+    this.pv = this.fade ? 1 : Math.max(1, parseInt(this.c.pv, 10) || 1);
+    this.pm = Math.max(1, Math.min(parseInt(this.c.pm, 10) || 1, this.pv));
+    this.isOn = !!this.c.on && this.n > this.pv;
+    this.classList.toggle('is-active', this.isOn);
+    this.classList.toggle('is-static', !this.isOn);
+    this.classList.toggle('is-draggable', this.isOn && this.drag !== 'off' && !this.fade);
+
+    this.track.style.transform = '';
+    this.track.style.transition = '';
+    this.viewport.style.height = '';
+    this.originals.forEach((el) => {
+      el.inert = false;
+      el.removeAttribute('aria-hidden');
+      el.classList.remove('is-active', 'is-visible');
+    });
+
+    if (!this.isOn) {
+      this.prevBtn.hidden = true;
+      this.nextBtn.hidden = true;
+      this.dotsEl.hidden = true;
+      this.dotsEl.innerHTML = '';
+      this.originals.forEach((el) => {
+        el.removeAttribute('role');
+        el.removeAttribute('aria-roledescription');
+        el.removeAttribute('aria-label');
+      });
+      return;
+    }
+
+    this.originals.forEach((el) => this.stripReveal(el));
+
+    const slideLabel = this.dataset.labelSlide || '[index] / [count]';
+    this.originals.forEach((el, i) => {
+      el.setAttribute('role', 'group');
+      el.setAttribute('aria-roledescription', 'slide');
+      el.setAttribute('aria-label', slideLabel.replace('[index]', i + 1).replace('[count]', this.n));
+    });
+
+    if (this.loop) this.addClones();
+    this.prevBtn.hidden = false;
+    this.nextBtn.hidden = false;
+    this.buildDots();
+    this.index = Math.min(this.index, this.maxIndex());
+    this.layout();
+    this.startTimer();
+  }
+
+  addClones() {
+    const k = Math.min(this.n, this.pv + this.pm + 1);
+    this.k = k;
+    const head = this.originals.slice(-k).map((el) => this.cloneSlide(el));
+    const tail = this.originals.slice(0, k).map((el) => this.cloneSlide(el));
+    head.reverse().forEach((el) => this.track.insertBefore(el, this.track.firstChild));
+    tail.forEach((el) => this.track.appendChild(el));
+  }
+
+  /* dentro de un carrusel activo la aparición animada la hace la sección, no cada ítem */
+  stripReveal(el) {
+    [el, ...el.querySelectorAll('.scroll-trigger')].forEach((node) => {
+      node.classList.remove('scroll-trigger', 'scroll-trigger--offscreen', 'animate--slide-in', 'animate--fade-in');
+    });
+  }
+
+  cloneSlide(el) {
+    const clone = el.cloneNode(true);
+    this.stripReveal(clone);
+    clone.classList.add('is-clone');
+    clone.setAttribute('aria-hidden', 'true');
+    clone.inert = true;
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach((child) => child.removeAttribute('id'));
+    clone.removeAttribute('data-shopify-editor-block');
+    clone.querySelectorAll('[data-shopify-editor-block]').forEach((child) => child.removeAttribute('data-shopify-editor-block'));
+    return clone;
+  }
+
+  removeClones() {
+    this.track.querySelectorAll(':scope > .is-clone').forEach((el) => el.remove());
+    this.k = 0;
+  }
+
+  maxIndex() {
+    if (this.loop || this.fade) return this.n - 1;
+    return Math.max(0, this.n - this.pv);
+  }
+
+  pageCount() {
+    if (this.loop || this.fade) return Math.ceil(this.n / this.pm);
+    return Math.ceil(this.maxIndex() / this.pm) + 1;
+  }
+
+  buildDots() {
+    const count = this.pageCount();
+    const label = this.dataset.labelDot || '[index]';
+    this.dotsEl.innerHTML = '';
+    for (let p = 0; p < count; p++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'gad-carousel__dot';
+      b.setAttribute('aria-label', label.replace('[index]', p + 1));
+      b.addEventListener('click', () => {
+        this.goTo(Math.min(p * this.pm, this.maxIndex()), true);
+        this.restartTimer();
+      });
+      this.dotsEl.appendChild(b);
+    }
+    this.dotsEl.hidden = count < 2;
+  }
+
+  measure() {
+    const first = this.originals[0];
+    const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
+    this.slideW = first.getBoundingClientRect().width;
+    this.step = this.slideW + gap;
+    this.viewW = this.viewport.clientWidth;
+    this.peek = Math.max(0, parseFloat(this.c.peek) || 0);
+    this.contentW = this.n * this.step - gap;
+  }
+
+  posFor(i) {
+    if (this.fade) return 0;
+    if (this.loop) return (i + this.k) * this.step - this.peek;
+    let x = i * this.step;
+    if (this.c.edge) return Math.min(Math.max(0, x), Math.max(0, this.contentW - this.viewW));
+    return Math.min(Math.max(-this.peek, x - this.peek), Math.max(-this.peek, this.contentW - this.viewW + this.peek));
+  }
+
+  layout() {
+    if (!this.isOn) return;
+    this.measure();
+    this.goTo(this.index, false);
+  }
+
+  setX(x, animate) {
+    this.x = x;
+    if (this.fade) return;
+    const instant = !animate || Gadsden.reduceMotion();
+    this.track.style.transition = instant ? 'none' : '';
+    this.track.style.transform = `translate3d(${-x}px, 0, 0)`;
+    clearTimeout(this._settle);
+    if (instant) {
+      void this.track.offsetWidth;
+      this.track.style.transition = '';
+      if (this.loop) this.normalize();
+    } else if (this.loop) {
+      // respaldo por si no llega transitionend (pestaña en segundo plano, transición interrumpida)
+      this._settle = setTimeout(() => this.normalize(), 650);
+    }
+  }
+
+  goTo(i, animate) {
+    if (!this.isOn) return;
+    if (this.loop) {
+      const lo = 1 - this.k;
+      const hi = this.n - 1 + this.k - this.pv;
+      if (i < lo || i > hi) {
+        const before = this.index;
+        this.normalize(true);
+        i += this.index - before;
+      }
+      i = Math.max(lo, Math.min(hi, i));
+    } else if (this.fade) {
+      i = ((i % this.n) + this.n) % this.n;
+    } else {
+      i = Math.max(0, Math.min(this.maxIndex(), i));
+    }
+    this.index = i;
+    this.setX(this.posFor(i), animate);
+    this.update();
+  }
+
+  normalize(force) {
+    if (!this.loop || !this.isOn) return;
+    if (this.index >= 0 && this.index < this.n && !force) return;
+    const real = ((this.index % this.n) + this.n) % this.n;
+    if (real === this.index) return;
+    this.x += (real - this.index) * this.step;
+    this.index = real;
+    this.track.style.transition = 'none';
+    this.track.style.transform = `translate3d(${-this.x}px, 0, 0)`;
+    void this.track.offsetWidth;
+    this.track.style.transition = '';
+    this.update();
+  }
+
+  move(dir, user) {
+    if (!this.isOn) return;
+    let target = this.index + dir * this.pm;
+    if (!this.loop && !this.fade) {
+      if (dir > 0 && this.index >= this.maxIndex()) target = user ? this.maxIndex() : 0;
+      if (dir < 0 && this.index <= 0) target = 0;
+    }
+    this.goTo(target, true);
+    if (user) this.restartTimer();
+  }
+
+  update() {
+    const real = this.loop ? ((this.index % this.n) + this.n) % this.n : this.index;
+    const page = this.loop || this.fade ? Math.floor(real / this.pm) : Math.ceil(real / this.pm);
+    Array.from(this.dotsEl.children).forEach((d, p) => {
+      const on = p === Math.min(page, this.dotsEl.children.length - 1);
+      d.classList.toggle('is-active', on);
+      if (on) d.setAttribute('aria-current', 'true');
+      else d.removeAttribute('aria-current');
+    });
+    if (!this.loop && !this.fade) {
+      this.prevBtn.disabled = this.index <= 0;
+      this.nextBtn.disabled = this.index >= this.maxIndex();
+    } else {
+      this.prevBtn.disabled = false;
+      this.nextBtn.disabled = false;
+    }
+    const visible = [];
+    this.originals.forEach((el, i) => {
+      let rel = i - real;
+      if (this.loop && rel < 0) rel += this.n;
+      const isVisible = rel >= 0 && rel < this.pv;
+      el.classList.toggle('is-active', i === real);
+      el.classList.toggle('is-visible', isVisible);
+      el.inert = !isVisible;
+      if (isVisible) {
+        el.removeAttribute('aria-hidden');
+        visible.push(el);
+      } else {
+        el.setAttribute('aria-hidden', 'true');
+      }
+    });
+    if (this.c.ah) {
+      const h = Math.max(...visible.map((el) => el.offsetHeight), 0);
+      if (h) this.viewport.style.height = `${h}px`;
+    }
+    this.dispatchEvent(new CustomEvent('gad:carousel:change', { bubbles: true, detail: { index: real, visible } }));
+  }
+
+  onKey(e) {
+    if (!this.isOn || e.target.closest('input, textarea, select')) return;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      this.move(-1, true);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      this.move(1, true);
+    }
+  }
+
+  /* arrastre con mouse o dedo; el scroll vertical queda libre (touch-action: pan-y) */
+  onDown(e) {
+    if (!this.isOn || this.drag === 'off' || this.fade || e.button > 0) return;
+    if (e.target.closest('input, textarea, select, button, .gad-no-drag')) return;
+    this.dragState = { id: e.pointerId, x0: e.clientX, y0: e.clientY, startX: this.x, moved: false, decided: false, last: [] };
+    this.onMoveBound = this.onMoveBound || ((ev) => this.onMove(ev));
+    this.onUpBound = this.onUpBound || ((ev) => this.onUp(ev));
+    window.addEventListener('pointermove', this.onMoveBound, { passive: false });
+    window.addEventListener('pointerup', this.onUpBound);
+    window.addEventListener('pointercancel', this.onUpBound);
+  }
+
+  onMove(e) {
+    const s = this.dragState;
+    if (!s || e.pointerId !== s.id) return;
+    const dx = e.clientX - s.x0;
+    const dy = e.clientY - s.y0;
+    if (!s.decided) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      s.decided = true;
+      s.horizontal = Math.abs(dx) > Math.abs(dy);
+      if (!s.horizontal) return this.endDrag();
+      s.moved = true;
+      this.classList.add('is-dragging');
+      this.pause('drag');
+      if (this.loop) {
+        this.normalize(true);
+        s.startX = this.x;
+      }
+    }
+    if (!s.horizontal) return;
+    e.preventDefault();
+    let x = s.startX - dx;
+    if (!this.loop) {
+      const min = this.posFor(0);
+      const max = this.posFor(this.maxIndex());
+      if (x < min) x = min - (min - x) * 0.35;
+      if (x > max) x = max + (x - max) * 0.35;
+    }
+    this.track.style.transition = 'none';
+    this.x = x;
+    this.track.style.transform = `translate3d(${-x}px, 0, 0)`;
+    s.last.push({ t: e.timeStamp, x: e.clientX });
+    if (s.last.length > 5) s.last.shift();
+  }
+
+  onUp(e) {
+    const s = this.dragState;
+    if (!s || (e && e.pointerId !== s.id)) return;
+    if (s.moved) {
+      this.track.style.transition = '';
+      const pts = s.last;
+      let v = 0;
+      if (pts.length > 1) {
+        const a = pts[0];
+        const b = pts[pts.length - 1];
+        v = (b.x - a.x) / Math.max(1, b.t - a.t);
+        v = Math.max(-2.5, Math.min(2.5, v));
+      }
+      const dx = s.startX - this.x;
+      if (this.drag === 'free') {
+        let target = this.x - v * 280;
+        if (!this.loop) target = Math.min(Math.max(this.posFor(0), target), this.posFor(this.maxIndex()));
+        const raw = this.loop ? (target + this.peek) / this.step - this.k : (target + (this.c.edge ? 0 : this.peek)) / this.step;
+        this.index = Math.round(raw);
+        if (this.loop) this.index = Math.max(1 - this.k, Math.min(this.n - 1 + this.k - this.pv, this.index));
+        else this.index = Math.max(0, Math.min(this.maxIndex(), this.index));
+        this.setX(target, true);
+        this.update();
+      } else {
+        let delta = 0;
+        const travelled = -dx / this.step;
+        if (Math.abs(travelled) > 0.2 || Math.abs(v) > 0.35) {
+          delta = Math.sign(travelled || -v) * Math.max(1, Math.round(Math.abs(travelled)));
+        }
+        this.goTo(this.index + delta, true);
+      }
+      this.suppressClick = true;
+      setTimeout(() => (this.suppressClick = false), 50);
+      this.resume('drag');
+      this.restartTimer();
+    }
+    this.endDrag();
+  }
+
+  endDrag() {
+    this.classList.remove('is-dragging');
+    this.dragState = null;
+    window.removeEventListener('pointermove', this.onMoveBound);
+    window.removeEventListener('pointerup', this.onUpBound);
+    window.removeEventListener('pointercancel', this.onUpBound);
+  }
+
+  onClickCapture(e) {
+    if (this.suppressClick) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.suppressClick = false;
+    }
+  }
+
+  /* pase automático: se frena con el mouse encima, con foco, arrastrando, fuera de pantalla o en otra pestaña */
+  startTimer() {
+    this.stopTimer();
+    if (!this.isOn || !this.speed || this.paused.size || Gadsden.reduceMotion()) return;
+    this.timer = setTimeout(() => {
+      this.move(1, false);
+      this.startTimer();
+    }, this.speed * 1000);
+  }
+
+  stopTimer() {
+    clearTimeout(this.timer);
+    this.timer = null;
+  }
+
+  restartTimer() {
+    if (this.speed) this.startTimer();
+  }
+
+  pause(reason) {
+    this.paused.add(reason);
+    this.stopTimer();
+  }
+
+  resume(reason) {
+    this.paused.delete(reason);
+    if (!this.paused.size) this.startTimer();
+  }
+}
+
+if (!customElements.get('gad-carousel')) customElements.define('gad-carousel', GadCarousel);

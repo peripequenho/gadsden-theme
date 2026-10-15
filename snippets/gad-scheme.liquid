@@ -1,0 +1,25 @@
+{%- comment -%}
+  Devuelve las clases de color de un contenedor: la combinación elegida, el velo claro
+  o los colores propios (ver gad-colors).
+
+  Accepts:
+  - s: {Object} settings de la sección o del bloque
+  - key: {String} el mismo identificador que se le pasó a gad-colors
+  - prefix: {String} prefijo de los ids (opcional, ej. 'card_')
+  - tint: {Boolean} usar el velo claro (para tarjetas con estilo 'tint')
+
+  Usage:
+  <div class="{% render 'gad-scheme', s: section.settings, key: section.id %}">
+{%- endcomment -%}
+{%- liquid
+  assign p = prefix | default: ''
+  assign k_on = p | append: 'custom_colors'
+  assign k_scheme = p | append: 'color_scheme'
+-%}
+{%- if s[k_on] -%}
+  gad-cc gad-cc-{{ key }} gradient
+{%- elsif tint -%}
+  gad-tint
+{%- else -%}
+  color-{{ s[k_scheme] | default: 'scheme-1' }} gradient
+{%- endif -%}

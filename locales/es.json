@@ -539,5 +539,15 @@
       "expanded": "Formulario del destinatario de la tarjeta de regalo expandido",
       "collapsed": "Formulario del destinatario de tarjeta de regalo contraído"
     }
+  },
+  "gadsden": {
+    "carousel": {
+      "region": "Carrusel",
+      "roledescription": "carrusel",
+      "previous": "Diapositiva anterior",
+      "next": "Diapositiva siguiente",
+      "go_to": "Ir a la página {{ index }}",
+      "slide_of": "{{ index }} de {{ count }}"
+    }
   }
 }

@@ -1,15 +1,46 @@
 <!doctype html>
-<html class="js" lang="{{ request.locale.iso_code }}">
+{%- liquid
+  assign gad_html_classes = 'js'
+  if settings.protect_content
+    assign gad_html_classes = gad_html_classes | append: ' gad-protect'
+  endif
+  if settings.button_fx_link != 'none'
+    assign gad_html_classes = gad_html_classes | append: ' gad-fx-link-' | append: settings.button_fx_link
+  endif
+  if settings.button_fx_action != 'none'
+    assign gad_html_classes = gad_html_classes | append: ' gad-fx-action-' | append: settings.button_fx_action
+  endif
+-%}
+<html
+  class="{{ gad_html_classes }}"
+  lang="{{ request.locale.iso_code }}"
+  data-gad-primary-host="{{ request.host }}"
+  data-gad-permanent-host="{{ shop.permanent_domain }}"
+>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="">
+    <script>
+      (function () {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var ignore = {{ settings.motion_ignore_reduce | json }};
+        var html = document.documentElement;
+        if (reduce && !ignore) html.classList.add('gad-reduce');
+        if ({{ settings.animations_reveal_on_scroll | json }} && (!reduce || ignore)) html.classList.add('gad-motion');
+        {%- if settings.reveal_repeat %}
+          html.dataset.gadRevealRepeat = 'true';
+        {%- endif %}
+      })();
+    </script>
     <link rel="canonical" href="{{ canonical_url }}">
 
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
@@ -62,6 +93,7 @@
     {%- if settings.animations_reveal_on_scroll -%}
       <script src="{{ 'animations.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+    <script src="{{ 'gadsden.js' | asset_url }}" defer="defer"></script>
 
     {{ content_for_header }}
 
@@ -104,6 +136,8 @@
         %}
 
         --color-foreground: {{ scheme.settings.text.red }},{{ scheme.settings.text.green }},{{ scheme.settings.text.blue }};
+        {%- assign scheme_accent = scheme.settings.accent | default: scheme.settings.button %}
+        --color-accent: {{ scheme_accent.red }},{{ scheme_accent.green }},{{ scheme_accent.blue }};
         --color-background-contrast: {{ background_color_contrast.red }},{{ background_color_contrast.green }},{{ background_color_contrast.blue }};
         --color-shadow: {{ scheme.settings.shadow.red }},{{ scheme.settings.shadow.green }},{{ scheme.settings.shadow.blue }};
         --color-button: {{ scheme.settings.button.red }},{{ scheme.settings.button.green }},{{ scheme.settings.button.blue }};
@@ -244,6 +278,31 @@
         --variant-pills-shadow-horizontal-offset: {{ settings.variant_pills_shadow_horizontal_offset }}px;
         --variant-pills-shadow-vertical-offset: {{ settings.variant_pills_shadow_vertical_offset }}px;
         --variant-pills-shadow-blur-radius: {{ settings.variant_pills_shadow_blur }}px;
+
+        --gad-reveal-duration: {{ settings.reveal_duration | default: 650 }}ms;
+        --gad-reveal-delay: {{ settings.reveal_delay | default: 0 }}ms;
+        --gad-reveal-stagger: {{ settings.reveal_stagger | default: 0 }}ms;
+        --gad-reveal-opacity: {{ settings.reveal_opacity | default: 0 | divided_by: 100.0 | at_least: 0.01 }};
+        --gad-reveal-x: {{ settings.reveal_x | default: 0 }}%;
+        --gad-reveal-y: {{ settings.reveal_y | default: 0 }}%;
+        --gad-reveal-scale: {{ settings.reveal_zoom | default: 100 | divided_by: 100.0 }};
+
+        --gad-arrow-size: {{ settings.carousel_arrow_size | default: 40 }}px;
+        --gad-arrow-radius: {{ settings.carousel_arrow_radius | default: 100 | divided_by: 2.0 }}%;
+        --gad-arrow-icon: {{ settings.carousel_arrow_icon | default: 50 }}%;
+        --gad-dot-w: {{ settings.carousel_dot_width | default: 8 }}px;
+        --gad-dot-h: {{ settings.carousel_dot_height | default: 8 }}px;
+        --gad-dot-scale: {{ settings.carousel_dot_active_scale | default: 130 | divided_by: 100.0 }};
+        --gad-dot-gap: {{ settings.carousel_dot_gap | default: 8 }}px;
+        --gad-dot-radius: {{ settings.carousel_dot_radius | default: 8 }}px;
+      }
+
+      @font-face {
+        font-family: 'Material Symbols Outlined';
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v377/kJF4BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJU22ZZLsYEpzC_1ver5Y0.woff2) format('woff2');
       }
 
       *,
@@ -279,6 +338,7 @@
     {% endstyle %}
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'gadsden.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}

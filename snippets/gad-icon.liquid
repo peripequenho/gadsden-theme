@@ -1,0 +1,30 @@
+{%- comment -%}
+  Ícono por nombre (Material Symbols) o imagen propia, que reemplaza al ícono.
+
+  Accepts:
+  - name: {String} nombre del ícono, por ejemplo 'local_shipping' (acepta metacampos de texto)
+  - filled: {Boolean} versión rellena
+  - image: {Object} imagen propia (opcional, gana sobre el nombre)
+  - size: {Number} tamaño en px (opcional; si no, hereda el tamaño de letra)
+  - class: {String} clases extra (opcional)
+
+  Usage:
+  {% render 'gad-icon', name: block.settings.icon, filled: block.settings.icon_filled, image: block.settings.icon_image %}
+{%- endcomment -%}
+{%- liquid
+  assign icon_name = name | strip | downcase | replace: ' ', '_' | replace: '-', '_'
+  assign icon_style = ''
+  if size != blank
+    assign icon_style = 'font-size:' | append: size | append: 'px;'
+  endif
+-%}
+{%- if image != blank -%}
+  {%- assign icon_px = size | default: 48 | times: 2 -%}
+  <span class="gad-icon gad-icon--image{% if class %} {{ class }}{% endif %}"{% if icon_style != '' %} style="{{ icon_style }}"{% endif %} aria-hidden="true">
+    {{- image | image_url: width: icon_px | image_tag: loading: 'lazy', alt: '', width: icon_px, height: icon_px -}}
+  </span>
+{%- elsif icon_name != blank -%}
+  <span class="gad-icon material-symbols-outlined{% if filled %} gad-icon--filled{% endif %}{% if class %} {{ class }}{% endif %}"{% if icon_style != '' %} style="{{ icon_style }}"{% endif %} aria-hidden="true" translate="no">
+    {{- icon_name | escape -}}
+  </span>
+{%- endif -%}

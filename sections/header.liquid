@@ -101,6 +101,12 @@
 </style>
 
 {%- style -%}
+  @media screen and (max-width: 749px) {
+    .header__heading-logo {
+      width: {{ settings.logo_width_mobile | default: settings.logo_width }}px;
+    }
+  }
+
   .header {
     padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
   }
@@ -189,8 +195,8 @@
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-            {% capture sizes %}(max-width: {{ settings.logo_width | times: 2 }}px) 50vw, {{ settings.logo_width }}px{% endcapture %}
-            {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+            {% capture sizes %}(max-width: 749px) {{ settings.logo_width_mobile | default: settings.logo_width }}px, {{ settings.logo_width }}px{% endcapture %}
+            {% capture widths %}{{ settings.logo_width_mobile | default: settings.logo_width }}, {{ settings.logo_width_mobile | default: settings.logo_width | times: 2 }}, {{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}{%- assign widths = widths | split: ', ' | uniq | join: ', ' -%}
             {{
               settings.logo
               | image_url: width: 600
@@ -232,8 +238,8 @@
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
             {%- assign logo_height = settings.logo_width | divided_by: settings.logo.aspect_ratio -%}
-            {% capture sizes %}(min-width: 750px) {{ settings.logo_width }}px, 50vw{% endcapture %}
-            {% capture widths %}{{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}
+            {% capture sizes %}(max-width: 749px) {{ settings.logo_width_mobile | default: settings.logo_width }}px, {{ settings.logo_width }}px{% endcapture %}
+            {% capture widths %}{{ settings.logo_width_mobile | default: settings.logo_width }}, {{ settings.logo_width_mobile | default: settings.logo_width | times: 2 }}, {{ settings.logo_width }}, {{ settings.logo_width | times: 1.5 | round }}, {{ settings.logo_width | times: 2 }}{% endcapture %}{%- assign widths = widths | split: ', ' | uniq | join: ', ' -%}
             {{
               settings.logo
               | image_url: width: 600

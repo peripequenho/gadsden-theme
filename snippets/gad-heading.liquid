@@ -1,0 +1,29 @@
+{%- comment -%}
+  Encabezado de sección con palabras resaltadas (T03): lo que el comerciante marca en negrita
+  en el título se pinta con el color de resaltado. Sin color elegido, usa el acento de la combinación.
+
+  Accepts:
+  - title: {String} título (texto corto con formato)
+  - size: {String} clase de tamaño de Dawn: 'h2', 'h1' o 'h0' (opcional, 'h1' por defecto)
+  - accent: {Color} color de resaltado (opcional)
+  - text: {String} texto con formato debajo del título (opcional)
+  - align: {String} 'left', 'center' o 'right' (opcional)
+  - tag: {String} etiqueta del título (opcional, 'h2' por defecto)
+  - class: {String} clases extra para el contenedor (opcional)
+
+  Usage:
+  {% render 'gad-heading', title: section.settings.heading, size: section.settings.heading_size, accent: section.settings.heading_accent, text: section.settings.text, align: 'center' %}
+{%- endcomment -%}
+{%- if title != blank or text != blank -%}
+  {%- assign heading_tag = tag | default: 'h2' -%}
+  <div class="gad-heading{% if align %} gad-heading--{{ align }}{% endif %}{% if class %} {{ class }}{% endif %}">
+    {%- if title != blank -%}
+      <{{ heading_tag }} class="gad-heading__title gad-hl inline-richtext {{ size | default: 'h1' }}"{% if accent != blank %} style="--gad-hl: {{ accent }};"{% endif %}>
+        {{- title -}}
+      </{{ heading_tag }}>
+    {%- endif -%}
+    {%- if text != blank -%}
+      <div class="gad-heading__text rte">{{ text }}</div>
+    {%- endif -%}
+  </div>
+{%- endif -%}

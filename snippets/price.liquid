@@ -113,8 +113,8 @@
       {%- endif -%}
     </div>
     {%- if show_badges -%}
-      <span class="badge price__badge-sale color-{{ settings.sale_badge_color_scheme }}">
-        {{ 'products.product.on_sale' | t }}
+      <span class="badge price__badge-sale gad-sale-badge color-{{ settings.sale_badge_color_scheme }}">
+        {%- render 'gad-sale-label', price: price, compare_at_price: compare_at_price -%}
       </span>
 
       <span class="badge price__badge-sold-out color-{{ settings.sold_out_badge_color_scheme }}">

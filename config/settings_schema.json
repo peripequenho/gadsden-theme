@@ -26,6 +26,17 @@
         "label": "t:settings_schema.logo.settings.logo_width.label"
       },
       {
+        "type": "range",
+        "id": "logo_width_mobile",
+        "min": 50,
+        "max": 300,
+        "step": 10,
+        "default": 90,
+        "unit": "px",
+        "label": "Ancho del logo en mobile",
+        "info": "En pantallas de menos de 750 px. El de arriba vale para desktop."
+      },
+      {
         "type": "image_picker",
         "id": "favicon",
         "label": "t:settings_schema.logo.settings.favicon.label",
@@ -36,6 +47,10 @@
   {
     "name": "t:settings_schema.colors.name",
     "settings": [
+      {
+        "type": "paragraph",
+        "content": "Gadsden arranca con cinco combinaciones: 1 · Fondo, 2 · Fondo alternativo, 3 · Acento 2, 4 · Inversa y 5 · Acento. Cada sección elige una, o usa sus colores propios desde la casilla \"Usar colores propios\"."
+      },
       {
         "type": "color_scheme_group",
         "id": "color_schemes",
@@ -57,6 +72,13 @@
             "id": "text",
             "label": "t:settings_schema.colors.settings.text.label",
             "default": "#121212"
+          },
+          {
+            "type": "color",
+            "id": "accent",
+            "label": "Acento",
+            "info": "Para las palabras resaltadas de los títulos, íconos y detalles de las secciones Gadsden.",
+            "default": "#334FB4"
           },
           {
             "type": "color",
@@ -209,6 +231,99 @@
         "default": true
       },
       {
+        "type": "checkbox",
+        "id": "reveal_repeat",
+        "default": false,
+        "label": "Repetir la aparición",
+        "info": "La sección vuelve a ocultarse al salir de pantalla y se anima otra vez al volver."
+      },
+      {
+        "type": "range",
+        "id": "reveal_duration",
+        "min": 300,
+        "max": 1000,
+        "step": 50,
+        "default": 650,
+        "unit": "ms",
+        "label": "Duración"
+      },
+      {
+        "type": "range",
+        "id": "reveal_delay",
+        "min": 0,
+        "max": 300,
+        "step": 30,
+        "default": 150,
+        "unit": "ms",
+        "label": "Retraso inicial"
+      },
+      {
+        "type": "range",
+        "id": "reveal_stagger",
+        "min": 0,
+        "max": 300,
+        "step": 30,
+        "default": 150,
+        "unit": "ms",
+        "label": "Retraso entre partes",
+        "info": "Las partes de una sección aparecen una detrás de otra con este intervalo."
+      },
+      {
+        "type": "header",
+        "content": "Cómo arrancan las partes"
+      },
+      {
+        "type": "range",
+        "id": "reveal_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 0,
+        "unit": "%",
+        "label": "Opacidad"
+      },
+      {
+        "type": "range",
+        "id": "reveal_x",
+        "min": -100,
+        "max": 100,
+        "step": 5,
+        "default": 0,
+        "unit": "%",
+        "label": "Corrimiento horizontal"
+      },
+      {
+        "type": "range",
+        "id": "reveal_y",
+        "min": -100,
+        "max": 100,
+        "step": 5,
+        "default": 0,
+        "unit": "%",
+        "label": "Corrimiento vertical"
+      },
+      {
+        "type": "range",
+        "id": "reveal_zoom",
+        "min": 100,
+        "max": 200,
+        "step": 5,
+        "default": 100,
+        "unit": "%",
+        "label": "Zoom"
+      },
+      {
+        "type": "header",
+        "content": "Accesibilidad"
+      },
+      {
+        "type": "checkbox",
+        "id": "motion_ignore_reduce",
+        "default": false,
+        "label": "Animar aunque el visitante pida reducir movimiento",
+        "info": "Por defecto, si el sistema del visitante pide reducir el movimiento, las apariciones, los pases automáticos y las cintas se quedan quietos."
+      },
+      {
         "type": "select",
         "id": "animations_hover_elements",
         "options": [
@@ -311,6 +426,67 @@
         "unit": "px",
         "label": "t:settings_schema.global.settings.blur.label",
         "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Efecto al pasar el mouse"
+      },
+      {
+        "type": "select",
+        "id": "button_fx_link",
+        "label": "Botones que llevan a otra página",
+        "options": [
+          {
+            "value": "none",
+            "label": "Ninguno"
+          },
+          {
+            "value": "glow",
+            "label": "Resplandor"
+          },
+          {
+            "value": "fill-center",
+            "label": "Relleno desde el centro"
+          },
+          {
+            "value": "fill-left",
+            "label": "Relleno de izquierda a derecha"
+          },
+          {
+            "value": "arrow",
+            "label": "Flecha junto al texto"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "select",
+        "id": "button_fx_action",
+        "label": "Botones de acción (agregar al carrito, pagar)",
+        "options": [
+          {
+            "value": "none",
+            "label": "Ninguno"
+          },
+          {
+            "value": "glow",
+            "label": "Resplandor"
+          },
+          {
+            "value": "fill-center",
+            "label": "Relleno desde el centro"
+          },
+          {
+            "value": "fill-left",
+            "label": "Relleno de izquierda a derecha"
+          },
+          {
+            "value": "arrow",
+            "label": "Flecha junto al texto"
+          }
+        ],
+        "default": "none",
+        "info": "En pantallas táctiles no hay \"pasar el mouse\": el efecto no se ve."
       }
     ]
   },
@@ -1259,10 +1435,40 @@
         "default": "scheme-5"
       },
       {
+        "type": "text",
+        "id": "sale_label_text",
+        "label": "Texto de la etiqueta de oferta",
+        "placeholder": "Ahorrás {porcentaje}",
+        "info": "Podés usar {porcentaje} y {monto} (lo que se ahorra). Vacío: dice \"Oferta\"."
+      },
+      {
+        "type": "checkbox",
+        "id": "sale_label_icon",
+        "default": true,
+        "label": "Mostrar ícono de descuento en la etiqueta"
+      },
+      {
         "type": "color_scheme",
         "id": "sold_out_badge_color_scheme",
         "label": "t:settings_schema.badges.settings.sold_out_badge_color_scheme.label",
         "default": "scheme-3"
+      },
+      {
+        "type": "header",
+        "content": "Etiquetas por tag"
+      },
+      {
+        "type": "text",
+        "id": "card_badges_tags",
+        "label": "Tags que se muestran como etiqueta",
+        "placeholder": "Nuevo, Más vendido",
+        "info": "Separados por comas. Si un producto tiene uno de estos tags, la tarjeta lo muestra como etiqueta. Podés usar {porcentaje}."
+      },
+      {
+        "type": "color_scheme",
+        "id": "card_badges_scheme",
+        "label": "Combinación de colores de las etiquetas por tag",
+        "default": "scheme-4"
       }
     ]
   },
@@ -1449,6 +1655,22 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Carrito vacío"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_continue_shopping",
+        "default": true,
+        "label": "Mostrar el botón \"Seguir comprando\""
+      },
+      {
+        "type": "url",
+        "id": "cart_continue_url",
+        "label": "Enlace del botón",
+        "info": "Vacío: lleva a todos los productos."
       }
     ]
   },
@@ -1464,6 +1686,116 @@
         "id": "customer_account_menu",
         "default": "customer-account-main-menu",
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
+      }
+    ]
+  },
+  {
+    "name": "Gadsden · Carruseles",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "El aspecto de las flechas y los puntos de todos los carruseles de la tienda."
+      },
+      {
+        "type": "header",
+        "content": "Flechas"
+      },
+      {
+        "type": "range",
+        "id": "carousel_arrow_size",
+        "min": 10,
+        "max": 80,
+        "step": 2,
+        "default": 40,
+        "unit": "px",
+        "label": "Tamaño del botón"
+      },
+      {
+        "type": "range",
+        "id": "carousel_arrow_radius",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 100,
+        "unit": "%",
+        "label": "Redondeo",
+        "info": "100 %: círculo. 0 %: cuadrado."
+      },
+      {
+        "type": "range",
+        "id": "carousel_arrow_icon",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "default": 50,
+        "unit": "%",
+        "label": "Tamaño del ícono"
+      },
+      {
+        "type": "header",
+        "content": "Puntos"
+      },
+      {
+        "type": "range",
+        "id": "carousel_dot_width",
+        "min": 2,
+        "max": 30,
+        "step": 1,
+        "default": 8,
+        "unit": "px",
+        "label": "Ancho"
+      },
+      {
+        "type": "range",
+        "id": "carousel_dot_height",
+        "min": 2,
+        "max": 30,
+        "step": 1,
+        "default": 8,
+        "unit": "px",
+        "label": "Alto"
+      },
+      {
+        "type": "range",
+        "id": "carousel_dot_active_scale",
+        "min": 100,
+        "max": 200,
+        "step": 5,
+        "default": 130,
+        "unit": "%",
+        "label": "Escala del punto activo"
+      },
+      {
+        "type": "range",
+        "id": "carousel_dot_gap",
+        "min": 1,
+        "max": 40,
+        "step": 1,
+        "default": 8,
+        "unit": "px",
+        "label": "Separación"
+      },
+      {
+        "type": "range",
+        "id": "carousel_dot_radius",
+        "min": 0,
+        "max": 15,
+        "step": 1,
+        "default": 8,
+        "unit": "px",
+        "label": "Redondeo"
+      }
+    ]
+  },
+  {
+    "name": "Gadsden · Seguridad",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "protect_content",
+        "default": false,
+        "label": "Proteger el contenido",
+        "info": "Desactiva el clic derecho, la selección de texto, el arrastre de imágenes y los atajos de las herramientas del navegador. No es una protección real: sólo le pone trabas a quien copia. Los campos de formulario siguen funcionando."
       }
     ]
   }
