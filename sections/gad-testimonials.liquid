@@ -1,0 +1,907 @@
+{%- liquid
+  assign s = section.settings
+  assign card_key = section.id | append: '-card'
+  assign star_class = ''
+  if s.empty_stars == 'outline'
+    assign star_class = ' gad-stars--outline'
+  elsif s.empty_stars == 'hidden'
+    assign star_class = ' gad-stars--hide-empty'
+  endif
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+{%- if s.card_style == 'custom' -%}
+  {%- render 'gad-colors', s: s, key: card_key, prefix: 'card_', force: true -%}
+{%- endif -%}
+
+<div
+  class="gad-testimonials gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --star: {{ s.star_color }}; --star-off: {{ s.star_empty_color }};{% if s.quotes_color != blank %} --quote: {{ s.quotes_color }};{% endif %}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="{% if s.full_width %}gad-testimonials__full{% else %}page-width{% endif %}">
+    {%- if s.heading != blank or s.text != blank -%}
+      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
+        {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      </div>
+    {%- endif -%}
+
+    {%- capture slides -%}
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div class="gad-testimonials__item" {{ block.shopify_attributes }}>
+          <figure class="gad-testimonials__card gad-testimonials--align-{{ s.text_align }} {% render 'gad-card-class', s: s, key: card_key %}">
+            {%- if s.show_quotes -%}
+              <span class="gad-testimonials__quote" aria-hidden="true">&ldquo;</span>
+            {%- endif -%}
+            {%- if b.video != blank or b.image != blank -%}
+              <div class="gad-testimonials__media gad-testimonials__media--{{ s.media_width }} gad-testimonials__media--{{ s.media_ratio }}">
+                {%- if b.video != blank -%}
+                  {%- render 'gad-video', video: b.video, poster: b.image, autoplay: false, loop: true, tap: true, width: 800 -%}
+                {%- else -%}
+                  {%- assign img_alt = b.image.alt | default: '' -%}
+                  {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 33vw, 90vw', widths: '300, 450, 600, 900' }}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- if s.show_stars -%}
+              <span class="gad-stars{{ star_class }}" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.rating }}">
+                {%- for i in (1..5) -%}
+                  <span class="gad-stars__star{% if i <= b.rating %} is-on{% endif %}" aria-hidden="true">
+                    {%- render 'gad-icon', name: 'star', filled: true -%}
+                  </span>
+                {%- endfor -%}
+              </span>
+            {%- endif -%}
+            <blockquote class="gad-testimonials__quote-body">
+              {%- if b.title != blank -%}
+                <p class="gad-testimonials__title h4">{{ b.title }}</p>
+              {%- endif -%}
+              {%- if b.text != blank -%}
+                <div class="gad-testimonials__text rte">{{ b.text }}</div>
+              {%- endif -%}
+            </blockquote>
+            {%- if b.author != blank or b.avatar != blank -%}
+              <figcaption class="gad-testimonials__author">
+                {%- if b.avatar != blank -%}
+                  {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', class: 'gad-testimonials__avatar', alt: '' }}
+                {%- endif -%}
+                {%- if b.author != blank -%}<span>{{ b.author }}</span>{%- endif -%}
+              </figcaption>
+            {%- endif -%}
+          </figure>
+        </div>
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
+        {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, m_per_view: 1 -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-testimonials__full {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .gad-testimonials__full {
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+
+  .gad-testimonials__item {
+    display: flex;
+  }
+
+  .gad-testimonials__card {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin: 0;
+    padding: 2.8rem 2.4rem;
+  }
+
+  .gad-testimonials__card.gad-card--box {
+    border-radius: var(--text-boxes-radius);
+  }
+
+  .gad-testimonials__card.gad-card--plain {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .gad-testimonials--align-left {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .gad-testimonials--align-center {
+    align-items: center;
+    text-align: center;
+  }
+
+  .gad-testimonials--align-right {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .gad-testimonials__quote {
+    position: absolute;
+    top: 0.4rem;
+    left: 1.6rem;
+    color: var(--quote, rgb(var(--color-accent)));
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 6.4rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .gad-testimonials--align-left .gad-testimonials__quote {
+    left: auto;
+    right: 1.6rem;
+  }
+
+  .gad-testimonials__media {
+    overflow: hidden;
+    width: 33%;
+    border-radius: var(--media-radius);
+  }
+
+  .gad-testimonials__media--half {
+    width: 50%;
+  }
+
+  .gad-testimonials__media--full {
+    width: 100%;
+  }
+
+  .gad-testimonials__media img,
+  .gad-testimonials__media gad-video,
+  .gad-testimonials__media video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-testimonials__media--portrait {
+    aspect-ratio: 3 / 4;
+  }
+
+  .gad-testimonials__media--square {
+    aspect-ratio: 1;
+  }
+
+  .gad-testimonials__media--circle {
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+
+  .gad-testimonials__quote-body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-style: normal;
+  }
+
+  .gad-testimonials__title {
+    margin: 0 0 0.6rem;
+    font-weight: 700;
+  }
+
+  .gad-testimonials__text p {
+    margin: 0;
+  }
+
+  .gad-testimonials__author {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: auto;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .gad-testimonials__avatar {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Testimonios",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que dicen nuestros clientes",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Tarjetas"
+    },
+    {
+      "type": "select",
+      "id": "media_width",
+      "label": "Ancho de la imagen o video",
+      "options": [
+        {
+          "value": "third",
+          "label": "Un tercio"
+        },
+        {
+          "value": "half",
+          "label": "La mitad"
+        },
+        {
+          "value": "full",
+          "label": "Completo"
+        }
+      ],
+      "default": "third"
+    },
+    {
+      "type": "select",
+      "id": "media_ratio",
+      "label": "Proporción",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "Adaptada a la imagen"
+        },
+        {
+          "value": "portrait",
+          "label": "Vertical"
+        },
+        {
+          "value": "square",
+          "label": "Cuadrada"
+        },
+        {
+          "value": "circle",
+          "label": "Círculo"
+        }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Alineación del texto",
+      "options": [
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        },
+        {
+          "value": "right",
+          "label": "Derecha"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stars",
+      "label": "Mostrar estrellas",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "empty_stars",
+      "label": "Estrellas vacías",
+      "options": [
+        {
+          "value": "filled",
+          "label": "Llenas de otro color"
+        },
+        {
+          "value": "outline",
+          "label": "En contorno"
+        },
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        }
+      ],
+      "default": "filled"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Color de las estrellas",
+      "default": "#F5B301"
+    },
+    {
+      "type": "color",
+      "id": "star_empty_color",
+      "label": "Color de las estrellas vacías",
+      "default": "#E1E1E1"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quotes",
+      "label": "Comillas decorativas",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "quotes_color",
+      "label": "Color de las comillas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Estilo de las tarjetas",
+      "options": [
+        {
+          "value": "none",
+          "label": "Sin tarjeta"
+        },
+        {
+          "value": "scheme",
+          "label": "Combinación de la paleta"
+        },
+        {
+          "value": "tint",
+          "label": "Velo claro"
+        },
+        {
+          "value": "custom",
+          "label": "Colores propios"
+        }
+      ],
+      "default": "tint",
+      "info": "Velo claro: un fondo apenas más oscuro que el de la sección."
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_color_scheme",
+      "label": "Combinación de las tarjetas",
+      "default": "scheme-2",
+      "info": "Sólo con \"Combinación de la paleta\"."
+    },
+    {
+      "type": "color",
+      "id": "card_cc_bg",
+      "label": "Fondo de las tarjetas",
+      "default": "#F3F3F3",
+      "info": "Sólo con \"Colores propios\"."
+    },
+    {
+      "type": "color_background",
+      "id": "card_cc_bg_gradient",
+      "label": "Degradé de las tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "card_cc_text",
+      "label": "Texto de las tarjetas",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Ancho"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Usar todo el ancho de la página",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "select",
+      "id": "car_type",
+      "label": "Tipo",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Clásico (se frena en los extremos)"
+        },
+        {
+          "value": "loop",
+          "label": "Infinito"
+        }
+      ],
+      "default": "loop"
+    },
+    {
+      "type": "select",
+      "id": "car_drag",
+      "label": "Arrastre con mouse o dedo",
+      "options": [
+        {
+          "value": "off",
+          "label": "Desactivado"
+        },
+        {
+          "value": "on",
+          "label": "Activado"
+        }
+      ],
+      "default": "on"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_autoplay",
+      "label": "Pase automático",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "car_speed",
+      "min": 1,
+      "max": 15,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Velocidad del pase",
+      "default": 6
+    },
+    {
+      "type": "color_scheme",
+      "id": "car_arrows_scheme",
+      "label": "Colores de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "car_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "d_carousel",
+      "label": "Mostrar como carrusel en desktop",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "d_per_view",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Tarjetas por fila",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "d_per_move",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "d_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "d_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "d_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "select",
+      "id": "d_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "sides"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_carousel",
+      "label": "Mostrar como carrusel en mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "m_per_move",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "m_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "m_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "m_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonio",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Si cargás un video, la imagen queda como miniatura."
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Se reproduce dentro de la tarjeta al tocarlo."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Calificación",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Excelente compra"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Contá acá la experiencia del cliente con sus palabras.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Avatar del autor"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "author",
+          "label": "Autor",
+          "default": "Nombre del cliente"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonios",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

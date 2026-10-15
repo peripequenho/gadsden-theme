@@ -1,0 +1,47 @@
+{%- comment -%}
+  Hasta 3 renglones de texto, cada uno con su ícono (por nombre o imagen), en columna o en fila,
+  con fondo opcional. Lo usan la cinta (S03), la ficha (PX8) y el carrito.
+  Los textos aceptan metacampos (texto corto con formato).
+
+  Accepts:
+  - b: {Object} settings del bloque. Ids: ti_text_1..3, ti_icon_1..3, ti_filled_1..3, ti_image_1..3,
+       ti_size_m, ti_size_d, ti_align, ti_color, ti_icon_scale, ti_icon_color, ti_width, ti_stack,
+       ti_gap, ti_bg, ti_bg_color, ti_radius, ti_padding, ti_border, ti_border_color
+  - key: {String} identificador único (block.id)
+  - attrs: {String} atributos extra del contenedor (opcional, ej. block.shopify_attributes)
+
+  Usage:
+  {% render 'gad-text-icons', b: block.settings, key: block.id, attrs: block.shopify_attributes %}
+{%- endcomment -%}
+{%- liquid
+  assign has_any = false
+  for i in (1..3)
+    assign k = 'ti_text_' | append: i
+    if b[k] != blank
+      assign has_any = true
+    endif
+  endfor
+  assign icon_px = b.ti_icon_scale | default: 120 | times: 0.16 | round
+-%}
+{%- if has_any -%}
+  <div
+    class="gad-ti gad-ti--{{ b.ti_stack | default: 'vertical' }} gad-ti--{{ b.ti_width | default: 'fit' }} gad-ti--align-{{ b.ti_align | default: 'left' }}{% if b.ti_bg %} gad-ti--bg{% endif %}"
+    style="--ti-size-m: {{ b.ti_size_m | default: 14 }}px; --ti-size-d: {{ b.ti_size_d | default: 16 }}px; --ti-gap: {{ b.ti_gap | default: 8 }}px; --ti-icon: {{ icon_px }}px;{% if b.ti_color != blank %} --ti-color: {{ b.ti_color }};{% endif %}{% if b.ti_icon_color != blank %} --gad-icon-color: {{ b.ti_icon_color }};{% endif %}{% if b.ti_bg %} --ti-bg: {{ b.ti_bg_color }}; --ti-radius: {{ b.ti_radius }}px; --ti-pad: {{ b.ti_padding }}px;{% if b.ti_border > 0 %} --ti-border: {{ b.ti_border }}px solid {{ b.ti_border_color }};{% endif %}{% endif %}"
+    {{ attrs }}
+  >
+    {%- for i in (1..3) -%}
+      {%- liquid
+        assign k_text = 'ti_text_' | append: i
+        assign k_icon = 'ti_icon_' | append: i
+        assign k_filled = 'ti_filled_' | append: i
+        assign k_image = 'ti_image_' | append: i
+      -%}
+      {%- if b[k_text] != blank -%}
+        <div class="gad-ti__row">
+          {%- render 'gad-icon', name: b[k_icon], filled: b[k_filled], image: b[k_image], class: 'gad-ti__icon' -%}
+          <span class="gad-ti__text">{{ b[k_text] }}</span>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+{%- endif -%}

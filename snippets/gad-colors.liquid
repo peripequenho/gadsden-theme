@@ -6,6 +6,7 @@
   - s: {Object} settings de la sección o del bloque
   - key: {String} identificador único (section.id, o section.id + '-' + block.id)
   - prefix: {String} prefijo de los ids, para juegos internos como las tarjetas (opcional, ej. 'card_')
+  - force: {Boolean} aplica los colores aunque no exista la casilla (estilos de tarjeta "propios")
 
   Ids que lee (con el prefijo delante): custom_colors, cc_bg, cc_bg_gradient, cc_bg_image,
   cc_bg_image_mobile, cc_text, cc_accent, cc_btn_bg, cc_btn_text, cc_outline
@@ -18,7 +19,7 @@
   assign p = prefix | default: ''
   assign k_on = p | append: 'custom_colors'
 -%}
-{%- if s[k_on] -%}
+{%- if s[k_on] or force -%}
   {%- liquid
     assign k = p | append: 'cc_bg'
     assign bg = s[k] | default: '#ffffff'

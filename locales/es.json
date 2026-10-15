@@ -548,6 +548,28 @@
       "next": "Diapositiva siguiente",
       "go_to": "Ir a la página {{ index }}",
       "slide_of": "{{ index }} de {{ count }}"
+    },
+    "video": {
+      "play": "Reproducir video",
+      "pause": "Pausar video",
+      "mute": "Silenciar",
+      "unmute": "Activar sonido"
+    },
+    "back_to_top": "Volver arriba",
+    "ticker": {
+      "hidden_here": "Esta cinta está oculta en esta página por su visibilidad por producto."
+    },
+    "reviews": {
+      "stars": "{{ count }} de 5 estrellas",
+      "verified": "Comprador verificado"
+    },
+    "compare": {
+      "benefit": "Beneficio",
+      "yes": "Incluido",
+      "no": "No incluido"
+    },
+    "before_after": {
+      "label": "Arrastrá para comparar el antes y el después"
     }
   }
 }

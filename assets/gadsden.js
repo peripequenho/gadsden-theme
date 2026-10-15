@@ -223,6 +223,7 @@ class GadCarousel extends HTMLElement {
     this.type = this.dataset.type || 'classic';
     this.drag = this.dataset.drag || 'on';
     this.speed = parseFloat(this.dataset.autoplay) || 0;
+    this.center = this.dataset.center === 'true';
     this.cfg = { d: this.readCfg('d'), m: this.readCfg('m') };
     this.index = 0;
     this.x = 0;
@@ -310,7 +311,7 @@ class GadCarousel extends HTMLElement {
     this.n = this.originals.length;
     this.pv = this.fade ? 1 : Math.max(1, parseInt(this.c.pv, 10) || 1);
     this.pm = Math.max(1, Math.min(parseInt(this.c.pm, 10) || 1, this.pv));
-    this.isOn = !!this.c.on && this.n > this.pv;
+    this.isOn = !!this.c.on && (this.n > this.pv || (this.center && this.n > 1));
     this.classList.toggle('is-active', this.isOn);
     this.classList.toggle('is-static', !this.isOn);
     this.classList.toggle('is-draggable', this.isOn && this.drag !== 'off' && !this.fade);
@@ -390,7 +391,7 @@ class GadCarousel extends HTMLElement {
   }
 
   maxIndex() {
-    if (this.loop || this.fade) return this.n - 1;
+    if (this.loop || this.fade || this.center) return this.n - 1;
     return Math.max(0, this.n - this.pv);
   }
 
@@ -420,7 +421,8 @@ class GadCarousel extends HTMLElement {
   measure() {
     const first = this.originals[0];
     const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
-    this.slideW = first.getBoundingClientRect().width;
+    // ancho de layout (sin transformaciones: en modo centrado las vecinas están escaladas)
+    this.slideW = parseFloat(getComputedStyle(first).width) || first.offsetWidth;
     this.step = this.slideW + gap;
     this.viewW = this.viewport.clientWidth;
     this.peek = Math.max(0, parseFloat(this.c.peek) || 0);
@@ -429,6 +431,11 @@ class GadCarousel extends HTMLElement {
 
   posFor(i) {
     if (this.fade) return 0;
+    if (this.center) {
+      const offset = (this.viewW - this.slideW) / 2;
+      if (this.loop) return (i + this.k) * this.step - offset;
+      return i * this.step - offset;
+    }
     if (this.loop) return (i + this.k) * this.step - this.peek;
     let x = i * this.step;
     if (this.c.edge) return Math.min(Math.max(0, x), Math.max(0, this.contentW - this.viewW));
@@ -523,8 +530,15 @@ class GadCarousel extends HTMLElement {
     const visible = [];
     this.originals.forEach((el, i) => {
       let rel = i - real;
-      if (this.loop && rel < 0) rel += this.n;
-      const isVisible = rel >= 0 && rel < this.pv;
+      let isVisible;
+      if (this.center) {
+        let dist = Math.abs(rel);
+        if (this.loop) dist = Math.min(dist, this.n - dist);
+        isVisible = dist <= Math.ceil((this.pv - 1) / 2);
+      } else {
+        if (this.loop && rel < 0) rel += this.n;
+        isVisible = rel >= 0 && rel < this.pv;
+      }
       el.classList.toggle('is-active', i === real);
       el.classList.toggle('is-visible', isVisible);
       el.inert = !isVisible;
@@ -685,3 +699,219 @@ class GadCarousel extends HTMLElement {
 }
 
 if (!customElements.get('gad-carousel')) customElements.define('gad-carousel', GadCarousel);
+
+/* ---------- video con carga diferida, play/pausa, sonido y línea de tiempo ---------- */
+class GadVideo extends HTMLElement {
+  connectedCallback() {
+    if (this._ready) return;
+    this._ready = true;
+    this.video = this.querySelector('video');
+    if (!this.video) return;
+    this.autoplay = this.dataset.autoplay === 'true' && !Gadsden.reduceMotion();
+    this.classList.toggle('gad-video--tap', this.classList.contains('gad-video--tap') || !this.autoplay);
+    this.playBtn = this.querySelector('.gad-video__play');
+    this.soundBtn = this.querySelector('.gad-video__sound');
+    this.bar = this.querySelector('.gad-video__timeline span');
+    this.inView = false;
+    this.slideVisible = true;
+    this.userPaused = false;
+
+    if (this.playBtn) this.playBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggle();
+    });
+    if (this.classList.contains('gad-video--tap'))
+      this.video.addEventListener('click', () => this.toggle());
+    if (this.soundBtn) this.soundBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.setMuted(!this.video.muted);
+    });
+    this.video.addEventListener('play', () => this.sync());
+    this.video.addEventListener('pause', () => this.sync());
+    if (this.bar)
+      this.video.addEventListener('timeupdate', () => {
+        const d = this.video.duration;
+        this.bar.style.width = d ? `${(this.video.currentTime / d) * 100}%` : '0%';
+      });
+
+    this.slide = this.closest('.gad-carousel__slide');
+    const carousel = this.closest('gad-carousel');
+    if (carousel && this.slide) {
+      this.onSlides = () => {
+        this.slideVisible = this.slide.classList.contains('is-visible') || !carousel.classList.contains('is-active');
+        this.decide();
+      };
+      carousel.addEventListener('gad:carousel:change', this.onSlides);
+      this.carousel = carousel;
+    }
+
+    this.io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          this.inView = entry.isIntersecting;
+          if (this.inView && this.video.preload === 'none') this.video.preload = 'auto';
+          this.decide();
+        });
+      },
+      { rootMargin: '200px 0px' }
+    );
+    this.io.observe(this);
+    this.sync();
+  }
+
+  disconnectedCallback() {
+    if (this.io) this.io.disconnect();
+    if (this.carousel && this.onSlides) this.carousel.removeEventListener('gad:carousel:change', this.onSlides);
+    this._ready = false;
+  }
+
+  decide() {
+    const shouldPlay = this.inView && this.slideVisible;
+    if (!shouldPlay) {
+      if (!this.video.paused) this.video.pause();
+      return;
+    }
+    if (this.autoplay && !this.userPaused && this.video.paused) {
+      this.video.muted = this.soundBtn ? this.video.muted : true;
+      const p = this.video.play();
+      if (p && p.catch) p.catch(() => this.sync());
+    }
+  }
+
+  toggle() {
+    if (this.video.paused) {
+      this.userPaused = false;
+      if (this.video.preload === 'none') this.video.preload = 'auto';
+      this.video.play().catch(() => {});
+    } else {
+      this.userPaused = true;
+      this.video.pause();
+    }
+  }
+
+  setMuted(muted) {
+    this.video.muted = muted;
+    if (!muted && this.video.paused) this.toggle();
+    this.sync();
+  }
+
+  sync() {
+    const playing = !this.video.paused;
+    this.classList.toggle('is-playing', playing);
+    if (this.playBtn) this.playBtn.setAttribute('aria-label', playing ? this.playBtn.dataset.labelPause : this.playBtn.dataset.labelPlay);
+    if (this.soundBtn) {
+      this.classList.toggle('is-muted', this.video.muted);
+      this.soundBtn.setAttribute('aria-pressed', String(!this.video.muted));
+      this.soundBtn.setAttribute('aria-label', this.video.muted ? this.soundBtn.dataset.labelUnmute : this.soundBtn.dataset.labelMute);
+    }
+  }
+}
+
+if (!customElements.get('gad-video')) customElements.define('gad-video', GadVideo);
+
+/* ---------- T11: botón de agregar al carrito dentro de secciones ---------- */
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest && e.target.closest('[data-gad-atc]');
+  if (!btn || btn.getAttribute('aria-disabled') === 'true') return;
+  e.preventDefault();
+  const skip = btn.dataset.skipCart === 'true';
+  const box = btn.closest('.gad-atc');
+  const errorEl = box && box.querySelector('.gad-atc__error');
+  let body;
+
+  if (btn.dataset.gadAtc === 'main') {
+    const form = document.querySelector('product-form form[data-type="add-to-cart-form"]');
+    if (!form) return;
+    if (!skip) {
+      if (form.requestSubmit) form.requestSubmit();
+      else form.querySelector('[type="submit"]').click();
+      return;
+    }
+    body = new FormData(form);
+  } else {
+    body = new FormData();
+    body.append('id', btn.dataset.variantId);
+    body.append('quantity', '1');
+  }
+
+  const cart = document.querySelector('cart-drawer') || document.querySelector('cart-notification');
+  if (cart && !skip && cart.getSectionsToRender) {
+    body.append('sections', cart.getSectionsToRender().map((s) => s.id));
+    body.append('sections_url', window.location.pathname);
+    if (cart.setActiveElement) cart.setActiveElement(btn);
+  }
+
+  if (errorEl) errorEl.hidden = true;
+  btn.setAttribute('aria-disabled', 'true');
+  btn.classList.add('loading');
+  const spinner = btn.querySelector('.loading__spinner');
+  if (spinner) spinner.classList.remove('hidden');
+
+  fetch(window.routes.cart_add_url, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/javascript' },
+    body,
+  })
+    .then((r) => r.json())
+    .then((res) => {
+      if (res.status) {
+        if (errorEl) {
+          errorEl.textContent = res.description || res.message || window.cartStrings.error;
+          errorEl.hidden = false;
+        }
+        return;
+      }
+      if (skip) {
+        window.location.href = `${(window.Shopify && Shopify.routes && Shopify.routes.root) || '/'}checkout`;
+        return;
+      }
+      if (!cart || !cart.renderContents) {
+        window.location.href = window.routes.cart_url;
+        return;
+      }
+      if (typeof publish === 'function' && window.PUB_SUB_EVENTS)
+        publish(PUB_SUB_EVENTS.cartUpdate, { source: 'gad-atc', productVariantId: body.get('id'), cartData: res });
+      cart.classList.remove('is-empty');
+      cart.renderContents(res);
+    })
+    .catch(() => {
+      if (errorEl) {
+        errorEl.textContent = window.cartStrings.error;
+        errorEl.hidden = false;
+      }
+    })
+    .finally(() => {
+      btn.classList.remove('loading');
+      btn.removeAttribute('aria-disabled');
+      if (spinner) spinner.classList.add('hidden');
+    });
+});
+
+/* ---------- S11: volver arriba ---------- */
+(function () {
+  const btn = document.querySelector('.gad-top');
+  if (!btn) return;
+  btn.hidden = false;
+  const after = parseInt(btn.dataset.after, 10) || 0;
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    btn.classList.toggle('is-visible', window.scrollY > after && document.documentElement.scrollHeight > window.innerHeight + after);
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    },
+    { passive: true }
+  );
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: Gadsden.reduceMotion() ? 'auto' : 'smooth' });
+    const target = document.getElementById('MainContent');
+    if (target) target.focus({ preventScroll: true });
+  });
+  update();
+})();

@@ -1788,6 +1788,75 @@
     ]
   },
   {
+    "name": "Gadsden · Volver arriba",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "back_to_top",
+        "label": "Mostrar el botón para volver arriba",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "back_to_top_after",
+        "min": 0,
+        "max": 1000,
+        "step": 50,
+        "unit": "px",
+        "label": "Aparece después de bajar",
+        "default": 400
+      },
+      {
+        "type": "color_scheme",
+        "id": "back_to_top_scheme",
+        "label": "Combinación de colores",
+        "default": "scheme-4",
+        "info": "El botón toma el color de los botones llenos de la combinación."
+      },
+      {
+        "type": "select",
+        "id": "back_to_top_position",
+        "label": "Posición",
+        "options": [
+          {
+            "value": "left",
+            "label": "Abajo a la izquierda"
+          },
+          {
+            "value": "center",
+            "label": "Abajo al centro"
+          },
+          {
+            "value": "right",
+            "label": "Abajo a la derecha"
+          }
+        ],
+        "default": "right"
+      },
+      {
+        "type": "range",
+        "id": "back_to_top_x",
+        "min": 0,
+        "max": 100,
+        "step": 4,
+        "unit": "px",
+        "label": "Separación del costado",
+        "default": 20,
+        "info": "No se usa si está al centro."
+      },
+      {
+        "type": "range",
+        "id": "back_to_top_y",
+        "min": 0,
+        "max": 150,
+        "step": 5,
+        "unit": "px",
+        "label": "Separación de abajo",
+        "default": 20
+      }
+    ]
+  },
+  {
     "name": "Gadsden · Seguridad",
     "settings": [
       {

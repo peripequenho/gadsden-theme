@@ -1,0 +1,22 @@
+{%- comment -%}
+  Clases de las tarjetas de una sección según su estilo: sin tarjeta, combinación de la paleta,
+  velo claro o colores propios. Con colores propios, la sección imprime antes
+  {% render 'gad-colors', s: s, key: key, prefix: 'card_', force: true %}.
+
+  Accepts:
+  - s: {Object} settings de la sección (lee card_style y card_color_scheme)
+  - key: {String} el mismo identificador que se le pasó a gad-colors
+
+  Usage:
+  <div class="gad-card {% render 'gad-card-class', s: section.settings, key: card_key %}">
+{%- endcomment -%}
+{%- case s.card_style -%}
+  {%- when 'scheme' -%}
+    gad-card--box color-{{ s.card_color_scheme | default: 'scheme-1' }} gradient
+  {%- when 'tint' -%}
+    gad-card--box gad-tint
+  {%- when 'custom' -%}
+    gad-card--box gad-cc gad-cc-{{ key }} gradient
+  {%- else -%}
+    gad-card--plain
+{%- endcase -%}

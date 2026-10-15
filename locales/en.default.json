@@ -537,6 +537,28 @@
       "next": "Next slide",
       "go_to": "Go to page {{ index }}",
       "slide_of": "{{ index }} of {{ count }}"
+    },
+    "video": {
+      "play": "Play video",
+      "pause": "Pause video",
+      "mute": "Mute",
+      "unmute": "Turn sound on"
+    },
+    "back_to_top": "Back to top",
+    "ticker": {
+      "hidden_here": "This ticker is hidden on this page because of its product visibility settings."
+    },
+    "reviews": {
+      "stars": "{{ count }} out of 5 stars",
+      "verified": "Verified buyer"
+    },
+    "compare": {
+      "benefit": "Benefit",
+      "yes": "Included",
+      "no": "Not included"
+    },
+    "before_after": {
+      "label": "Drag to compare before and after"
     }
   }
 }

@@ -1,0 +1,807 @@
+{%- liquid
+  assign s = section.settings
+  assign card_key = section.id | append: '-card'
+  case s.icon_size
+    when 'small'
+      assign icon_px = 28
+    when 'large'
+      assign icon_px = 56
+    else
+      assign icon_px = 40
+  endcase
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+{%- if s.card_style == 'custom' -%}
+  {%- render 'gad-colors', s: s, key: card_key, prefix: 'card_', force: true -%}
+{%- endif -%}
+
+<div
+  class="gad-icon-bar gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --icon-px: {{ icon_px }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="{% unless s.full_width %}page-width{% else %}gad-icon-bar__full{% endunless %}">
+    {%- if s.heading != blank or s.text != blank -%}
+      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
+        {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      </div>
+    {%- endif -%}
+
+    {%- capture slides -%}
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div class="gad-icon-bar__item" {{ block.shopify_attributes }}>
+          <div class="gad-icon-bar__card gad-icon-bar__card--{{ s.layout }} {% render 'gad-card-class', s: s, key: card_key %}">
+            {%- if b.icon_image != blank or b.icon != blank -%}
+              <span class="gad-icon-bar__icon gad-accent-{{ s.icon_color }}">
+                {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: icon_px -%}
+              </span>
+            {%- endif -%}
+            {%- if b.title != blank or b.text != blank -%}
+              <div class="gad-icon-bar__body">
+                {%- if b.title != blank -%}
+                  <h3 class="gad-icon-bar__title">
+                    {%- if b.link != blank -%}
+                      <a href="{{ b.link }}" class="full-unstyled-link">{{ b.title }}</a>
+                    {%- else -%}
+                      {{ b.title }}
+                    {%- endif -%}
+                  </h3>
+                {%- endif -%}
+                {%- if b.text != blank -%}
+                  <div class="gad-icon-bar__text rte">{{ b.text }}</div>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
+        {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-icon-bar__full {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-icon-bar__full {
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  .gad-icon-bar__item {
+    display: flex;
+  }
+
+  .gad-icon-bar__card {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    text-align: center;
+  }
+
+  .gad-icon-bar__card.gad-card--box {
+    padding: 2.4rem 2rem;
+    border-radius: var(--text-boxes-radius);
+  }
+
+  .gad-icon-bar__card--horizontal {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+  }
+
+  .gad-icon-bar__icon {
+    display: inline-flex;
+    font-size: var(--icon-px);
+    line-height: 1;
+  }
+
+  .gad-icon-bar__icon .gad-icon {
+    font-size: var(--icon-px);
+  }
+
+  .gad-icon-bar__title {
+    margin: 0;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .gad-icon-bar__text {
+    margin-top: 0.4rem;
+    font-size: 1.4rem;
+  }
+
+  .gad-icon-bar__text p {
+    margin: 0;
+  }
+
+  .gad-accent-accent {
+    --gad-icon-color: rgb(var(--color-accent));
+  }
+
+  .gad-accent-text {
+    --gad-icon-color: rgb(var(--color-foreground));
+  }
+
+  .gad-accent-button {
+    --gad-icon-color: rgb(var(--color-button));
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Barra de íconos",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Comprá con tranquilidad",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "header",
+      "content": "Íconos"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposición",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "Ícono arriba del texto"
+        },
+        {
+          "value": "horizontal",
+          "label": "Ícono al costado"
+        }
+      ],
+      "default": "vertical"
+    },
+    {
+      "type": "select",
+      "id": "icon_size",
+      "label": "Tamaño de los íconos",
+      "options": [
+        {
+          "value": "small",
+          "label": "Chico"
+        },
+        {
+          "value": "medium",
+          "label": "Mediano"
+        },
+        {
+          "value": "large",
+          "label": "Grande"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "icon_color",
+      "label": "Color de los íconos",
+      "options": [
+        {
+          "value": "accent",
+          "label": "Acento de la combinación"
+        },
+        {
+          "value": "text",
+          "label": "Texto"
+        },
+        {
+          "value": "button",
+          "label": "Botón"
+        }
+      ],
+      "default": "accent"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Tarjetas"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Estilo de las tarjetas",
+      "options": [
+        {
+          "value": "none",
+          "label": "Sin tarjeta"
+        },
+        {
+          "value": "scheme",
+          "label": "Combinación de la paleta"
+        },
+        {
+          "value": "tint",
+          "label": "Velo claro"
+        },
+        {
+          "value": "custom",
+          "label": "Colores propios"
+        }
+      ],
+      "default": "none",
+      "info": "Velo claro: un fondo apenas más oscuro que el de la sección."
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_color_scheme",
+      "label": "Combinación de las tarjetas",
+      "default": "scheme-2",
+      "info": "Sólo con \"Combinación de la paleta\"."
+    },
+    {
+      "type": "color",
+      "id": "card_cc_bg",
+      "label": "Fondo de las tarjetas",
+      "default": "#F3F3F3",
+      "info": "Sólo con \"Colores propios\"."
+    },
+    {
+      "type": "color_background",
+      "id": "card_cc_bg_gradient",
+      "label": "Degradé de las tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "card_cc_text",
+      "label": "Texto de las tarjetas",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Ancho"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Usar todo el ancho de la página",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "select",
+      "id": "car_type",
+      "label": "Tipo",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Clásico (se frena en los extremos)"
+        },
+        {
+          "value": "loop",
+          "label": "Infinito"
+        }
+      ],
+      "default": "loop"
+    },
+    {
+      "type": "select",
+      "id": "car_drag",
+      "label": "Arrastre con mouse o dedo",
+      "options": [
+        {
+          "value": "off",
+          "label": "Desactivado"
+        },
+        {
+          "value": "on",
+          "label": "Activado"
+        }
+      ],
+      "default": "on"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_autoplay",
+      "label": "Pase automático",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "car_speed",
+      "min": 1,
+      "max": 15,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Velocidad del pase",
+      "default": 4
+    },
+    {
+      "type": "color_scheme",
+      "id": "car_arrows_scheme",
+      "label": "Colores de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "car_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "d_carousel",
+      "label": "Mostrar como carrusel en desktop",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "d_per_view",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Columnas",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "d_per_move",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "d_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "d_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "d_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "select",
+      "id": "d_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "sides"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_carousel",
+      "label": "Mostrar como carrusel en mobile",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "m_per_view",
+      "label": "Columnas",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "m_per_move",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "m_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "m_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "m_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "icon",
+      "name": "Ícono",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "default": "verified_user",
+          "info": "Nombre en inglés de Material Symbols (fonts.google.com/icons), ej. local_shipping."
+        },
+        {
+          "type": "checkbox",
+          "id": "icon_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Ícono propio (imagen)",
+          "info": "Reemplaza al ícono por nombre."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Beneficio"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace del título"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barra de íconos",
+      "blocks": [
+        {
+          "type": "icon",
+          "settings": {
+            "icon": "verified_user",
+            "title": "Pago seguro"
+          }
+        },
+        {
+          "type": "icon",
+          "settings": {
+            "icon": "local_shipping",
+            "title": "Envíos a todo el país"
+          }
+        },
+        {
+          "type": "icon",
+          "settings": {
+            "icon": "inventory_2",
+            "title": "Cambios y devoluciones"
+          }
+        },
+        {
+          "type": "icon",
+          "settings": {
+            "icon": "support_agent",
+            "title": "Atención personalizada"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

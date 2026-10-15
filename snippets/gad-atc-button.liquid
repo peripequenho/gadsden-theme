@@ -1,0 +1,62 @@
+{%- comment -%}
+  Botón de agregar al carrito dentro de secciones (T11).
+  - Con producto asignado: agrega la primera variante disponible de ese producto.
+  - Sin producto, en una ficha: hace lo mismo que el botón principal (variante y cantidad elegidas).
+  - Sin producto y fuera de una ficha: no se muestra (no hay qué agregar).
+  - Producto agotado: botón deshabilitado con el texto "Agotado".
+
+  Accepts:
+  - label: {String} texto del botón (sin texto no se muestra)
+  - product: {Object} producto asignado (opcional)
+  - skip_cart: {Boolean} ir directo al pago
+  - secondary: {Boolean} estilo contorno (opcional)
+  - class: {String} clases extra del contenedor (opcional)
+
+  Usage:
+  {% render 'gad-atc-button', label: section.settings.atc_label, product: section.settings.atc_product, skip_cart: section.settings.atc_skip_cart %}
+{%- endcomment -%}
+{%- liquid
+  assign mode = ''
+  if product != blank
+    assign mode = 'variant'
+    assign variant = product.selected_or_first_available_variant
+  elsif request.page_type == 'product'
+    assign mode = 'main'
+  endif
+-%}
+{%- if label != blank and mode != '' -%}
+  {%- liquid
+    assign sold_out = false
+    if mode == 'variant'
+      if product.available == false or variant.available == false
+        assign sold_out = true
+      endif
+    endif
+  -%}
+  <div class="gad-atc{% if class %} {{ class }}{% endif %}">
+    <button
+      type="button"
+      class="button gad-atc__btn{% if secondary %} button--secondary{% endif %}"
+      data-gad-atc="{{ mode }}"
+      {% if mode == 'variant' %}
+        data-variant-id="{{ variant.id }}"
+      {% endif %}
+      {% if skip_cart %}
+        data-skip-cart="true"
+      {% endif %}
+      {% if sold_out %}
+        disabled aria-disabled="true"
+      {% endif %}
+    >
+      <span class="gad-atc__label">
+        {%- if sold_out -%}
+          {{- 'products.product.sold_out' | t -}}
+        {%- else -%}
+          {{- label | escape -}}
+        {%- endif -%}
+      </span>
+      {%- render 'loading-spinner' -%}
+    </button>
+    <p class="gad-atc__error" role="alert" hidden></p>
+  </div>
+{%- endif -%}

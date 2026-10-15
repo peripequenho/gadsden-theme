@@ -1,0 +1,1039 @@
+{%- liquid
+  assign s = section.settings
+  assign show_nav = true
+  if section.blocks.size < 2 and request.design_mode == false
+    assign show_nav = false
+  endif
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+
+<div
+  class="gad-tabs-section gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- if s.heading != blank or s.text != blank -%}
+      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
+        {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <gad-tabs
+        class="gad-tabs gad-tabs--{{ s.width }} gad-tabs--d-{{ s.layout }} gad-tabs--{{ s.active_style }} gad-tabs--{{ s.nav_style }}{% if s.stretch_d %} gad-tabs--stretch-d{% endif %}{% if s.stretch_m %} gad-tabs--stretch-m{% endif %}{% if s.custom_buttons %} gad-tabs--custom{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+        style="--tab-radius: {{ s.button_radius }}px; --tab-size-d: {{ s.font_size_d }}px; --tab-size-m: {{ s.font_size_m }}px;{% if s.custom_buttons %} --tab-color: {{ s.button_color }}; --tab-active-text: {{ s.button_active_text }};{% endif %}"
+        {% if settings.animations_reveal_on_scroll %}
+          data-cascade
+        {% endif %}
+      >
+        {%- if show_nav -%}
+          <div class="gad-tabs__nav" role="tablist">
+            <span class="gad-tabs__indicator" aria-hidden="true"></span>
+            {%- for block in section.blocks -%}
+              <button
+                type="button"
+                role="tab"
+                id="GadTab-{{ block.id }}"
+                class="gad-tabs__btn{% if forloop.first %} is-active{% endif %}"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-controls="GadTabPanel-{{ block.id }}"
+                tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+                data-block-id="{{ block.id }}"
+              >
+                {%- if block.settings.icon != blank -%}
+                  {%- render 'gad-icon', name: block.settings.icon, filled: block.settings.icon_filled, class: 'gad-tabs__btn-icon' -%}
+                {%- endif -%}
+                <span>{{ block.settings.label | default: forloop.index }}</span>
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        <div class="gad-tabs__panels">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign b = block.settings
+              assign has_media = false
+              if b.image != blank or b.video != blank
+                assign has_media = true
+              endif
+            -%}
+            <div
+              id="GadTabPanel-{{ block.id }}"
+              role="tabpanel"
+              aria-labelledby="GadTab-{{ block.id }}"
+              class="gad-tabs__panel{% if has_media %} has-media gad-tabs__panel--{{ b.media_width }} gad-tabs__panel--media-{{ b.media_position }} gad-tabs__panel--m-media-{{ b.m_media_position }}{% endif %}"
+              {% unless forloop.first %}
+                hidden
+              {% endunless %}
+              {{ block.shopify_attributes }}
+            >
+              {%- if has_media -%}
+                <div class="gad-tabs__media">
+                  {%- if b.video != blank -%}
+                    {%- render 'gad-video',
+                      video: b.video,
+                      poster: b.image,
+                      autoplay: b.autoplay,
+                      loop: b.loop,
+                      tap: true,
+                      pulse: b.pulse,
+                      button_scheme: b.play_scheme,
+                      width: 1500
+                    -%}
+                  {%- else -%}
+                    {%- assign img_alt = b.image.alt | default: '' -%}
+                    {{ b.image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 50vw, 100vw', widths: '375, 550, 750, 1100, 1500' }}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+              <div class="gad-tabs__body gad-tabs--a-{{ b.align }} gad-tabs--m-a-{{ b.m_align }}">
+                {%- if b.title != blank -%}
+                  <h3 class="gad-tabs__title gad-hl {{ b.title_size }}"{% if b.title_accent != blank %} style="--gad-hl: {{ b.title_accent }};"{% endif %}>{{ b.title }}</h3>
+                {%- endif -%}
+                {%- if b.text != blank -%}
+                  <div class="gad-tabs__text rte">{{ b.text }}</div>
+                {%- endif -%}
+                {%- if b.button_label != blank or b.atc_label != blank -%}
+                  <div class="gad-buttons gad-tabs__buttons">
+                    {%- if b.button_label != blank -%}
+                      <a
+                        {% if b.button_link == blank %}
+                          role="link" aria-disabled="true"
+                        {% else %}
+                          href="{{ b.button_link }}"
+                        {% endif %}
+                        class="button{% if b.button_outline %} button--secondary{% else %} button--primary{% endif %}"
+                      >
+                        {{- b.button_label | escape -}}
+                      </a>
+                    {%- endif -%}
+                    {%- render 'gad-atc-button', label: b.atc_label, product: b.atc_product, skip_cart: b.atc_skip_cart -%}
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+      </gad-tabs>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  gad-tabs {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    --tab-color: rgb(var(--color-button));
+    --tab-active-text: rgb(var(--color-button-text));
+  }
+
+  .gad-tabs--xs {
+    max-width: 48rem;
+  }
+
+  .gad-tabs--s {
+    max-width: 72rem;
+  }
+
+  .gad-tabs--m {
+    max-width: 96rem;
+  }
+
+  .gad-tabs__nav {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 3.2rem;
+    padding: 0.4rem;
+    border: 0.1rem solid var(--tab-color);
+    border-radius: calc(var(--tab-radius) + 0.4rem);
+  }
+
+  .gad-tabs--shadow .gad-tabs__nav {
+    border-color: transparent;
+    box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.12);
+    background: rgb(var(--color-background));
+  }
+
+  .gad-tabs__indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    height: 0;
+    border-radius: var(--tab-radius);
+    background: var(--tab-color);
+    transition: transform var(--duration-long) var(--ease-out-slow), width var(--duration-long) var(--ease-out-slow),
+      height var(--duration-long) var(--ease-out-slow);
+    pointer-events: none;
+  }
+
+  .gad-tabs--fade .gad-tabs__indicator {
+    display: none;
+  }
+
+  .gad-tabs__btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1rem 1.8rem;
+    border: 0;
+    border-radius: var(--tab-radius);
+    background: transparent;
+    color: var(--tab-color);
+    font-family: inherit;
+    font-size: var(--tab-size-m);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--duration-default) ease, opacity var(--duration-default) ease, background-color var(--duration-default) ease;
+  }
+
+  .gad-tabs__btn.is-active {
+    color: var(--tab-active-text);
+  }
+
+  .gad-tabs--fade .gad-tabs__btn {
+    background: var(--tab-color);
+    color: var(--tab-active-text);
+    opacity: 0.45;
+  }
+
+  .gad-tabs--fade .gad-tabs__btn.is-active {
+    opacity: 1;
+  }
+
+  .gad-tabs__btn-icon {
+    font-size: 1.3em;
+  }
+
+  .gad-tabs__btn p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-tabs--stretch-m .gad-tabs__nav {
+      width: 100%;
+    }
+
+    .gad-tabs--stretch-m .gad-tabs__btn {
+      flex: 1 1 0;
+    }
+  }
+
+  .gad-tabs__panel {
+    display: grid;
+    gap: 2.4rem;
+    align-items: center;
+    animation: gadTabIn var(--duration-medium) ease;
+  }
+
+  .gad-tabs__panel[hidden] {
+    display: none;
+  }
+
+  html.gad-reduce .gad-tabs__panel {
+    animation: none;
+  }
+
+  @keyframes gadTabIn {
+    from {
+      opacity: 0;
+      transform: translateY(0.8rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .gad-tabs__media {
+    overflow: hidden;
+    border-radius: var(--media-radius);
+  }
+
+  .gad-tabs__media img,
+  .gad-tabs__media video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .gad-tabs__panel--m-media-second .gad-tabs__media {
+    order: 2;
+  }
+
+  .gad-tabs__title {
+    margin: 0 0 1.2rem;
+  }
+
+  .gad-tabs__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .gad-tabs__buttons {
+    margin-top: 2rem;
+  }
+
+  .gad-tabs--m-a-left {
+    text-align: left;
+  }
+
+  .gad-tabs--m-a-center {
+    text-align: center;
+  }
+
+  .gad-tabs--m-a-center .gad-buttons {
+    justify-content: center;
+  }
+
+  .gad-tabs--m-a-right {
+    text-align: right;
+  }
+
+  .gad-tabs--m-a-right .gad-buttons {
+    justify-content: flex-end;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-tabs__btn {
+      font-size: var(--tab-size-d);
+    }
+
+    .gad-tabs--stretch-d .gad-tabs__nav {
+      width: 100%;
+    }
+
+    .gad-tabs--stretch-d .gad-tabs__btn {
+      flex: 1 1 0;
+    }
+
+    .gad-tabs--a-left {
+      text-align: left;
+    }
+
+    .gad-tabs--a-center {
+      text-align: center;
+    }
+
+    .gad-tabs--a-right {
+      text-align: right;
+    }
+
+    .gad-tabs--a-left .gad-buttons {
+      justify-content: flex-start;
+    }
+
+    .gad-tabs--a-center .gad-buttons {
+      justify-content: center;
+    }
+
+    .gad-tabs--a-right .gad-buttons {
+      justify-content: flex-end;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .gad-tabs__panel--half {
+      grid-template-columns: 1fr 1fr;
+      gap: 4.8rem;
+    }
+
+    .gad-tabs__panel .gad-tabs__media {
+      order: 0;
+    }
+
+    .gad-tabs__panel--media-second .gad-tabs__media {
+      order: 2;
+    }
+
+    .gad-tabs--d-vertical {
+      display: grid;
+      grid-template-columns: minmax(16rem, 26rem) 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .gad-tabs--d-vertical .gad-tabs__nav {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      width: 100%;
+      margin: 0;
+    }
+
+    .gad-tabs--d-vertical .gad-tabs__btn {
+      justify-content: flex-start;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadTabs extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.nav = this.querySelector('.gad-tabs__nav');
+      this.buttons = Array.from(this.querySelectorAll('.gad-tabs__btn'));
+      this.panels = Array.from(this.querySelectorAll('.gad-tabs__panel'));
+      this.indicator = this.querySelector('.gad-tabs__indicator');
+      this.buttons.forEach((btn, i) => {
+        btn.addEventListener('click', () => this.select(i, false));
+        btn.addEventListener('keydown', (e) => this.onKey(e, i));
+      });
+      this.addEventListener('shopify:block:select', (e) => {
+        const i = this.panels.findIndex((p) => p.contains(e.target));
+        if (i >= 0) this.select(i, false);
+      });
+      this.ro = new ResizeObserver(() => this.moveIndicator());
+      if (this.nav) this.ro.observe(this.nav);
+      this.moveIndicator();
+    }
+
+    disconnectedCallback() {
+      if (this.ro) this.ro.disconnect();
+      this._ready = false;
+    }
+
+    select(i, focus) {
+      this.buttons.forEach((btn, j) => {
+        const on = i === j;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', String(on));
+        btn.tabIndex = on ? 0 : -1;
+        if (on && focus) btn.focus();
+      });
+      this.panels.forEach((panel, j) => {
+        panel.hidden = i !== j;
+        if (i !== j) panel.querySelectorAll('video').forEach((v) => v.pause());
+      });
+      this.moveIndicator();
+    }
+
+    onKey(e, i) {
+      const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      const n = this.buttons.length;
+      let next = i;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % n;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + n) % n;
+      if (e.key === 'Home') next = 0;
+      if (e.key === 'End') next = n - 1;
+      this.select(next, true);
+    }
+
+    moveIndicator() {
+      if (!this.indicator) return;
+      const active = this.buttons.find((b) => b.classList.contains('is-active'));
+      if (!active) return;
+      this.indicator.style.width = `${active.offsetWidth}px`;
+      this.indicator.style.height = `${active.offsetHeight}px`;
+      this.indicator.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
+    }
+  }
+
+  if (!customElements.get('gad-tabs')) customElements.define('gad-tabs', GadTabs);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Pestañas de contenido",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Pestañas"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Ancho del contenedor",
+      "options": [
+        {
+          "value": "xs",
+          "label": "Extra chico"
+        },
+        {
+          "value": "s",
+          "label": "Chico"
+        },
+        {
+          "value": "m",
+          "label": "Mediano"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_buttons",
+      "label": "Colores propios para los botones",
+      "default": false,
+      "info": "Si no, usan el color de los botones de la combinación."
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color de los botones y del borde",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "button_active_text",
+      "label": "Texto del botón activo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeo de los botones",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "nav_style",
+      "label": "Estilo del contenedor",
+      "options": [
+        {
+          "value": "border",
+          "label": "Con borde"
+        },
+        {
+          "value": "shadow",
+          "label": "Con sombra"
+        }
+      ],
+      "default": "border"
+    },
+    {
+      "type": "select",
+      "id": "active_style",
+      "label": "Botón activo",
+      "options": [
+        {
+          "value": "slide",
+          "label": "Fondo que se desliza"
+        },
+        {
+          "value": "fade",
+          "label": "Cambio de opacidad"
+        }
+      ],
+      "default": "slide",
+      "info": "El fondo que se desliza queda mejor cuando todos los botones entran en una fila."
+    },
+    {
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Disposición de los botones",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "En fila arriba"
+        },
+        {
+          "value": "vertical",
+          "label": "En columna a la izquierda"
+        }
+      ],
+      "default": "horizontal"
+    },
+    {
+      "type": "range",
+      "id": "font_size_d",
+      "min": 14,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de letra de los botones",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "stretch_d",
+      "label": "Estirar los botones a todo el ancho",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "range",
+      "id": "font_size_m",
+      "min": 8,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de letra de los botones",
+      "default": 14
+    },
+    {
+      "type": "checkbox",
+      "id": "stretch_m",
+      "label": "Estirar los botones a todo el ancho",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Pestaña",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Botón"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "label",
+          "label": "Texto del botón",
+          "default": "Pestaña"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "info": "Opcional. Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "checkbox",
+          "id": "icon_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Imagen o video"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Si cargás un video, la imagen queda como miniatura. Sin imagen ni video, el texto usa todo el ancho."
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "checkbox",
+          "id": "loop",
+          "label": "Repetir el video",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "autoplay",
+          "label": "Reproducción automática sin sonido",
+          "default": false
+        },
+        {
+          "type": "color_scheme",
+          "id": "play_scheme",
+          "label": "Combinación del botón de reproducir",
+          "default": "scheme-1"
+        },
+        {
+          "type": "checkbox",
+          "id": "pulse",
+          "label": "Onda alrededor del botón de reproducir",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Texto"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Título de la pestaña",
+          "info": "Marcá en negrita las palabras que querés resaltar."
+        },
+        {
+          "type": "select",
+          "id": "title_size",
+          "label": "Tamaño del título",
+          "options": [
+            {
+              "value": "h3",
+              "label": "Chico"
+            },
+            {
+              "value": "h2",
+              "label": "Mediano"
+            },
+            {
+              "value": "h1",
+              "label": "Grande"
+            },
+            {
+              "value": "h0",
+              "label": "Extra grande"
+            }
+          ],
+          "default": "h2"
+        },
+        {
+          "type": "color",
+          "id": "title_accent",
+          "label": "Color de las palabras resaltadas"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Contá acá lo que va en esta pestaña.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "info": "Sin texto, el botón no aparece."
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Enlace del botón"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_outline",
+          "label": "Botón con contorno",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "atc_label",
+          "label": "Texto del botón de agregar al carrito",
+          "info": "Sin texto, el botón no aparece. En una ficha agrega ese producto con la variante y la cantidad elegidas."
+        },
+        {
+          "type": "product",
+          "id": "atc_product",
+          "label": "Producto",
+          "info": "Opcional. Si elegís uno, el botón agrega ése. Fuera de una ficha hace falta elegirlo."
+        },
+        {
+          "type": "checkbox",
+          "id": "atc_skip_cart",
+          "label": "Ir directo al pago",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Desktop"
+        },
+        {
+          "type": "select",
+          "id": "media_width",
+          "label": "Ancho de la imagen o video",
+          "options": [
+            {
+              "value": "half",
+              "label": "La mitad"
+            },
+            {
+              "value": "full",
+              "label": "Completo"
+            }
+          ],
+          "default": "half"
+        },
+        {
+          "type": "select",
+          "id": "media_position",
+          "label": "Posición de la imagen o video",
+          "options": [
+            {
+              "value": "first",
+              "label": "Primero"
+            },
+            {
+              "value": "second",
+              "label": "Segundo"
+            }
+          ],
+          "default": "first"
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación del texto",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Mobile"
+        },
+        {
+          "type": "select",
+          "id": "m_media_position",
+          "label": "Imagen o video",
+          "options": [
+            {
+              "value": "first",
+              "label": "Arriba del texto"
+            },
+            {
+              "value": "second",
+              "label": "Abajo del texto"
+            }
+          ],
+          "default": "first"
+        },
+        {
+          "type": "select",
+          "id": "m_align",
+          "label": "Alineación del texto",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pestañas de contenido",
+      "blocks": [
+        {
+          "type": "tab",
+          "settings": {
+            "label": "Pestaña 1"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "label": "Pestaña 2"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "label": "Pestaña 3"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

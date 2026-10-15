@@ -40,8 +40,6 @@
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
     {%- endif -%}
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {%- endunless -%}
@@ -302,7 +300,7 @@
         font-style: normal;
         font-weight: 400;
         font-display: block;
-        src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v377/kJF4BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJU22ZZLsYEpzC_1ver5Y0.woff2) format('woff2');
+        src: url({{ 'material-symbols-outlined.woff2' | asset_url }}) format('woff2');
       }
 
       *,
@@ -403,6 +401,8 @@
     </main>
 
     {% sections 'footer-group' %}
+
+    {%- render 'gad-back-to-top' -%}
 
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
