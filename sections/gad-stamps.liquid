@@ -1,0 +1,407 @@
+{%- comment -%}
+  Sellos que entran al llegar (L04): arriba un espacio para video o imagen; abajo título y sellos
+  (palabra grande + línea) que entran de a uno con un golpe de sello cuando la sección aparece.
+  Sin JavaScript o con "reducir movimiento" se ven todos quietos.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-stamps
+  class="gad-st2 gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --st-h: {{ s.media_height }}vh; --st-rot: {{ s.angle }}deg;"
+  data-delay="{{ s.delay }}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  {%- if s.video != blank or s.image != blank -%}
+    <div class="gad-st2__media">
+      {%- if s.video != blank -%}
+        {{ s.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false, preload: 'metadata' }}
+      {%- else -%}
+        {{ s.image | image_url: width: 1800 | image_tag: loading: 'lazy', alt: s.image.alt, sizes: '100vw', widths: '750, 1200, 1800' }}
+      {%- endif -%}
+    </div>
+  {%- elsif request.design_mode -%}
+    <div class="gad-st2__media gad-st2__media--empty">{{ 'gadsden.stamps.media' | t }}</div>
+  {%- endif -%}
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="gad-st2__row">
+        {%- for block in section.blocks -%}
+          <div class="gad-st2__stamp" {{ block.shopify_attributes }}>
+            <b>{{ block.settings.word | escape }}</b>
+            {%- if block.settings.text != blank -%}<span>{{ block.settings.text }}</span>{%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+    {%- if s.closing != blank -%}<p class="gad-st2__closing">{{ s.closing }}</p>{%- endif -%}
+  </div>
+</gad-stamps>
+
+{% stylesheet %}
+  gad-stamps {
+    display: block;
+    overflow-x: clip;
+  }
+
+  .gad-st2__media {
+    height: var(--st-h, 50vh);
+    margin: 0 0 3.2rem;
+    overflow: hidden;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-st2__media video,
+  .gad-st2__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-st2__media--empty {
+    display: grid;
+    place-items: center;
+    height: 20rem;
+    font-size: 1.3rem;
+  }
+
+  .gad-st2__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.6rem;
+  }
+
+  .gad-st2__stamp {
+    display: grid;
+    flex: 1 1 18rem;
+    max-width: 30rem;
+    justify-items: center;
+    gap: 0.4rem;
+    padding: 1.6rem 1.2rem;
+    border: 0.3rem solid rgb(var(--color-accent, var(--color-button)));
+    border-radius: 0.6rem;
+    text-align: center;
+    transform: rotate(var(--st-rot, -3deg));
+  }
+
+  .gad-st2__stamp b {
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-size: 3rem;
+    line-height: 1;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+  }
+
+  .gad-st2__stamp span {
+    font-size: 1.4rem;
+  }
+
+  gad-stamps.is-armed .gad-st2__stamp {
+    opacity: 0;
+    transform: rotate(var(--st-rot, -3deg)) scale(1.8);
+  }
+
+  gad-stamps.is-armed .gad-st2__stamp.is-in {
+    opacity: 1;
+    transform: rotate(var(--st-rot, -3deg)) scale(1);
+    transition: transform 0.28s cubic-bezier(0.3, 1.5, 0.5, 1), opacity 0.12s;
+  }
+
+  .gad-st2__closing {
+    margin: 2.8rem 0 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadStamps extends HTMLElement {
+    connectedCallback() {
+      if (this._ready || (window.Gadsden && Gadsden.reduceMotion()) || (window.Shopify && Shopify.designMode)) return;
+      this._ready = true;
+      const stamps = [...this.querySelectorAll('.gad-st2__stamp')];
+      if (!stamps.length) return;
+      const delay = parseInt(this.dataset.delay, 10) || 350;
+      this.classList.add('is-armed');
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        stamps.forEach((el, i) => setTimeout(() => el.classList.add('is-in'), 150 + i * delay));
+      }, { threshold: 0.3 });
+      io.observe(this.querySelector('.gad-st2__row'));
+    }
+  }
+
+  if (!customElements.get('gad-stamps')) customElements.define('gad-stamps', GadStamps);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Sellos animados",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video de arriba"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "O una imagen"
+    },
+    {
+      "type": "range",
+      "id": "media_height",
+      "min": 30,
+      "max": 90,
+      "step": 5,
+      "unit": "vh",
+      "label": "Alto del video",
+      "default": 50,
+      "info": "En porcentaje del alto de la pantalla."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que <strong>sentís</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "angle",
+      "min": -10,
+      "max": 0,
+      "step": 1,
+      "unit": "°",
+      "label": "Inclinación de los sellos",
+      "default": -3
+    },
+    {
+      "type": "range",
+      "id": "delay",
+      "min": 100,
+      "max": 1000,
+      "step": 50,
+      "unit": "ms",
+      "label": "Pausa entre sellos",
+      "default": 350
+    },
+    {
+      "type": "inline_richtext",
+      "id": "closing",
+      "label": "Frase de cierre"
+    },
+    {
+      "type": "paragraph",
+      "content": "Los sellos entran de a uno al llegar a la sección. Con \"reducir movimiento\" aparecen quietos."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stamp",
+      "name": "Sello",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "word",
+          "label": "Palabra",
+          "default": "Fresco"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Línea",
+          "default": "Lo que pasa en ese momento."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sellos animados",
+      "blocks": [
+        {
+          "type": "stamp"
+        },
+        {
+          "type": "stamp",
+          "settings": {
+            "word": "Seco"
+          }
+        },
+        {
+          "type": "stamp",
+          "settings": {
+            "word": "Listo"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

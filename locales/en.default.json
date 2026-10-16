@@ -608,6 +608,9 @@
     },
     "offer": {
       "pick": "Pick a product for this offer."
+    },
+    "stamps": {
+      "media": "Upload a video or an image for the top of this section."
     }
   }
 }

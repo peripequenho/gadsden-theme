@@ -1,0 +1,462 @@
+{%- comment -%}
+  Pasos con cronómetro (L06): tarjetas por paso con foto arriba y un panel abajo (número, título,
+  duración y texto). Un cronómetro opcional corre desde cero hasta el total al aparecer la sección, y
+  las duraciones entran como sellos. Sin JavaScript o con "reducir movimiento" se ve el total quieto.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-timed-steps
+  class="gad-ts gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  data-total="{{ s.timer_total }}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- if s.timer_total > 0 -%}
+      <div class="gad-ts__timer color-{{ s.panel_scheme }}" role="img" aria-label="{{ s.timer_label | escape }} {{ s.timer_total }} s">
+        {%- if s.timer_label != blank -%}<span class="gad-ts__timer-label">{{ s.timer_label | escape }}</span>{%- endif -%}
+        <b><span data-gad-ts-digits>{{ s.timer_total }},0</span> s</b>
+      </div>
+    {%- endif -%}
+    {%- capture slides -%}
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div class="gad-ts__step" {{ block.shopify_attributes }}>
+          <div class="gad-ts__photo">
+            <span class="gad-ts__num">{{ forloop.index }}</span>
+            {%- if b.image != blank -%}
+              {{ b.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 990px) 25vw, 85vw', widths: '400, 600, 800' }}
+            {%- else -%}
+              <span class="gad-ts__ph">{%- render 'gad-icon', name: b.icon, filled: true -%}</span>
+            {%- endif -%}
+          </div>
+          <div class="gad-ts__panel color-{{ s.panel_scheme }}">
+            <div class="gad-ts__head">
+              <h3 class="gad-ts__title h4">{{ b.title }}</h3>
+              {%- if b.time != blank -%}<span class="gad-ts__time" data-gad-ts-stamp>{{ b.time | escape }}</span>{%- endif -%}
+            </div>
+            {%- if b.text != blank -%}<p class="gad-ts__text">{{ b.text }}</p>{%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if section.blocks.size > 0 -%}
+      {%- assign cols = section.blocks.size | at_most: 4 -%}
+      {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, force_d_on: false, force_m_on: true, d_per_view: cols, m_per_view: 1, gap_d: 20, gap_m: 12 -%}
+    {%- endif -%}
+  </div>
+</gad-timed-steps>
+
+{% stylesheet %}
+  .gad-ts__timer {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 1rem;
+    margin: -1rem auto 2.8rem;
+    padding: 0.8rem 1.6rem;
+    border-radius: 99rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  .gad-ts__timer-label {
+    font-size: 1.2rem;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+  }
+
+  .gad-ts__timer b {
+    font-size: 2.2rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gad-ts__step {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 1.2rem;
+  }
+
+  .gad-ts__photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-ts__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-ts__ph {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: 7rem;
+    opacity: 0.6;
+  }
+
+  .gad-ts__num {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: grid;
+    place-items: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 50%;
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    font-weight: 700;
+  }
+
+  .gad-ts__panel {
+    flex: 1;
+    display: grid;
+    align-content: start;
+    gap: 0.6rem;
+    padding: 1.6rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  .gad-ts__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .gad-ts__title {
+    margin: 0;
+  }
+
+  .gad-ts__time {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.8rem;
+    border: 0.15rem solid currentColor;
+    border-radius: 0.4rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    transform: rotate(-4deg);
+  }
+
+  .gad-ts.is-armed [data-gad-ts-stamp] {
+    opacity: 0;
+    transform: rotate(-4deg) scale(2);
+  }
+
+  .gad-ts.is-armed [data-gad-ts-stamp].is-in {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1);
+    transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), opacity 0.15s;
+  }
+
+  .gad-ts__text {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadTimedSteps extends HTMLElement {
+    connectedCallback() {
+      if (this._ready || (window.Gadsden && Gadsden.reduceMotion())) return;
+      this._ready = true;
+      this.total = parseFloat(this.dataset.total) || 0;
+      this.digits = this.querySelector('[data-gad-ts-digits]');
+      this.stamps = [...this.querySelectorAll('[data-gad-ts-stamp]')];
+      this.classList.add('is-armed');
+      if (this.digits) this.digits.textContent = '0,0';
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        this.run();
+      }, { threshold: 0.35 });
+      io.observe(this);
+    }
+
+    run() {
+      this.stamps.forEach((el, i) => setTimeout(() => el.classList.add('is-in'), 300 + i * 450));
+      if (!this.digits || !this.total) return;
+      const start = performance.now();
+      const tick = (now) => {
+        const t = Math.min(this.total, (now - start) / 1000);
+        this.digits.textContent = t.toFixed(1).replace('.', ',');
+        if (t < this.total) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }
+
+  if (!customElements.get('gad-timed-steps')) customElements.define('gad-timed-steps', GadTimedSteps);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Pasos con cronómetro",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Listo en <strong>15 segundos</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "timer_total",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "label": "Cronómetro",
+      "default": 15,
+      "info": "Corre desde cero hasta este número al aparecer la sección. 0: sin cronómetro."
+    },
+    {
+      "type": "text",
+      "id": "timer_label",
+      "label": "Texto del cronómetro",
+      "default": "Reloj en mano"
+    },
+    {
+      "type": "color_scheme",
+      "id": "panel_scheme",
+      "label": "Combinación de los paneles",
+      "default": "scheme-3"
+    },
+    {
+      "type": "paragraph",
+      "content": "En mobile los pasos se deslizan; en desktop van en una fila."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Paso",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono sin foto",
+          "default": "touch_app",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Paso"
+        },
+        {
+          "type": "text",
+          "id": "time",
+          "label": "Duración",
+          "default": "5 s"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Qué hacer en este paso, en una frase."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pasos con cronómetro",
+      "blocks": [
+        {
+          "type": "step",
+          "settings": {
+            "time": "2 s"
+          }
+        },
+        {
+          "type": "step"
+        },
+        {
+          "type": "step",
+          "settings": {
+            "time": "8 s",
+            "icon": "check_circle"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

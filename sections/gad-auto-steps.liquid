@@ -1,0 +1,522 @@
+{%- comment -%}
+  Pasos automáticos (L07): estilo historias. Rayitas de progreso arriba y una tarjeta por paso
+  (imagen chica, título con chip de tiempo y frase). Avanza solo, se pausa al tocar y se desliza con
+  el dedo. En el último paso aparece el botón (agregar al carrito o enlace).
+  Con "reducir movimiento" no avanza solo: se pasa con las rayitas o deslizando.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-as gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --as-ms: {{ s.seconds | times: 1000 }}ms;{% if s.accent != blank %} --as-accent: {{ s.accent }};{% endif %}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width page-width--narrow">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- if section.blocks.size > 0 -%}
+      <gad-auto-steps class="gad-as__box" data-ms="{{ s.seconds | times: 1000 }}">
+        <div class="gad-as__bars" role="tablist">
+          {%- for block in section.blocks -%}
+            <button type="button" class="gad-as__bar" role="tab" aria-label="{{ forloop.index }}. {{ block.settings.title | strip_html | escape }}" data-i="{{ forloop.index0 }}"><span></span></button>
+          {%- endfor -%}
+        </div>
+        <div class="gad-as__viewport">
+          <div class="gad-as__track">
+            {%- for block in section.blocks -%}
+              {%- assign b = block.settings -%}
+              <div class="gad-as__card" role="tabpanel" {{ block.shopify_attributes }}>
+                <div class="gad-as__media">
+                  {%- if b.image != blank -%}
+                    {{ b.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '300px', widths: '300, 600' }}
+                  {%- else -%}
+                    {{ 'image' | placeholder_svg_tag: 'gad-as__ph' }}
+                  {%- endif -%}
+                </div>
+                <div class="gad-as__head">
+                  <span class="gad-as__n">{{ forloop.index }}</span>
+                  <h3 class="gad-as__title h4">{{ b.title }}</h3>
+                  {%- if b.tag != blank -%}<span class="gad-as__tag">{{ b.tag | escape }}</span>{%- endif -%}
+                </div>
+                {%- if b.text != blank -%}<p class="gad-as__text">{{ b.text }}</p>{%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+        <div class="gad-as__cta" data-gad-as-cta hidden>
+          {%- if s.atc_product != blank or request.page_type == 'product' -%}
+            {%- render 'gad-atc-button', label: s.button_label, product: s.atc_product -%}
+          {%- elsif s.button_label != blank -%}
+            <a href="{{ s.button_link | default: '#' }}" class="button">{{ s.button_label | escape }}</a>
+          {%- endif -%}
+        </div>
+      </gad-auto-steps>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-as__box {
+    display: block;
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  .gad-as__bars {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .gad-as__bar {
+    flex: 1;
+    height: 1.6rem;
+    padding: 0.6rem 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .gad-as__bar span {
+    display: block;
+    height: 0.4rem;
+    overflow: hidden;
+    border-radius: 99rem;
+    background: rgba(var(--color-foreground), 0.15);
+  }
+
+  .gad-as__bar span::after {
+    content: '';
+    display: block;
+    height: 100%;
+    background: var(--as-accent, rgb(var(--color-button)));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .gad-as__bar.is-done span::after {
+    transform: scaleX(1);
+  }
+
+  .gad-as__bar.is-active span::after {
+    animation: gadAsFill var(--as-ms, 4000ms) linear forwards;
+  }
+
+  .gad-as__box.is-paused .gad-as__bar.is-active span::after,
+  .gad-as__box.is-static .gad-as__bar.is-active span::after {
+    animation-play-state: paused;
+  }
+
+  .gad-as__box.is-static .gad-as__bar.is-active span::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  @keyframes gadAsFill {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .gad-as__viewport {
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .gad-as__track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  html.gad-reduce .gad-as__track {
+    transition: none;
+  }
+
+  .gad-as__card {
+    display: grid;
+    flex: 0 0 100%;
+    gap: 1rem;
+    align-content: start;
+    padding: 0 0.2rem;
+  }
+
+  .gad-as__media {
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    border-radius: 1.2rem;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-as__media img,
+  .gad-as__ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-as__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .gad-as__n {
+    display: grid;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: var(--as-accent, rgb(var(--color-button)));
+    color: rgb(var(--color-button-text));
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .gad-as__title {
+    margin: 0;
+  }
+
+  .gad-as__tag {
+    padding: 0.2rem 0.8rem;
+    border-radius: 99rem;
+    background: rgba(var(--color-foreground), 0.08);
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .gad-as__text {
+    margin: 0;
+  }
+
+  .gad-as__cta {
+    margin-top: 2rem;
+  }
+
+  .gad-as__cta .button {
+    width: 100%;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadAutoSteps extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.bars = [...this.querySelectorAll('.gad-as__bar')];
+      this.track = this.querySelector('.gad-as__track');
+      this.cta = this.querySelector('[data-gad-as-cta]');
+      this.ms = parseInt(this.dataset.ms, 10) || 4000;
+      this.auto = !(window.Gadsden && Gadsden.reduceMotion());
+      if (!this.auto) this.classList.add('is-static');
+      this.bars.forEach((b) => b.addEventListener('click', () => this.go(Number(b.dataset.i))));
+      this.bars.forEach((b) => b.querySelector('span').addEventListener('animationend', () => this.go(this.i + 1, true)));
+      const vp = this.querySelector('.gad-as__viewport');
+      vp.addEventListener('pointerdown', (e) => {
+        this.x0 = e.clientX;
+        this.classList.add('is-paused');
+      });
+      vp.addEventListener('pointerup', (e) => {
+        this.classList.remove('is-paused');
+        const dx = e.clientX - (this.x0 ?? e.clientX);
+        if (Math.abs(dx) > 40) this.go(this.i + (dx < 0 ? 1 : -1));
+      });
+      vp.addEventListener('pointercancel', () => this.classList.remove('is-paused'));
+      this.addEventListener('shopify:block:select', (e) => {
+        const i = [...this.querySelectorAll('.gad-as__card')].indexOf(e.target);
+        if (i >= 0) this.go(i);
+        this.classList.add('is-paused');
+      });
+      this.addEventListener('shopify:block:deselect', () => this.classList.remove('is-paused'));
+      this.i = 0;
+      const io = new IntersectionObserver((entries) => this.classList.toggle('is-paused', !entries[0].isIntersecting));
+      io.observe(this);
+      this.go(0);
+    }
+
+    go(i, fromTimer) {
+      const n = this.bars.length;
+      if (fromTimer && this.i === n - 1) return;
+      if (i >= n || i < 0) i = 0;
+      this.i = i;
+      this.track.style.transform = `translateX(${document.dir === 'rtl' ? '' : '-'}${i * 100}%)`;
+      this.bars.forEach((b, k) => {
+        b.classList.remove('is-active');
+        b.classList.toggle('is-done', k < i);
+        b.setAttribute('aria-selected', k === i ? 'true' : 'false');
+      });
+      void this.bars[i].offsetWidth;
+      this.bars[i].classList.add('is-active');
+      if (this.cta) this.cta.hidden = i !== n - 1;
+    }
+  }
+
+  if (!customElements.get('gad-auto-steps')) customElements.define('gad-auto-steps', GadAutoSteps);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Pasos automáticos",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Cómo se <strong>usa</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "seconds",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Segundos por paso",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Color de las rayitas y números",
+      "info": "Vacío: el color de los botones."
+    },
+    {
+      "type": "header",
+      "content": "Botón del último paso"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto",
+      "default": "Agregar al carrito"
+    },
+    {
+      "type": "product",
+      "id": "atc_product",
+      "label": "Producto a agregar",
+      "info": "En una ficha, vacío agrega el de la página."
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "O un enlace",
+      "info": "Se usa si no hay producto."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Paso",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Abrí el sobre"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Chip",
+          "default": "10 s"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Frase",
+          "default": "Una frase que explica el paso."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pasos automáticos",
+      "blocks": [
+        {
+          "type": "step"
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Aplicalo"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "title": "Listo"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

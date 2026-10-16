@@ -620,6 +620,9 @@
     },
     "offer": {
       "pick": "Elegí un producto para esta oferta."
+    },
+    "stamps": {
+      "media": "Subí un video o una imagen para la parte de arriba de esta sección."
     }
   }
 }

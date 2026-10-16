@@ -1,0 +1,516 @@
+{%- comment -%}
+  Tarjetas que se despliegan (L02): tarjetas apaisadas con foto y una frase. Al tocar una se abre (y
+  se cierran las demás) con una intro corta y un botón que abre una ventana con el texto completo.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-reveal-cards
+  class="gad-rc gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rc-cols: {{ s.columns_d }};"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    <div class="gad-rc__grid">
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div class="gad-rc__card" {{ block.shopify_attributes }}>
+          <button type="button" class="gad-rc__toggle" aria-expanded="false" aria-controls="GadRc-{{ block.id }}">
+            {%- if b.image != blank -%}
+              {{ b.image | image_url: width: 1000 | image_tag: loading: 'lazy', alt: '', class: 'gad-rc__img', sizes: '(min-width: 990px) 50vw, 100vw', widths: '500, 750, 1000' }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-rc__img gad-rc__ph' }}
+            {%- endif -%}
+            <span class="gad-rc__phrase">{{ b.phrase }}</span>
+            <span class="gad-rc__chev">{%- render 'gad-icon', name: 'expand_more' -%}</span>
+          </button>
+          <div class="gad-rc__more" id="GadRc-{{ block.id }}">
+            <div class="gad-rc__more-inner">
+              {%- if b.intro != blank -%}<p class="gad-rc__intro">{{ b.intro }}</p>{%- endif -%}
+              {%- if b.body != blank and s.button_label != blank -%}
+                <button type="button" class="button button--secondary gad-rc__open" data-title="{{ b.phrase | strip_html | escape }}">{{ s.button_label | escape }}</button>
+                <template class="gad-rc__body">{{ b.body }}</template>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+  <dialog class="gad-rc__dialog color-{{ s.dialog_scheme }}" aria-labelledby="GadRcTitle-{{ section.id }}">
+    <button type="button" class="gad-rc__close" aria-label="{{ 'accessibility.close' | t }}">{%- render 'gad-icon', name: 'close' -%}</button>
+    {%- if s.dialog_video != blank -%}
+      <div class="gad-rc__dmedia">{{ s.dialog_video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false }}</div>
+    {%- elsif s.dialog_image != blank -%}
+      <div class="gad-rc__dmedia">{{ s.dialog_image | image_url: width: 1200 | image_tag: loading: 'lazy', alt: '' }}</div>
+    {%- endif -%}
+    <div class="gad-rc__dbody">
+      <h3 class="h3" id="GadRcTitle-{{ section.id }}"></h3>
+      <div class="rte gad-rc__dtext"></div>
+    </div>
+  </dialog>
+</gad-reveal-cards>
+
+{% stylesheet %}
+  .gad-rc__grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-rc__grid {
+      grid-template-columns: repeat(var(--rc-cols, 2), minmax(0, 1fr));
+      gap: 1.6rem;
+      align-items: start;
+    }
+  }
+
+  .gad-rc__card {
+    overflow: hidden;
+    border-radius: 1.2rem;
+    background: rgba(var(--color-foreground), 0.05);
+  }
+
+  .gad-rc__toggle {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    min-height: 13rem;
+    padding: 1.6rem 5rem 1.6rem 1.6rem;
+    border: 0;
+    background: #1a1a1a;
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    isolation: isolate;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-rc__toggle {
+      min-height: 18rem;
+    }
+  }
+
+  .gad-rc__img {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-rc__ph {
+    opacity: 0.3;
+  }
+
+  .gad-rc__toggle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.1));
+  }
+
+  .gad-rc__phrase {
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .gad-rc__chev {
+    position: absolute;
+    right: 1.4rem;
+    bottom: 1.4rem;
+    display: grid;
+    place-items: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 2.2rem;
+    transition: transform 0.25s;
+    --gad-icon-color: #fff;
+  }
+
+  .gad-rc__toggle[aria-expanded='true'] .gad-rc__chev {
+    transform: rotate(180deg);
+  }
+
+  .gad-rc__more {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+
+  .gad-rc__toggle[aria-expanded='true'] + .gad-rc__more {
+    grid-template-rows: 1fr;
+  }
+
+  html.gad-reduce .gad-rc__more {
+    transition: none;
+  }
+
+  .gad-rc__more-inner {
+    overflow: hidden;
+  }
+
+  .gad-rc__intro {
+    margin: 1.6rem 1.6rem 1.2rem;
+  }
+
+  .gad-rc__open {
+    margin: 0 1.6rem 1.6rem;
+  }
+
+  .gad-rc__dialog {
+    width: min(64rem, calc(100vw - 2.4rem));
+    max-height: calc(100dvh - 4rem);
+    padding: 0;
+    overflow: auto;
+    border: 0;
+    border-radius: 1.6rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  .gad-rc__dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .gad-rc__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(var(--color-background), 0.85);
+    color: rgb(var(--color-foreground));
+    font-size: 2.2rem;
+    cursor: pointer;
+  }
+
+  .gad-rc__dmedia img,
+  .gad-rc__dmedia video {
+    display: block;
+    width: 100%;
+    max-height: 40vh;
+    object-fit: cover;
+  }
+
+  .gad-rc__dbody {
+    padding: 2.4rem;
+  }
+
+  .gad-rc__dbody h3 {
+    margin: 0 0 1rem;
+    padding-right: 4rem;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadRevealCards extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.toggles = [...this.querySelectorAll('.gad-rc__toggle')];
+      this.dialog = this.querySelector('.gad-rc__dialog');
+      this.toggles.forEach((t) =>
+        t.addEventListener('click', () => {
+          const open = t.getAttribute('aria-expanded') === 'true';
+          this.toggles.forEach((o) => o.setAttribute('aria-expanded', 'false'));
+          if (!open) t.setAttribute('aria-expanded', 'true');
+        })
+      );
+      this.querySelectorAll('.gad-rc__open').forEach((btn) =>
+        btn.addEventListener('click', () => {
+          this.dialog.querySelector('h3').textContent = btn.dataset.title;
+          this.dialog.querySelector('.gad-rc__dtext').replaceChildren(btn.nextElementSibling.content.cloneNode(true));
+          this.dialog.showModal();
+          document.documentElement.classList.add('gad-modal-open');
+        })
+      );
+      this.dialog.querySelector('.gad-rc__close').addEventListener('click', () => this.dialog.close());
+      this.dialog.addEventListener('click', (e) => {
+        if (e.target === this.dialog) this.dialog.close();
+      });
+      this.dialog.addEventListener('close', () => document.documentElement.classList.remove('gad-modal-open'));
+      this.addEventListener('shopify:block:select', (e) => {
+        const t = e.target.querySelector('.gad-rc__toggle');
+        if (t && t.getAttribute('aria-expanded') !== 'true') t.click();
+      });
+    }
+  }
+
+  if (!customElements.get('gad-reveal-cards')) customElements.define('gad-reveal-cards', GadRevealCards);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Tarjetas desplegables",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "¿Te pasa <strong>esto</strong>?",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Columnas en desktop",
+      "default": 2,
+      "info": "En mobile van apiladas."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón de la ventana",
+      "default": "Leer más"
+    },
+    {
+      "type": "header",
+      "content": "Ventana"
+    },
+    {
+      "type": "video",
+      "id": "dialog_video",
+      "label": "Video de cabecera"
+    },
+    {
+      "type": "image_picker",
+      "id": "dialog_image",
+      "label": "O una imagen"
+    },
+    {
+      "type": "color_scheme",
+      "id": "dialog_scheme",
+      "label": "Combinación de la ventana",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Tarjeta",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "phrase",
+          "label": "Frase",
+          "default": "Una situación que el cliente reconoce"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "intro",
+          "label": "Intro al desplegar",
+          "default": "Dos líneas que la explican sin vueltas."
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Texto de la ventana",
+          "default": "<p>La explicación completa. Vacío: sin botón.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tarjetas desplegables",
+      "blocks": [
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        },
+        {
+          "type": "card"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

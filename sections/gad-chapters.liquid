@@ -1,0 +1,531 @@
+{%- comment -%}
+  Capítulos en video (L05): un escenario con un solo video a la vez y fichas por etapa abajo. Al
+  terminar un clip pasa solo al siguiente (en bucle); tocar una ficha salta a esa etapa y la ficha
+  activa se llena con el avance. Arranca al entrar en pantalla y se pausa al salir. Las etapas sin
+  video muestran su imagen y pasan a los segundos elegidos. Con "reducir movimiento" no avanza solo.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-ch gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ch-ratio: {{ s.ratio }};"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- if section.blocks.size > 0 -%}
+      <gad-chapters class="gad-ch__board" data-seconds="{{ s.seconds }}">
+        <div class="gad-ch__stage">
+          {%- for block in section.blocks -%}
+            {%- assign b = block.settings -%}
+            <div class="gad-ch__cap{% if forloop.first %} is-active{% endif %}" data-i="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+              {%- if b.video != blank -%}
+                {{ b.video | video_tag: autoplay: false, loop: false, muted: true, playsinline: true, controls: false, preload: 'metadata' }}
+              {%- elsif b.image != blank -%}
+                {{ b.image | image_url: width: 1200 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 990px) 60vw, 100vw', widths: '600, 900, 1200' }}
+              {%- else -%}
+                {{ 'lifestyle-2' | placeholder_svg_tag: 'gad-ch__ph' }}
+              {%- endif -%}
+              <div class="gad-ch__caption">
+                <span class="gad-ch__n">{{ b.number | default: forloop.index | escape }}</span>
+                <h3 class="gad-ch__title h3">{{ b.title }}</h3>
+                {%- if b.text != blank -%}<p class="gad-ch__text">{{ b.text }}</p>{%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        </div>
+        <div class="gad-ch__tabs" role="tablist">
+          {%- for block in section.blocks -%}
+            <button type="button" class="gad-ch__tab{% if forloop.first %} is-active{% endif %}" role="tab" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" data-i="{{ forloop.index0 }}">
+              <span class="gad-ch__tab-n">{{ block.settings.number | default: forloop.index | escape }}</span>
+              <span class="gad-ch__tab-t">{{ block.settings.title | strip_html }}</span>
+              <span class="gad-ch__fill"></span>
+            </button>
+          {%- endfor -%}
+        </div>
+      </gad-chapters>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-ch__board {
+    display: block;
+    max-width: 96rem;
+    margin: 0 auto;
+  }
+
+  .gad-ch__stage {
+    position: relative;
+    aspect-ratio: var(--ch-ratio, 4 / 5);
+    overflow: hidden;
+    border-radius: 1.2rem;
+    background: #111;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-ch__stage {
+      max-height: 70vh;
+      margin: 0 auto;
+    }
+  }
+
+  .gad-ch__cap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s, visibility 0.35s;
+    color: #fff;
+  }
+
+  .gad-ch__cap.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .gad-ch__cap video,
+  .gad-ch__cap img,
+  .gad-ch__ph {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-ch__ph {
+    opacity: 0.25;
+  }
+
+  .gad-ch__caption {
+    position: relative;
+    width: 100%;
+    padding: 6rem 2rem 2rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+  }
+
+  .gad-ch__n {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .gad-ch .gad-ch__title {
+    margin: 0.4rem 0;
+    color: #fff;
+  }
+
+  .gad-ch__text {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .gad-ch__tabs {
+    display: grid;
+    grid-auto-columns: minmax(12rem, 1fr);
+    grid-auto-flow: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .gad-ch__tab {
+    position: relative;
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem 1.2rem 1.4rem;
+    overflow: hidden;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    border-radius: 0.8rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .gad-ch__tab.is-active {
+    border-color: rgb(var(--color-button));
+  }
+
+  .gad-ch__tab-n {
+    font-size: 1.2rem;
+    opacity: 0.7;
+  }
+
+  .gad-ch__tab-t {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .gad-ch__fill {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 0.3rem;
+    background: rgb(var(--color-button));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadChapters extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.caps = [...this.querySelectorAll('.gad-ch__cap')];
+      this.tabs = [...this.querySelectorAll('.gad-ch__tab')];
+      this.seconds = parseFloat(this.dataset.seconds) || 5;
+      this.auto = !(window.Gadsden && Gadsden.reduceMotion());
+      this.i = 0;
+      this.visible = false;
+      this.tabs.forEach((t) => t.addEventListener('click', () => this.go(Number(t.dataset.i), true)));
+      this.caps.forEach((cap, i) => {
+        const v = cap.querySelector('video');
+        if (!v) return;
+        v.addEventListener('timeupdate', () => i === this.i && v.duration && this.fill(v.currentTime / v.duration));
+        v.addEventListener('ended', () => i === this.i && this.next());
+      });
+      new IntersectionObserver((entries) => {
+        this.visible = entries[0].isIntersecting;
+        this.visible ? this.play() : this.stop();
+      }, { threshold: 0.4 }).observe(this);
+      this.addEventListener('shopify:block:select', (e) => {
+        const i = this.caps.indexOf(e.target);
+        if (i >= 0) this.go(i, true);
+      });
+    }
+
+    fill(r) {
+      this.tabs.forEach((t, k) => (t.querySelector('.gad-ch__fill').style.transform = `scaleX(${k < this.i ? 1 : k === this.i ? r : 0})`));
+    }
+
+    video() {
+      return this.caps[this.i].querySelector('video');
+    }
+
+    play() {
+      const v = this.video();
+      cancelAnimationFrame(this.raf);
+      if (v) {
+        if (this.auto) v.play().catch(() => {});
+        return;
+      }
+      if (!this.auto) return;
+      const start = performance.now() - (this.elapsed || 0);
+      const tick = (now) => {
+        this.elapsed = now - start;
+        const r = Math.min(1, this.elapsed / (this.seconds * 1000));
+        this.fill(r);
+        if (r >= 1) return this.next();
+        this.raf = requestAnimationFrame(tick);
+      };
+      this.raf = requestAnimationFrame(tick);
+    }
+
+    stop() {
+      cancelAnimationFrame(this.raf);
+      const v = this.video();
+      if (v) v.pause();
+    }
+
+    next() {
+      this.go((this.i + 1) % this.caps.length);
+    }
+
+    go(i, user) {
+      this.stop();
+      const old = this.video();
+      if (old) old.currentTime = 0;
+      this.i = i;
+      this.elapsed = 0;
+      this.caps.forEach((c, k) => c.classList.toggle('is-active', k === i));
+      this.tabs.forEach((t, k) => {
+        t.classList.toggle('is-active', k === i);
+        t.setAttribute('aria-selected', k === i ? 'true' : 'false');
+      });
+      this.fill(0);
+      const v = this.video();
+      if (v && user && !this.auto) v.play().catch(() => {});
+      if (this.visible) this.play();
+    }
+  }
+
+  if (!customElements.get('gad-chapters')) customElements.define('gad-chapters', GadChapters);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Capítulos en video",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Así se <strong>hace</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Forma del escenario",
+      "options": [
+        {
+          "value": "4 / 5",
+          "label": "Vertical 4:5"
+        },
+        {
+          "value": "9 / 16",
+          "label": "Vertical 9:16"
+        },
+        {
+          "value": "1 / 1",
+          "label": "Cuadrado"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Horizontal 16:9"
+        }
+      ],
+      "default": "4 / 5"
+    },
+    {
+      "type": "range",
+      "id": "seconds",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Segundos de las etapas sin video",
+      "default": 5
+    },
+    {
+      "type": "paragraph",
+      "content": "Un video a la vez: cuando termina pasa solo al siguiente. Clips cortos (5 a 10 s), sin sonido."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "chapter",
+      "name": "Etapa",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Se ve si no hay video."
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Número o volanta",
+          "info": "Vacío: el número de la etapa."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Etapa"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Qué pasa en esta etapa."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Capítulos en video",
+      "blocks": [
+        {
+          "type": "chapter"
+        },
+        {
+          "type": "chapter"
+        },
+        {
+          "type": "chapter"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
