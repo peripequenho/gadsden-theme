@@ -1108,3 +1108,277 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
     font-size: var(--tx-d, 13px);
   }
 }
+
+/* ---------- H01 cabecera: buscador, link activo, título y menú secundario del menú mobile ---------- */
+.gad-header--no-search .header__search {
+  display: none !important;
+}
+
+.gad-header--active-pill .header__inline-menu .header__active-menu-item.gad-active {
+  display: inline-block;
+  margin: -0.5rem 0;
+  padding: 0.5rem 1.2rem;
+  border-radius: 10rem;
+  color: rgb(var(--color-foreground));
+  text-decoration: none;
+}
+
+.gad-header--active-underline .header__inline-menu .header__active-menu-item {
+  text-decoration-color: rgb(var(--color-accent, var(--color-button)));
+  text-decoration-thickness: 0.2rem;
+  text-underline-offset: 0.5rem;
+}
+
+.gad-menu-drawer__title {
+  margin: 0;
+  padding: 0 3rem 1.2rem;
+  color: rgba(var(--color-foreground), 0.65);
+}
+
+.gad-menu-drawer__secondary {
+  margin: 1.2rem 0 0;
+  padding: 1.2rem 0 0;
+  border-top: 0.1rem solid rgba(var(--color-foreground), 0.1);
+  list-style: none;
+}
+
+.gad-menu-drawer__secondary a {
+  display: block;
+  padding: 0.8rem 3rem;
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
+/* ---------- H03 y H04 barra de anuncios ---------- */
+.gad-ann-bar .announcement-bar.gad-ann {
+  display: block;
+  min-width: 0;
+  padding: var(--pt, 10px) 0 var(--pb, 10px);
+}
+
+.gad-ann-bar--hidden-here {
+  opacity: 0.4;
+}
+
+.gad-ann__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.gad-ann__item--am-left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.gad-ann__item--am-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.gad-ann__inner {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: inherit;
+  gap: 0.4rem 0.6rem;
+  margin: 0;
+  color: rgb(var(--color-foreground));
+  font-size: var(--fs-m, 12px);
+  line-height: 1.35;
+  letter-spacing: 0.04rem;
+  text-decoration: none;
+}
+
+.gad-ann__link:hover .gad-ann__text {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+.gad-ann__item--m-stack .gad-ann__inner {
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.gad-ann__icon {
+  flex: none;
+  font-size: var(--ic-m, 16px);
+}
+
+.gad-ann__icon.gad-icon--image img {
+  display: block;
+  width: var(--ic-m, 16px);
+  height: auto;
+}
+
+@media screen and (max-width: 989px) {
+  .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--m-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
+    border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
+  }
+}
+
+@media screen and (min-width: 990px) {
+  .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--d-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
+    border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
+  }
+}
+
+.gad-ann__coupon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.2rem 0.2rem 0.2rem 1rem;
+  border: 0.1rem dashed currentColor;
+  border-radius: 10rem;
+}
+
+.gad-ann__code {
+  font-weight: var(--font-body-weight-bold, 700);
+  letter-spacing: 0.08em;
+}
+
+.gad-ann__copy {
+  padding: 0.2rem 0.9rem;
+  border: 0;
+  border-radius: 10rem;
+  background: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+  font: inherit;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.gad-ann__coupon.is-copied .gad-ann__copy {
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+}
+
+.utility-bar__grid .gad-ann__social .list-social {
+  display: flex;
+  justify-content: inherit;
+  margin: 0;
+  grid-area: auto;
+}
+
+.gad-ann__social .list-social__link {
+  padding: 0.2rem 0.6rem;
+}
+
+.gad-ann__social .list-social__item .icon,
+.gad-ann__social .svg-wrapper {
+  width: var(--ic-m, 16px);
+  height: var(--ic-m, 16px);
+  scale: 1;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-ann__item--ad-center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .gad-ann__item--ad-left {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .gad-ann__item--ad-right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .gad-ann__inner {
+    font-size: var(--fs-d, 13px);
+  }
+
+  .gad-ann__item--d-row .gad-ann__inner {
+    flex-direction: row;
+    gap: 0.4rem 0.6rem;
+  }
+
+  .gad-ann__item--d-stack .gad-ann__inner {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .gad-ann__icon {
+    font-size: var(--ic-d, 18px);
+  }
+
+  .gad-ann__icon.gad-icon--image img,
+  .gad-ann__social .list-social__item .icon,
+  .gad-ann__social .svg-wrapper {
+    width: var(--ic-d, 18px);
+    height: var(--ic-d, 18px);
+  }
+}
+
+/* ---------- H05 y H06 pie ---------- */
+.footer__blocks-wrapper.gad-foot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3rem var(--grid-mobile-horizontal-spacing, 1rem);
+}
+
+.footer__blocks-wrapper.gad-foot-grid > .footer-block.grid__item {
+  grid-column: span var(--w-m, 2);
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .footer__blocks-wrapper.gad-foot-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-desktop-horizontal-spacing, 2rem);
+  }
+
+  .footer__blocks-wrapper.gad-foot-grid > .footer-block.grid__item {
+    grid-column: span var(--w-d, 3);
+  }
+}
+
+.gad-foot-image-link {
+  display: block;
+}
+
+.gad-foot-news__text {
+  margin-bottom: 1.2rem;
+}
+
+.gad-foot-news .newsletter-form {
+  align-items: stretch;
+  max-width: none;
+  margin: 0;
+}
+
+.gad-foot-news .newsletter-form__field-wrapper {
+  width: 100%;
+  max-width: 44rem;
+}
+
+.gad-foot-news--filled .newsletter-form__field-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.gad-foot-news--filled .field {
+  flex: 1 1 20rem;
+}
+
+.gad-foot-news__button {
+  flex: none;
+}
+
+.gad-foot-card {
+  max-width: 30rem;
+}
+
+.gad-copyright a {
+  color: inherit;
+}

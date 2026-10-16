@@ -24,6 +24,9 @@
       <div class="menu-drawer__inner-container">
         <div class="menu-drawer__navigation-container">
           <nav class="menu-drawer__navigation">
+            {%- if section.settings.mobile_menu_title != blank -%}
+              <p class="gad-menu-drawer__title h4">{{ section.settings.mobile_menu_title | escape }}</p>
+            {%- endif -%}
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
                 <li>
@@ -138,6 +141,24 @@
                 </li>
               {%- endfor -%}
             </ul>
+            {%- assign secondary_block = section.blocks | where: 'type', 'mobile_menu' | first -%}
+            {%- if secondary_block.settings.menu != blank -%}
+              <ul class="gad-menu-drawer__secondary list-menu" role="list" {{ secondary_block.shopify_attributes }}>
+                {%- for link in secondary_block.settings.menu.links -%}
+                  <li>
+                    <a
+                      href="{{ link.url }}"
+                      class="link link--text list-menu__item focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{- link.title | escape -}}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
           </nav>
           <div class="menu-drawer__utility-links">
             {%- if show_country_selector or show_language_selector -%}

@@ -915,3 +915,49 @@ document.addEventListener('click', (e) => {
   });
   update();
 })();
+
+/* ---------- H04: cupón de la barra de anuncios, se copia con un toque ---------- */
+if (!customElements.get('gad-copy'))
+  customElements.define(
+    'gad-copy',
+    class GadCopy extends HTMLElement {
+      connectedCallback() {
+        const button = this.querySelector('button');
+        if (!button || button.dataset.gadReady) return;
+        button.dataset.gadReady = '1';
+        button.addEventListener('click', () => this.copy());
+      }
+      async copy() {
+        const code = this.dataset.code || '';
+        let ok = false;
+        try {
+          await navigator.clipboard.writeText(code);
+          ok = true;
+        } catch (e) {
+          const area = document.createElement('textarea');
+          area.value = code;
+          area.setAttribute('readonly', '');
+          area.style.cssText = 'position:fixed;opacity:0';
+          document.body.appendChild(area);
+          area.select();
+          try {
+            ok = document.execCommand('copy');
+          } catch (err) {}
+          area.remove();
+        }
+        if (!ok) return;
+        const label = this.querySelector('[data-gad-copy-label]');
+        const status = this.querySelector('[data-gad-copy-status]');
+        if (!this.original) this.original = label.textContent;
+        label.textContent = this.dataset.copied || this.original;
+        if (status) status.textContent = this.dataset.copied || '';
+        this.classList.add('is-copied');
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          label.textContent = this.original;
+          if (status) status.textContent = '';
+          this.classList.remove('is-copied');
+        }, 2000);
+      }
+    }
+  );

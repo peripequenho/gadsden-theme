@@ -1,0 +1,33 @@
+{%- comment -%}
+  Visibilidad por producto (H03): imprime true o false.
+  Con lista y "sólo en estas fichas", se ve sólo en esas fichas; con lista sin la casilla, se oculta en esas fichas.
+  Sin lista, se ve siempre.
+
+  Accepts:
+  - list: {Array} productos (ajuste product_list)
+  - only: {Boolean} mostrar sólo en esas fichas
+  - product: {Object} producto de la página (nil fuera de una ficha)
+
+  Usage:
+  {%- capture visible -%}{% render 'gad-product-visibility', list: s.hide_products, only: s.only_listed, product: product %}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign show = true
+  if list != blank
+    assign listed = false
+    if product
+      for p in list
+        if p.id == product.id
+          assign listed = true
+          break
+        endif
+      endfor
+    endif
+    if only
+      assign show = listed
+    elsif listed
+      assign show = false
+    endif
+  endif
+  echo show
+-%}

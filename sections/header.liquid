@@ -170,7 +170,7 @@
       assign language_selector = true
     endif
   -%}
-  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}">
+  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}{% unless section.settings.show_search %} gad-header--no-search{% endunless %}{% if section.settings.active_highlight %} gad-header--active-{{ section.settings.active_style }}{% endif %}">
     {%- liquid
       assign render_search_left = false
       if section.settings.logo_position == 'top-center' or section.settings.menu == blank or shop.customer_accounts_enabled
@@ -190,7 +190,7 @@
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
       {%- endif -%}
-      <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+      <a href="{{ section.settings.logo_link | default: routes.root_url }}" class="header__heading-link link link--text focus-inset">
         {%- if settings.logo != blank -%}
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
@@ -233,7 +233,7 @@
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
       {%- endif -%}
-      <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+      <a href="{{ section.settings.logo_link | default: routes.root_url }}" class="header__heading-link link link--text focus-inset">
         {%- if settings.logo != blank -%}
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
@@ -684,11 +684,79 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Gadsden · Cabecera"
+    },
+    {
+      "type": "url",
+      "id": "logo_link",
+      "label": "Enlace del logo",
+      "info": "Vacío: al inicio."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Mostrar el buscador",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "active_highlight",
+      "label": "Resaltar el link de la página actual",
+      "default": false,
+      "info": "En el menú de desktop."
+    },
+    {
+      "type": "select",
+      "id": "active_style",
+      "label": "Cómo se resalta",
+      "options": [
+        {
+          "value": "pill",
+          "label": "Pastilla de color"
+        },
+        {
+          "value": "underline",
+          "label": "Subrayado en el color de acento"
+        }
+      ],
+      "default": "pill"
+    },
+    {
+      "type": "color_scheme",
+      "id": "active_scheme",
+      "label": "Combinación de la pastilla",
+      "default": "scheme-2"
+    },
+    {
+      "type": "text",
+      "id": "mobile_menu_title",
+      "label": "Título del menú mobile",
+      "default": "Menú",
+      "info": "Vacío: sin título."
     }
   ],
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "mobile_menu",
+      "name": "Menú secundario mobile",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Va en el menú mobile, debajo del principal, con letra más chica."
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menú"
+        }
+      ]
     }
   ]
 }
