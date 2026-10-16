@@ -373,7 +373,7 @@
           {%- endif -%}
           <span>
             {{- label -}}
-            {%- if b.show_total %} • {{ cart.total_price | money }}{% endif -%}
+            {%- if b.show_total %} • <span class="gad-cart-checkout__total">{{ cart.total_price | money }}</span>{% endif -%}
           </span>
           {%- if b.icon_after != blank -%}
             {{ b.icon_after | image_url: width: 96 | image_tag: class: 'gad-cart-checkout__icon', loading: 'lazy', alt: '' }}

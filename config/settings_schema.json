@@ -164,7 +164,7 @@
       {
         "type": "font_picker",
         "id": "type_header_font",
-        "default": "assistant_n4",
+        "default": "poppins_n7",
         "label": "t:settings_schema.typography.settings.type_header_font.label"
       },
       {
@@ -184,7 +184,7 @@
       {
         "type": "font_picker",
         "id": "type_body_font",
-        "default": "assistant_n4",
+        "default": "poppins_n4",
         "label": "t:settings_schema.typography.settings.type_body_font.label"
       },
       {
@@ -434,7 +434,7 @@
         "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.thickness.label",
-        "default": 1
+        "default": 2
       },
       {
         "type": "range",
@@ -454,7 +454,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 8
       },
       {
         "type": "header",
@@ -592,7 +592,7 @@
         "step": 5,
         "unit": "%",
         "label": "t:settings_schema.global.settings.opacity.label",
-        "default": 55
+        "default": 25
       },
       {
         "type": "range",
@@ -602,7 +602,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 40
+        "default": 8
       },
       {
         "type": "header",
@@ -675,7 +675,7 @@
         "step": 5,
         "unit": "%",
         "label": "t:settings_schema.global.settings.opacity.label",
-        "default": 55
+        "default": 25
       },
       {
         "type": "range",
@@ -685,7 +685,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 8
       },
       {
         "type": "header",
@@ -800,7 +800,7 @@
         "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.thickness.label",
-        "default": 0
+        "default": 1
       },
       {
         "type": "range",
@@ -810,7 +810,7 @@
         "step": 5,
         "unit": "%",
         "label": "t:settings_schema.global.settings.opacity.label",
-        "default": 0
+        "default": 10
       },
       {
         "type": "range",
@@ -820,7 +820,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 12
       },
       {
         "type": "header",
@@ -1218,7 +1218,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 12
       },
       {
         "type": "header",
@@ -1281,7 +1281,7 @@
         "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.thickness.label",
-        "default": 1
+        "default": 0
       },
       {
         "type": "range",
@@ -1301,7 +1301,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 12
       },
       {
         "type": "header",
@@ -1388,7 +1388,7 @@
         "step": 2,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
-        "default": 0
+        "default": 12
       },
       {
         "type": "header",
@@ -1537,7 +1537,7 @@
             "label": "Arriba al centro"
           }
         ],
-        "default": "bottom left",
+        "default": "top left",
         "label": "t:settings_schema.badges.settings.position.label"
       },
       {
@@ -1730,7 +1730,7 @@
         "type": "checkbox",
         "id": "currency_code_enabled",
         "label": "t:settings_schema.currency_format.settings.currency_code_enabled.label",
-        "default": true
+        "default": false
       }
     ]
   },
@@ -2017,7 +2017,7 @@
         "step": 5,
         "unit": "%",
         "label": "Opacidad del borde",
-        "default": 55
+        "default": 25
       },
       {
         "type": "range",
@@ -2027,7 +2027,7 @@
         "step": 1,
         "unit": "px",
         "label": "Redondeo",
-        "default": 0
+        "default": 8
       },
       {
         "type": "checkbox",
@@ -2215,7 +2215,7 @@
         "step": 5,
         "unit": "%",
         "label": "Opacidad del borde",
-        "default": 55
+        "default": 25
       },
       {
         "type": "range",
@@ -2225,7 +2225,7 @@
         "step": 1,
         "unit": "px",
         "label": "Redondeo",
-        "default": 0
+        "default": 8
       },
       {
         "type": "checkbox",
@@ -2287,7 +2287,7 @@
             "label": "Contorno y enlaces"
           }
         ],
-        "default": "foreground"
+        "default": "button"
       },
       {
         "type": "range",
@@ -2303,7 +2303,7 @@
         "type": "checkbox",
         "id": "pill_bold",
         "label": "Negrita",
-        "default": false
+        "default": true
       },
       {
         "type": "range",

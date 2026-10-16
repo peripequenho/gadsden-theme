@@ -280,7 +280,7 @@
   .gad-cmp__label {
     display: block;
     font-weight: 700;
-    font-size: calc(var(--c1-size) * 0.75);
+    font-size: calc(var(--c1-size) * 0.65);
     line-height: 1.2;
     word-break: normal;
     overflow-wrap: break-word;
@@ -288,15 +288,15 @@
   }
 
   .gad-cmp__other--2 .gad-cmp__label {
-    font-size: calc(var(--c2-size) * 0.75);
+    font-size: calc(var(--c2-size) * 0.65);
   }
 
   .gad-cmp__other--3 .gad-cmp__label {
-    font-size: calc(var(--c3-size) * 0.75);
+    font-size: calc(var(--c3-size) * 0.65);
   }
 
   .gad-cmp__label--own {
-    font-size: calc(var(--own-size) * 0.75);
+    font-size: calc(var(--own-size) * 0.65);
   }
 
   .gad-cmp__logo {
@@ -472,6 +472,23 @@
 
     .gad-cmp__label--own {
       font-size: var(--own-size);
+    }
+
+    /* Tabla al costado del texto: las columnas quedan angostas, las etiquetas van más chicas. */
+    .gad-cmp-layout--text .gad-cmp__label {
+      font-size: calc(var(--c1-size) * 0.75);
+    }
+
+    .gad-cmp-layout--text .gad-cmp__other--2 .gad-cmp__label {
+      font-size: calc(var(--c2-size) * 0.75);
+    }
+
+    .gad-cmp-layout--text .gad-cmp__other--3 .gad-cmp__label {
+      font-size: calc(var(--c3-size) * 0.75);
+    }
+
+    .gad-cmp-layout--text .gad-cmp__label--own {
+      font-size: calc(var(--own-size) * 0.75);
     }
 
     .gad-cmp__logo {

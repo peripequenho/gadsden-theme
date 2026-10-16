@@ -187,18 +187,24 @@
 
   .gad-rh__words {
     position: relative;
-    display: inline-grid;
+    display: inline-block;
     color: var(--rh-word);
   }
 
+  /* El ancho sigue a la palabra visible: las demás van superpuestas sin ocupar lugar. */
   .gad-rh__word {
-    grid-area: 1 / 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
     opacity: 0;
     transform: translateY(0.6em);
     transition: opacity 0.35s, transform 0.35s;
   }
 
   .gad-rh__word.is-active {
+    position: relative;
+    white-space: normal;
     opacity: 1;
     transform: none;
   }
@@ -219,12 +225,14 @@
     color: inherit;
   }
 
-  .gad-rh__pill {
-    display: inline-flex;
+  .gad-rh__copy .gad-rh__pill {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.4rem 1.6rem;
-    margin: 1.6rem 0 0;
+    width: fit-content;
+    max-width: 100%;
+    margin: 1.6rem auto 0;
     padding: 0.8rem 1.6rem;
     border-radius: 99rem;
     background: rgba(var(--color-foreground), 0.06);

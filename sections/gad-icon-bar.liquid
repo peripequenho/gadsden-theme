@@ -81,6 +81,20 @@
 
   .gad-icon-bar__item {
     display: flex;
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  /* Caja angosta (dos por fila en mobile): el ícono va arriba del texto para que no se pisen. */
+  @container (max-width: 24rem) {
+    .gad-icon-bar__item .gad-icon-bar__card--horizontal {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .gad-icon-bar__item .gad-icon-bar__card.gad-card--box {
+      padding: 1.6rem 1.2rem;
+    }
   }
 
   .gad-icon-bar__card {

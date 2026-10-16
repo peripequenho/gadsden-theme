@@ -207,7 +207,13 @@
             "color_scheme": "scheme-1"
           }
         }
-      }
+      },
+      "dd_radius": 8,
+      "q_radius": 8,
+      "dd_border_opacity": 25,
+      "q_border_opacity": 25,
+      "pill_bold": true,
+      "pill_accent": "button"
     }
   }
 }

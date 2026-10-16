@@ -7,7 +7,7 @@
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
   class="gad-plans gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --plans-d: {{ s.columns_d }};"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --plans-d: {{ section.blocks.size | at_most: s.columns_d | at_least: 1 }};"
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
@@ -94,6 +94,8 @@
     .gad-plans__grid {
       grid-auto-flow: row;
       grid-template-columns: repeat(var(--plans-d, 3), minmax(0, 1fr));
+      max-width: calc(var(--plans-d, 3) * 38rem);
+      margin-inline: auto;
       overflow: visible;
     }
   }
