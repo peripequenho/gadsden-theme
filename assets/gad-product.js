@@ -21,7 +21,7 @@
   }
 
   function subscribeVariant() {
-    if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS) subscribe(PUB_SUB_EVENTS.variantChange, onVariantChange);
+    if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') subscribe(PUB_SUB_EVENTS.variantChange, onVariantChange);
   }
 
   /* ---------- PX4: ocultar y saltear agotadas ---------- */
@@ -285,7 +285,7 @@
     init();
   });
   document.addEventListener('shopify:section:load', init);
-  if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS)
+  if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined')
     subscribe(PUB_SUB_EVENTS.variantChange, () => setTimeout(initOffers, 0));
   window.GadProduct = { syncFromHtml, filterGallery, sleep };
 })();
@@ -320,7 +320,7 @@ class GadStickyBar extends HTMLElement {
     this.spacer.className = 'gad-sticky-spacer';
     this.spacer.setAttribute('aria-hidden', 'true');
     document.body.appendChild(this.spacer);
-    if (window.subscribe && window.PUB_SUB_EVENTS) {
+    if (window.subscribe && typeof PUB_SUB_EVENTS !== 'undefined') {
       this.unsubCart = subscribe(PUB_SUB_EVENTS.cartUpdate, () => this.stopLoading());
       this.unsubErr = subscribe(PUB_SUB_EVENTS.cartError, () => this.stopLoading());
     }

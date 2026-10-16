@@ -197,11 +197,11 @@
   document.addEventListener('DOMContentLoaded', () => refresh(document));
   document.addEventListener('shopify:section:load', (e) => refresh(e.target));
 
-  if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS) {
+  if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
     subscribe(PUB_SUB_EVENTS.cartUpdate, () => setTimeout(() => refresh(document), 60));
   } else {
     document.addEventListener('DOMContentLoaded', () => {
-      if (typeof subscribe === 'function' && window.PUB_SUB_EVENTS) {
+      if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
         subscribe(PUB_SUB_EVENTS.cartUpdate, () => setTimeout(() => refresh(document), 60));
       }
     });
@@ -869,7 +869,7 @@ document.addEventListener('click', (e) => {
         window.location.href = window.routes.cart_url;
         return;
       }
-      if (typeof publish === 'function' && window.PUB_SUB_EVENTS)
+      if (typeof publish === 'function' && typeof PUB_SUB_EVENTS !== 'undefined')
         publish(PUB_SUB_EVENTS.cartUpdate, { source: 'gad-atc', productVariantId: body.get('id'), cartData: res });
       cart.classList.remove('is-empty');
       cart.renderContents(res);
@@ -1468,3 +1468,104 @@ if (!customElements.get('gad-stories'))
       }
     }
   );
+
+/* ---------- P12: cupón con un clic ---------- */
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest && e.target.closest('[data-gad-apply-code]');
+  if (!btn || btn.disabled) return;
+  const code = btn.dataset.gadApplyCode;
+  btn.disabled = true;
+  btn.classList.add('loading');
+  try {
+    await fetch(`${window.Shopify && Shopify.routes ? Shopify.routes.root : '/'}discount/${encodeURIComponent(code)}`, { credentials: 'same-origin' });
+    try {
+      sessionStorage.setItem('gad-code-' + code, '1');
+    } catch (err) {}
+    Gadsden.markCodes(document);
+  } catch (err) {
+    btn.disabled = false;
+  }
+  btn.classList.remove('loading');
+});
+Gadsden.markCodes = function (scope) {
+  scope.querySelectorAll('[data-gad-apply-code]').forEach((btn) => {
+    let done = false;
+    try {
+      done = sessionStorage.getItem('gad-code-' + btn.dataset.gadApplyCode) === '1';
+    } catch (err) {}
+    const box = btn.closest('.gad-p-code');
+    if (box) box.classList.toggle('is-applied', done);
+    btn.disabled = done;
+  });
+};
+Gadsden.markCodes(document);
+document.addEventListener('shopify:section:load', (e) => Gadsden.markCodes(e.target));
+
+/* ---------- P14 y P18: lo que se suma junto con el producto principal ---------- */
+Gadsden.mainQuantity = function (formId) {
+  const input = document.querySelector(`input[name="quantity"][form="${formId}"]`) || document.querySelector(`#${formId} input[name="quantity"]`);
+  return Math.max(1, parseInt(input && input.value, 10) || 1);
+};
+if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
+  subscribe(PUB_SUB_EVENTS.cartUpdate, (event) => {
+    if (!event || event.source !== 'product-form') return;
+    const items = [];
+    document.querySelectorAll('[data-gad-with-main]').forEach((box) => {
+      const form = document.getElementById(box.dataset.form);
+      const idInput = form && form.querySelector('[name="id"]');
+      if (!idInput || String(idInput.value) !== String(event.productVariantId)) return;
+      box.querySelectorAll('input[data-gad-addon]:checked').forEach((c) => items.push({ id: Number(c.value), quantity: 1 }));
+      const qty = Gadsden.mainQuantity(box.dataset.form);
+      box.querySelectorAll('[data-gad-qgift]').forEach((g) => {
+        if (qty >= Number(g.dataset.min)) items.push({ id: Number(g.dataset.variant), quantity: 1, properties: { _gad_extra: 'regalo' } });
+      });
+    });
+    if (items.length) setTimeout(() => Gadsden.addItems(items).catch(() => {}), 150);
+  });
+}
+
+if (!customElements.get('gad-qty-gifts'))
+  customElements.define(
+    'gad-qty-gifts',
+    class extends HTMLElement {
+      connectedCallback() {
+        this.update = () => {
+          const qty = Gadsden.mainQuantity(this.dataset.form);
+          this.querySelectorAll('[data-gad-qgift]').forEach((g) => g.classList.toggle('is-unlocked', qty >= Number(g.dataset.min)));
+        };
+        this.onChange = (e) => {
+          if (e.target && e.target.name === 'quantity') this.update();
+        };
+        document.addEventListener('change', this.onChange);
+        document.addEventListener('click', this.onClick = () => setTimeout(this.update, 50));
+        this.update();
+      }
+      disconnectedCallback() {
+        document.removeEventListener('change', this.onChange);
+        document.removeEventListener('click', this.onClick);
+      }
+    }
+  );
+
+/* ---------- P19 y P20: fechas estimadas de entrega ---------- */
+Gadsden.addDays = function (days, skipWeekends) {
+  const d = new Date();
+  let left = Number(days) || 0;
+  while (left > 0) {
+    d.setDate(d.getDate() + 1);
+    if (skipWeekends && (d.getDay() === 0 || d.getDay() === 6)) continue;
+    left--;
+  }
+  return d;
+};
+Gadsden.fillDates = function (scope) {
+  scope.querySelectorAll('[data-gad-days]').forEach((el) => {
+    const box = el.closest('[data-gad-dates]');
+    const skip = box && box.dataset.skipWeekends === 'true';
+    const style = (box && box.dataset.format) || 'short';
+    const opts = style === 'long' ? { weekday: 'long', day: 'numeric', month: 'long' } : { weekday: 'short', day: 'numeric', month: 'short' };
+    el.textContent = Gadsden.addDays(el.dataset.gadDays, skip).toLocaleDateString(document.documentElement.lang || undefined, opts);
+  });
+};
+Gadsden.fillDates(document);
+document.addEventListener('shopify:section:load', (e) => Gadsden.fillDates(e.target));

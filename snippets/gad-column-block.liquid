@@ -43,7 +43,7 @@
           endif
         -%}
         <div class="gad-cols__video">
-          <iframe src="{{ embed }}" title="{{ b.title | default: 'Video' | escape }}" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+          <iframe src="{{ embed }}" title="{{ b.title | strip_html | default: 'Video' | escape }}" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
         </div>
       {%- elsif request.design_mode -%}
         {{ 'hero-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}

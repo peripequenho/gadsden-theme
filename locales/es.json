@@ -607,6 +607,9 @@
     },
     "shoppable": {
       "pick": "Elegí un producto para este punto."
+    },
+    "product": {
+      "pick_products": "Elegí productos en este bloque."
     }
   }
 }

@@ -1101,3 +1101,403 @@ html.gad-modal-open {
     right: calc(var(--vthumb-w) + 2.4rem);
   }
 }
+
+/* ---------- P12 cupón con un clic ---------- */
+.gad-p-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.4rem;
+  border: 0.1rem dashed rgba(var(--color-foreground), 0.35);
+  border-radius: 0.8rem;
+  background: rgb(var(--color-background));
+  color: rgb(var(--color-foreground));
+}
+
+.gad-p-code__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1.4rem;
+}
+
+.gad-p-code__value {
+  letter-spacing: 0.1rem;
+}
+
+.gad-p-code__btn {
+  min-height: 3.8rem;
+  padding: 0 1.6rem;
+  font-size: 1.3rem;
+}
+
+.gad-p-code__btn .gad-icon {
+  font-size: 1.8rem;
+}
+
+.gad-p-code__done,
+.gad-p-code.is-applied .gad-p-code__apply {
+  display: none;
+}
+
+.gad-p-code.is-applied .gad-p-code__done {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.gad-p-code__btn:disabled {
+  opacity: 1;
+}
+
+/* ---------- P14 productos para sumar y P18 regalos por cantidad ---------- */
+.gad-p-addons__title,
+.gad-p-qgifts__title {
+  margin: 0 0 0.8rem;
+  font-weight: 600;
+}
+
+.gad-p-addons__list,
+.gad-p-qgifts__list {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0;
+}
+
+.gad-p-addons__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.gad-p-addons__item input {
+  width: 1.8rem;
+  height: 1.8rem;
+  accent-color: rgb(var(--color-button));
+}
+
+.gad-p-addons__item img,
+.gad-p-qgifts__media img {
+  display: block;
+  width: 4.8rem;
+  height: 4.8rem;
+  border-radius: 0.4rem;
+  object-fit: cover;
+}
+
+.gad-p-addons__item.is-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.gad-p-addons__name {
+  flex: 1;
+  min-width: 0;
+}
+
+.gad-p-addons__price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gad-p-qgifts__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 0.1rem dashed rgba(var(--color-foreground), 0.25);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  opacity: 0.6;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+
+.gad-p-qgifts__item.is-unlocked {
+  border-style: solid;
+  border-color: rgb(var(--color-button));
+  opacity: 1;
+}
+
+.gad-p-qgifts__media {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 2.2rem;
+  min-height: 2.2rem;
+}
+
+.gad-p-qgifts__lock,
+.gad-p-qgifts__open {
+  position: absolute;
+  right: -0.6rem;
+  bottom: -0.6rem;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: rgb(var(--color-foreground));
+  font-size: 1.4rem;
+  --gad-icon-color: rgb(var(--color-background));
+}
+
+.gad-p-qgifts__open,
+.gad-p-qgifts__item.is-unlocked .gad-p-qgifts__lock {
+  display: none;
+}
+
+.gad-p-qgifts__item.is-unlocked .gad-p-qgifts__open {
+  display: grid;
+  background: rgb(var(--color-button));
+  --gad-icon-color: rgb(var(--color-button-text));
+}
+
+/* ---------- P15 video, P16 sellos de pago y P17 combo ---------- */
+.gad-pblock .gad-cols__video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 0.8rem;
+}
+
+.gad-pblock .gad-cols__video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.gad-pblock .list-payment {
+  justify-content: flex-start;
+  margin: -0.5rem;
+  padding-top: 0;
+}
+
+.gad-p-align--center .list-payment {
+  justify-content: center;
+}
+
+.gad-p-align--right .list-payment {
+  justify-content: flex-end;
+}
+
+.gad-p-bundle__title {
+  margin: 0 0 1rem;
+}
+
+/* ---------- P19 envío estimado y P20 hitos ---------- */
+.gad-p-delivery {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1.4rem;
+}
+
+.gad-p-delivery.gad-p-align--center {
+  justify-content: center;
+}
+
+.gad-p-delivery.gad-p-align--right {
+  justify-content: flex-end;
+}
+
+.gad-p-delivery__icon {
+  flex: 0 0 auto;
+  font-size: 2.2rem;
+}
+
+.gad-p-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  text-align: center;
+}
+
+.gad-p-steps__item {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  font-size: 1.3rem;
+}
+
+.gad-p-steps__item + .gad-p-steps__item::before {
+  content: '';
+  position: absolute;
+  top: 1.8rem;
+  right: calc(50% + 2.4rem);
+  left: calc(-50% + 2.4rem);
+  border-top: 0.2rem dashed var(--st);
+  opacity: 0.6;
+}
+
+.gad-p-steps__icon {
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin-bottom: 0.4rem;
+  border-radius: 50%;
+  background: var(--st);
+  font-size: 2rem;
+  --gad-icon-color: #fff;
+}
+
+.gad-p-steps__label {
+  font-weight: 600;
+}
+
+.gad-p-steps__date {
+  opacity: 0.75;
+}
+
+/* ---------- P21 botones a secciones ---------- */
+.gad-p-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.gad-p-jump.gad-p-align--center {
+  justify-content: center;
+}
+
+.gad-p-jump.gad-p-align--right {
+  justify-content: flex-end;
+}
+
+.gad-p-jump__link {
+  color: rgb(var(--color-foreground));
+  font-size: 1.4rem;
+  text-decoration: none;
+}
+
+.gad-p-jump__link--pill {
+  padding: 0.6rem 1.4rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.25);
+  border-radius: 99rem;
+}
+
+.gad-p-jump__link--pill:hover {
+  border-color: rgb(var(--color-foreground));
+}
+
+.gad-p-jump__link--underline {
+  text-decoration: underline;
+  text-underline-offset: 0.3rem;
+}
+
+/* ---------- P22 avatares ---------- */
+.gad-p-avatars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.4rem;
+}
+
+.gad-p-avatars.gad-p-align--center {
+  justify-content: center;
+}
+
+.gad-p-avatars.gad-p-align--right {
+  justify-content: flex-end;
+}
+
+.gad-p-avatars__faces {
+  display: flex;
+}
+
+.gad-p-avatars__face {
+  display: grid;
+  place-items: center;
+  width: var(--av, 34px);
+  height: var(--av, 34px);
+  border: 0.2rem solid rgb(var(--color-background));
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  font-size: calc(var(--av, 34px) * 0.32);
+  font-weight: 700;
+}
+
+.gad-p-avatars__face + .gad-p-avatars__face {
+  margin-left: calc(var(--av, 34px) * -0.22);
+}
+
+.gad-p-avatars__face--2 {
+  background: color-mix(in srgb, rgb(var(--color-button)) 80%, rgb(var(--color-background)));
+}
+
+.gad-p-avatars__face--3 {
+  background: color-mix(in srgb, rgb(var(--color-button)) 65%, rgb(var(--color-background)));
+}
+
+.gad-p-avatars__face--4 {
+  background: color-mix(in srgb, rgb(var(--color-button)) 50%, rgb(var(--color-background)));
+  color: rgb(var(--color-foreground));
+}
+
+.gad-p-avatars__face--5 {
+  background: color-mix(in srgb, rgb(var(--color-button)) 35%, rgb(var(--color-background)));
+  color: rgb(var(--color-foreground));
+}
+
+/* ---------- P23 campo personalizado ---------- */
+.gad-p-field__label {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.gad-p-field__input {
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.35);
+  border-radius: var(--inputs-radius, 0);
+  font: inherit;
+  font-size: 1.5rem;
+}
+
+.gad-p-field__check {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+}
+
+.gad-p-field__check input {
+  width: 1.8rem;
+  height: 1.8rem;
+  accent-color: rgb(var(--color-button));
+}
+
+.gad-p-field__help {
+  margin: 0.6rem 0 0;
+  font-size: 1.3rem;
+  opacity: 0.75;
+}
+
+.gad-p-field__help p {
+  margin: 0;
+}
+
+/* ---------- P24 botón con enlace ---------- */
+.gad-p-btn {
+  gap: 0.6rem;
+}
+
+.gad-p-btn .gad-icon {
+  font-size: 2rem;
+}
+
+.gad-p-note {
+  padding: 1rem;
+  border: 0.1rem dashed rgba(var(--color-foreground), 0.3);
+  font-size: 1.3rem;
+}

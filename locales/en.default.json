@@ -595,6 +595,9 @@
     },
     "shoppable": {
       "pick": "Pick a product for this point."
+    },
+    "product": {
+      "pick_products": "Pick products in this block."
     }
   }
 }

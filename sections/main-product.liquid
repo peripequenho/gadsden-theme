@@ -498,6 +498,7 @@
                       type="button"
                       aria-haspopup="dialog"
                     >
+                      {%- if block.settings.icon != blank -%}{%- render 'gad-icon', name: block.settings.icon -%}{%- endif -%}
                       {{ block.settings.text | default: block.settings.page.title | escape }}
                     </button>
                   </modal-opener>
@@ -2739,6 +2740,1070 @@
       ]
     },
     {
+      "type": "code",
+      "name": "Cupón con un clic",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Usá el cupón"
+        },
+        {
+          "type": "text",
+          "id": "code",
+          "label": "Código",
+          "default": "BIENVENIDA",
+          "info": "Tiene que existir en Descuentos de Shopify."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Aplicar"
+        },
+        {
+          "type": "text",
+          "id": "applied_label",
+          "label": "Texto ya aplicado",
+          "default": "Aplicado"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Combinación",
+          "default": "scheme-2"
+        },
+        {
+          "type": "paragraph",
+          "content": "El descuento queda guardado para el pago. En esa visita el botón se muestra como aplicado."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "addons",
+      "name": "Productos para sumar",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Sumalo a tu compra"
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Productos",
+          "limit": 4
+        },
+        {
+          "type": "checkbox",
+          "id": "checked",
+          "label": "Marcados de entrada",
+          "default": false
+        },
+        {
+          "type": "paragraph",
+          "content": "Los marcados se agregan al carrito junto con el producto, con el botón de agregar."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video subido"
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Miniatura"
+        },
+        {
+          "type": "checkbox",
+          "id": "autoplay",
+          "label": "Reproducción automática sin sonido",
+          "default": false
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "O un video de YouTube o Vimeo",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Descripción del video",
+          "info": "Para lectores de pantalla."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "payment",
+      "name": "Sellos de pago",
+      "settings": [
+        {
+          "type": "text",
+          "id": "custom_list",
+          "label": "Medios a mostrar",
+          "info": "Vacío: los habilitados en la tienda. Para elegir, escribí los nombres separados por coma, ej. visa, master."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "bundle",
+      "name": "Oferta combinada",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Llevalos juntos"
+        },
+        {
+          "type": "checkbox",
+          "id": "include_current",
+          "label": "Sumar el producto de la página primero",
+          "default": true
+        },
+        {
+          "type": "product_list",
+          "id": "products",
+          "label": "Productos",
+          "limit": 4
+        },
+        {
+          "type": "checkbox",
+          "id": "checked",
+          "label": "Marcados de entrada",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "discount",
+          "min": 0,
+          "max": 50,
+          "step": 5,
+          "unit": "%",
+          "label": "Descuento a mostrar",
+          "default": 10,
+          "info": "Sólo cambia el total que se ve. Para cobrarlo así, creá el descuento en Shopify."
+        },
+        {
+          "type": "text",
+          "id": "total_label",
+          "label": "Texto del total",
+          "default": "Total:"
+        },
+        {
+          "type": "text",
+          "id": "discount_note",
+          "label": "Aviso del descuento",
+          "default": "Ahorrás {porcentaje} llevándolos juntos.",
+          "info": "{porcentaje}: el descuento elegido."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Agregar los elegidos"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "qty_gifts",
+      "name": "Regalos por cantidad",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Título",
+          "default": "Llevá más y sumá regalos"
+        },
+        {
+          "type": "paragraph",
+          "content": "Cada regalo se desbloquea al elegir esa cantidad y se agrega con el producto. Para que salga gratis, creá el descuento en Shopify."
+        },
+        {
+          "type": "header",
+          "content": "Regalo 1"
+        },
+        {
+          "type": "range",
+          "id": "min_1",
+          "min": 2,
+          "max": 10,
+          "step": 1,
+          "label": "Desde la cantidad",
+          "default": 2
+        },
+        {
+          "type": "product",
+          "id": "gift_1",
+          "label": "Producto de regalo"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "gift_text_1",
+          "label": "Texto",
+          "default": "Llevando {cantidad}: <strong>{regalo}</strong> de regalo",
+          "info": "{cantidad} y {regalo}: la cantidad y el nombre del regalo."
+        },
+        {
+          "type": "header",
+          "content": "Regalo 2"
+        },
+        {
+          "type": "range",
+          "id": "min_2",
+          "min": 2,
+          "max": 10,
+          "step": 1,
+          "label": "Desde la cantidad",
+          "default": 3
+        },
+        {
+          "type": "product",
+          "id": "gift_2",
+          "label": "Producto de regalo"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "gift_text_2",
+          "label": "Texto",
+          "default": "Llevando {cantidad}: <strong>{regalo}</strong> de regalo",
+          "info": "{cantidad} y {regalo}: la cantidad y el nombre del regalo."
+        },
+        {
+          "type": "header",
+          "content": "Regalo 3"
+        },
+        {
+          "type": "range",
+          "id": "min_3",
+          "min": 2,
+          "max": 10,
+          "step": 1,
+          "label": "Desde la cantidad",
+          "default": 4
+        },
+        {
+          "type": "product",
+          "id": "gift_3",
+          "label": "Producto de regalo"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "gift_text_3",
+          "label": "Texto",
+          "default": "Llevando {cantidad}: <strong>{regalo}</strong> de regalo",
+          "info": "{cantidad} y {regalo}: la cantidad y el nombre del regalo."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "delivery",
+      "name": "Envío estimado",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Llega entre el {desde} y el {hasta}",
+          "info": "{desde} y {hasta}: las fechas calculadas."
+        },
+        {
+          "type": "range",
+          "id": "min_days",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "label": "Días mínimos",
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "max_days",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "label": "Días máximos",
+          "default": 7
+        },
+        {
+          "type": "checkbox",
+          "id": "skip_weekends",
+          "label": "Contar sólo días hábiles",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "format",
+          "label": "Formato de la fecha",
+          "options": [
+            {
+              "value": "short",
+              "label": "Corto (lun. 20 oct.)"
+            },
+            {
+              "value": "long",
+              "label": "Largo (lunes 20 de octubre)"
+            }
+          ],
+          "default": "short"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "default": "local_shipping",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "shipping_steps",
+      "name": "Hitos del envío",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color de los íconos",
+          "info": "Vacío: el color de los botones."
+        },
+        {
+          "type": "checkbox",
+          "id": "skip_weekends",
+          "label": "Contar sólo días hábiles",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Pedido (hoy)"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Texto",
+          "default": "Pedido"
+        },
+        {
+          "type": "text",
+          "id": "icon_1",
+          "label": "Ícono",
+          "default": "shopping_bag",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "header",
+          "content": "Enviado"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Texto",
+          "default": "Enviado"
+        },
+        {
+          "type": "text",
+          "id": "icon_2",
+          "label": "Ícono",
+          "default": "local_shipping",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "range",
+          "id": "days_2",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "label": "Días desde hoy",
+          "default": 1
+        },
+        {
+          "type": "header",
+          "content": "Entregado"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Texto",
+          "default": "Entregado"
+        },
+        {
+          "type": "text",
+          "id": "icon_3",
+          "label": "Ícono",
+          "default": "home",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "range",
+          "id": "days_3",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "label": "Días desde hoy",
+          "default": 5
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "jump",
+      "name": "Botones a secciones",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Cada botón lleva a la sección con ese nombre de ancla (ajuste \"Nombre del ancla\" de la sección)."
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Estilo",
+          "options": [
+            {
+              "value": "pill",
+              "label": "Píldora"
+            },
+            {
+              "value": "underline",
+              "label": "Subrayado"
+            }
+          ],
+          "default": "pill"
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "label_1",
+          "label": "Texto del botón 1",
+          "default": "Beneficios"
+        },
+        {
+          "type": "text",
+          "id": "target_1",
+          "label": "Ancla del botón 1",
+          "default": "beneficios"
+        },
+        {
+          "type": "text",
+          "id": "label_2",
+          "label": "Texto del botón 2",
+          "default": "Cómo se usa"
+        },
+        {
+          "type": "text",
+          "id": "target_2",
+          "label": "Ancla del botón 2",
+          "default": "como-se-usa"
+        },
+        {
+          "type": "text",
+          "id": "label_3",
+          "label": "Texto del botón 3",
+          "default": "Opiniones"
+        },
+        {
+          "type": "text",
+          "id": "target_3",
+          "label": "Ancla del botón 3",
+          "default": "opiniones"
+        },
+        {
+          "type": "text",
+          "id": "label_4",
+          "label": "Texto del botón 4"
+        },
+        {
+          "type": "text",
+          "id": "target_4",
+          "label": "Ancla del botón 4"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "avatars",
+      "name": "Avatares de reseñas",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Foto 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Foto 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Foto 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_4",
+          "label": "Foto 4"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_5",
+          "label": "Foto 5"
+        },
+        {
+          "type": "text",
+          "id": "initials",
+          "label": "Iniciales sin foto",
+          "default": "MA, JP, LC, SR",
+          "info": "Separadas por coma, en el orden de las fotos. Se usan donde no hay foto."
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 24,
+          "max": 56,
+          "step": 2,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 34
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<strong>+2.000</strong> clientes felices"
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "field",
+      "name": "Campo personalizado",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Nombre del campo",
+          "default": "Nombre para grabar",
+          "info": "Es también el nombre con el que llega en el pedido."
+        },
+        {
+          "type": "select",
+          "id": "type",
+          "label": "Tipo",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto corto"
+            },
+            {
+              "value": "textarea",
+              "label": "Texto largo"
+            },
+            {
+              "value": "select",
+              "label": "Lista de opciones"
+            },
+            {
+              "value": "checkbox",
+              "label": "Casilla"
+            }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Texto de ayuda dentro del campo"
+        },
+        {
+          "type": "text",
+          "id": "options",
+          "label": "Opciones",
+          "info": "Para la lista: separadas por coma."
+        },
+        {
+          "type": "text",
+          "id": "checked_value",
+          "label": "Valor de la casilla marcada",
+          "default": "Sí"
+        },
+        {
+          "type": "range",
+          "id": "max_length",
+          "min": 0,
+          "max": 200,
+          "step": 5,
+          "label": "Largo máximo",
+          "default": 0,
+          "info": "0: sin límite."
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Obligatorio",
+          "default": false
+        },
+        {
+          "type": "richtext",
+          "id": "help",
+          "label": "Aclaración debajo"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Botón con enlace",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Texto",
+          "default": "Ver guía de talles"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Estilo",
+          "options": [
+            {
+              "value": "filled",
+              "label": "Lleno"
+            },
+            {
+              "value": "outline",
+              "label": "Contorno"
+            },
+            {
+              "value": "link",
+              "label": "Enlace"
+            }
+          ],
+          "default": "outline"
+        },
+        {
+          "type": "checkbox",
+          "id": "full_width",
+          "label": "Todo el ancho",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "new_tab",
+          "label": "Abrir en otra pestaña",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
       "type": "text",
       "name": "t:sections.main-product.blocks.text.name",
       "settings": [
@@ -3885,6 +4950,12 @@
           "id": "page",
           "type": "page",
           "label": "t:sections.main-product.blocks.popup.settings.page.label"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "info": "Ej. straighten para una tabla de talles. Nombre en inglés de Material Symbols."
         },
         {
           "type": "select",
