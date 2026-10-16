@@ -3396,6 +3396,30 @@
           "label": "Varsayılan olarak açık"
         }
       }
+    },
+    "main-account": {
+      "name": "Hesap"
+    },
+    "main-activate-account": {
+      "name": "Hesap etkinleştirme"
+    },
+    "main-addresses": {
+      "name": "Adresler"
+    },
+    "main-login": {
+      "name": "Giriş bilgileri",
+      "shop_login_button": {
+        "enable": "Shop ile giriş yapmayı etkinleştirin"
+      }
+    },
+    "main-order": {
+      "name": "Sipariş"
+    },
+    "main-register": {
+      "name": "Kayıt"
+    },
+    "main-reset-password": {
+      "name": "Parola sıfırlama"
     }
   }
 }

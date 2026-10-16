@@ -3396,6 +3396,30 @@
           "label": "Otevřeno ve výchozím stavu"
         }
       }
+    },
+    "main-account": {
+      "name": "Účet"
+    },
+    "main-activate-account": {
+      "name": "Aktivace účtu"
+    },
+    "main-addresses": {
+      "name": "Adresy"
+    },
+    "main-login": {
+      "name": "Přihlášení",
+      "shop_login_button": {
+        "enable": "Povolit přihlášení přes Shop"
+      }
+    },
+    "main-order": {
+      "name": "Objednávka"
+    },
+    "main-register": {
+      "name": "Registrace"
+    },
+    "main-reset-password": {
+      "name": "Reset hesla"
     }
   }
 }

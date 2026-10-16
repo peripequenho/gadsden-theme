@@ -592,6 +592,12 @@
       "field": "Campo",
       "required": "Completá este campo.",
       "email": "Ingresá un email válido."
+    },
+    "music": {
+      "play": "Poner música",
+      "pause": "Pausar la música",
+      "seek": "Avance del tema",
+      "empty": "Cargá la dirección del audio para mostrar el reproductor."
     }
   }
 }

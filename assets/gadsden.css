@@ -2021,3 +2021,120 @@ html.gad-badge-flush .card--media .card__inner .card__content {
 [dir='rtl'] .gad-carousel__track > * {
   direction: rtl;
 }
+
+/* ---------- S15/S16 reproductor de música ---------- */
+.gad-music {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.gad-music__toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 4.8rem;
+  height: 4.8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(var(--color-button));
+  color: rgb(var(--color-button-text));
+  font-size: 2.4rem;
+  cursor: pointer;
+  --gad-icon-color: rgb(var(--color-button-text));
+}
+
+.gad-music__on,
+.gad-music.is-playing .gad-music__off {
+  display: none;
+}
+
+.gad-music.is-playing .gad-music__on {
+  display: inline;
+}
+
+.gad-music--pulse.is-playing .gad-music__toggle {
+  animation: gad-music-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes gad-music-pulse {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.gad-music-float {
+  position: fixed;
+  bottom: var(--my, 20px);
+  z-index: 40;
+  background: transparent;
+}
+
+.gad-music-float[data-side='bottom-left'] {
+  left: var(--mx, 20px);
+}
+
+.gad-music-float[data-side='bottom-right'] {
+  right: var(--mx, 20px);
+}
+
+.gad-music-float .gad-music__toggle {
+  box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.gad-music-section .gad-music {
+  padding: 1.6rem;
+  border-radius: 1.2rem;
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+.gad-music__cover img {
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  object-fit: cover;
+  border-radius: 0.8rem;
+}
+
+.gad-music__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gad-music__title,
+.gad-music__artist {
+  margin: 0;
+}
+
+.gad-music__artist {
+  opacity: 0.7;
+  font-size: 1.4rem;
+}
+
+.gad-music__bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.8rem;
+}
+
+.gad-music__seek {
+  flex: 1;
+  accent-color: rgb(var(--color-button));
+}
+
+.gad-music__time {
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gad-music--pulse.is-playing .gad-music__toggle {
+    animation: none;
+  }
+}
+
+html.gad-modal-open {
+  overflow: hidden;
+}

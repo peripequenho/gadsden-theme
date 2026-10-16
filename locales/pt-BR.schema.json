@@ -3396,6 +3396,30 @@
           "label": "Aberto por padrão"
         }
       }
+    },
+    "main-account": {
+      "name": "Conta"
+    },
+    "main-activate-account": {
+      "name": "Ativação de conta"
+    },
+    "main-addresses": {
+      "name": "Endereços"
+    },
+    "main-login": {
+      "name": "Fazer login",
+      "shop_login_button": {
+        "enable": "Ativar a opção Fazer login com o Shop"
+      }
+    },
+    "main-order": {
+      "name": "Pedido"
+    },
+    "main-register": {
+      "name": "Registro"
+    },
+    "main-reset-password": {
+      "name": "Redefinição de senha"
     }
   }
 }

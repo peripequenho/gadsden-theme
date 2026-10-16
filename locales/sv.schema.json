@@ -3396,6 +3396,30 @@
           "label": "Öppen som standard"
         }
       }
+    },
+    "main-account": {
+      "name": "Konto"
+    },
+    "main-activate-account": {
+      "name": "Kontoaktivering"
+    },
+    "main-addresses": {
+      "name": "Adresser"
+    },
+    "main-login": {
+      "name": "Inloggning",
+      "shop_login_button": {
+        "enable": "Aktivera inloggning med Shop"
+      }
+    },
+    "main-order": {
+      "name": "Order"
+    },
+    "main-register": {
+      "name": "Registrering"
+    },
+    "main-reset-password": {
+      "name": "Lösenordsåterställning"
     }
   }
 }

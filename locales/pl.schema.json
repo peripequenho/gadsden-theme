@@ -3396,6 +3396,30 @@
           "label": "Domyślnie otwarte"
         }
       }
+    },
+    "main-account": {
+      "name": "Konto"
+    },
+    "main-activate-account": {
+      "name": "Aktywacja konta"
+    },
+    "main-addresses": {
+      "name": "Adresy"
+    },
+    "main-login": {
+      "name": "Zaloguj",
+      "shop_login_button": {
+        "enable": "Włącz logowanie przez Shop"
+      }
+    },
+    "main-order": {
+      "name": "Zamówienie"
+    },
+    "main-register": {
+      "name": "Rejestracja"
+    },
+    "main-reset-password": {
+      "name": "Resetowanie hasła"
     }
   }
 }

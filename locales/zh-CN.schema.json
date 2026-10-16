@@ -3396,6 +3396,30 @@
           "label": "默认展开"
         }
       }
+    },
+    "main-account": {
+      "name": "账户"
+    },
+    "main-activate-account": {
+      "name": "账户激活"
+    },
+    "main-addresses": {
+      "name": "地址"
+    },
+    "main-login": {
+      "name": "登录",
+      "shop_login_button": {
+        "enable": "启用“使用 Shop 登录”"
+      }
+    },
+    "main-order": {
+      "name": "订单"
+    },
+    "main-register": {
+      "name": "注册"
+    },
+    "main-reset-password": {
+      "name": "密码重设"
     }
   }
 }

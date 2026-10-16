@@ -1102,3 +1102,147 @@ if (!customElements.get('gad-language-popup'))
       }
     }
   );
+
+/* ---------- ventanas simples: [data-gad-dialog="id"] abre, [data-gad-dialog-close] o el fondo cierran.
+   Los iframes cargan al abrir (data-src) y se descargan al cerrar, para cortar el video. ---------- */
+(() => {
+  const open = (dialog) => {
+    dialog.querySelectorAll('iframe[data-src]').forEach((f) => (f.src = f.dataset.src));
+    dialog.showModal();
+    document.documentElement.classList.add('gad-modal-open');
+  };
+  const close = (dialog) => {
+    dialog.close();
+  };
+  document.addEventListener('click', (event) => {
+    const opener = event.target.closest && event.target.closest('[data-gad-dialog]');
+    if (opener) {
+      const dialog = document.getElementById(opener.dataset.gadDialog);
+      if (dialog && typeof dialog.showModal === 'function') open(dialog);
+      return;
+    }
+    const closer = event.target.closest && event.target.closest('[data-gad-dialog-close]');
+    if (closer) {
+      const dialog = closer.closest('dialog');
+      if (dialog) close(dialog);
+      return;
+    }
+    if (event.target.tagName === 'DIALOG' && event.target.matches('.gad-gp__dialog, .gad-x-dialog')) close(event.target);
+  });
+  document.addEventListener(
+    'close',
+    (event) => {
+      const dialog = event.target;
+      if (!(dialog instanceof HTMLDialogElement) || !dialog.matches('.gad-gp__dialog, .gad-x-dialog')) return;
+      dialog.querySelectorAll('iframe[data-src]').forEach((f) => f.removeAttribute('src'));
+      if (!document.querySelector('dialog[open]')) document.documentElement.classList.remove('gad-modal-open');
+    },
+    true
+  );
+})();
+
+/* ---------- S14: popup promocional ---------- */
+if (!customElements.get('gad-promo-popup'))
+  customElements.define(
+    'gad-promo-popup',
+    class GadPromoPopup extends HTMLElement {
+      connectedCallback() {
+        const dialog = this.querySelector('dialog');
+        if (!dialog || this.dataset.ready) return;
+        this.dataset.ready = '1';
+        const key = 'gad-promo-closed';
+        const sentKey = 'gad-promo-sent';
+        const mode = this.dataset.mode;
+        const form = dialog.querySelector('form');
+        let sent = false;
+        try {
+          sent = sessionStorage.getItem(sentKey) === '1' && /customer_posted=true/.test(location.search);
+          if (sent) sessionStorage.removeItem(sentKey);
+        } catch (e) {}
+        if (form)
+          form.addEventListener('submit', () => {
+            try {
+              sessionStorage.setItem(sentKey, '1');
+            } catch (e) {}
+          });
+        const showSuccess = sent || mode === 'success_testing';
+        if (showSuccess) {
+          dialog.querySelector('[data-gad-promo-offer]').hidden = true;
+          dialog.querySelector('[data-gad-promo-success]').hidden = false;
+        }
+        const close = () => {
+          dialog.close();
+        };
+        dialog.addEventListener('close', () => {
+          if (mode === 'enabled') {
+            try {
+              localStorage.setItem(key, String(Date.now()));
+            } catch (e) {}
+          }
+        });
+        dialog.addEventListener('click', (event) => {
+          if (event.target === dialog || event.target.closest('[data-gad-promo-close]')) close();
+        });
+        if (mode === 'enabled' && !showSuccess) {
+          let last = 0;
+          try {
+            last = parseInt(localStorage.getItem(key) || '0', 10);
+          } catch (e) {}
+          const days = parseFloat(this.dataset.days || '30') * 86400000;
+          if (last && Date.now() - last < days) return;
+        }
+        if (this.hasAttribute('data-design') && mode === 'enabled') return;
+        const wait = showSuccess ? 0 : parseFloat(this.dataset.seconds || '5') * 1000;
+        setTimeout(() => {
+          if (document.querySelector('dialog[open]')) return;
+          dialog.showModal();
+          const timer = dialog.querySelector('[data-gad-promo-timer]');
+          if (timer && !showSuccess) {
+            const end = Date.now() + parseInt(timer.dataset.seconds, 10) * 1000;
+            const out = timer.querySelector('[data-gad-promo-time]');
+            const tick = () => {
+              const left = Math.max(0, Math.round((end - Date.now()) / 1000));
+              out.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
+              if (left > 0 && dialog.open) setTimeout(tick, 1000);
+            };
+            tick();
+          }
+        }, wait);
+      }
+    }
+  );
+
+/* ---------- S15/S16: reproductor de música (nunca arranca solo) ---------- */
+if (!customElements.get('gad-music'))
+  customElements.define(
+    'gad-music',
+    class GadMusic extends HTMLElement {
+      connectedCallback() {
+        const audio = this.querySelector('audio');
+        const button = this.querySelector('.gad-music__toggle');
+        if (!audio || !button || this.dataset.ready) return;
+        this.dataset.ready = '1';
+        audio.volume = Math.min(1, Math.max(0, parseFloat(this.dataset.volume || '30') / 100));
+        const seek = this.querySelector('[data-gad-music-seek]');
+        const time = this.querySelector('[data-gad-music-time]');
+        const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+        const sync = () => {
+          const playing = !audio.paused;
+          this.classList.toggle('is-playing', playing);
+          button.setAttribute('aria-pressed', String(playing));
+          button.setAttribute('aria-label', playing ? button.dataset.labelPause : button.dataset.labelPlay);
+        };
+        button.addEventListener('click', () => (audio.paused ? audio.play().catch(() => {}) : audio.pause()));
+        audio.addEventListener('play', sync);
+        audio.addEventListener('pause', sync);
+        audio.addEventListener('timeupdate', () => {
+          if (seek && audio.duration) seek.value = (audio.currentTime / audio.duration) * 100;
+          if (time) time.textContent = fmt(audio.currentTime);
+        });
+        if (seek)
+          seek.addEventListener('input', () => {
+            if (audio.duration) audio.currentTime = (seek.value / 100) * audio.duration;
+          });
+      }
+    }
+  );

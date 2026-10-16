@@ -3396,6 +3396,30 @@
           "label": "Standaard geopend"
         }
       }
+    },
+    "main-account": {
+      "name": "Account"
+    },
+    "main-activate-account": {
+      "name": "Accountactivering"
+    },
+    "main-addresses": {
+      "name": "Adressen"
+    },
+    "main-login": {
+      "name": "Inloggen",
+      "shop_login_button": {
+        "enable": "Inloggen met Shop inschakelen"
+      }
+    },
+    "main-order": {
+      "name": "Bestelling"
+    },
+    "main-register": {
+      "name": "Registratie"
+    },
+    "main-reset-password": {
+      "name": "Wachtwoord opnieuw instellen"
     }
   }
 }

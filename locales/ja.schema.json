@@ -3396,6 +3396,30 @@
           "label": "デフォルトで開く"
         }
       }
+    },
+    "main-account": {
+      "name": "アカウント"
+    },
+    "main-activate-account": {
+      "name": "アカウントの有効化"
+    },
+    "main-addresses": {
+      "name": "アドレス"
+    },
+    "main-login": {
+      "name": "ログイン",
+      "shop_login_button": {
+        "enable": "[Shopでログイン] を有効にする"
+      }
+    },
+    "main-order": {
+      "name": "注文"
+    },
+    "main-register": {
+      "name": "登録"
+    },
+    "main-reset-password": {
+      "name": "パスワードのリセット"
     }
   }
 }

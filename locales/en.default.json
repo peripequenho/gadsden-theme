@@ -581,6 +581,12 @@
       "field": "Field",
       "required": "Please fill in this field.",
       "email": "Please enter a valid email."
+    },
+    "music": {
+      "play": "Play music",
+      "pause": "Pause music",
+      "seek": "Song progress",
+      "empty": "Add the audio address to show the player."
     }
   }
 }

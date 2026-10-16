@@ -3396,6 +3396,30 @@
           "label": "기본으로 열기"
         }
       }
+    },
+    "main-account": {
+      "name": "계정"
+    },
+    "main-activate-account": {
+      "name": "계정 활성화"
+    },
+    "main-addresses": {
+      "name": "주소"
+    },
+    "main-login": {
+      "name": "로그인",
+      "shop_login_button": {
+        "enable": "Shop으로 로그인 활성화"
+      }
+    },
+    "main-order": {
+      "name": "주문"
+    },
+    "main-register": {
+      "name": "등록"
+    },
+    "main-reset-password": {
+      "name": "암호 재설정"
     }
   }
 }

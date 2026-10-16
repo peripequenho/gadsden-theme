@@ -3396,6 +3396,30 @@
           "label": "Aperto per impostazione predefinita"
         }
       }
+    },
+    "main-account": {
+      "name": "Account"
+    },
+    "main-activate-account": {
+      "name": "Attivazione account"
+    },
+    "main-addresses": {
+      "name": "Indirizzi"
+    },
+    "main-login": {
+      "name": "Accedi",
+      "shop_login_button": {
+        "enable": "Abilita Accedi con Shop"
+      }
+    },
+    "main-order": {
+      "name": "Ordine"
+    },
+    "main-register": {
+      "name": "Registrazione"
+    },
+    "main-reset-password": {
+      "name": "Reimpostazione della password"
     }
   }
 }
