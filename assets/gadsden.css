@@ -2182,3 +2182,113 @@ body:has(.gad-th-flag--logo2) .section-header:not(.scrolled-past-header) .gad-lo
 body:has(.gad-th-flag--hide-bars) .shopify-section-group-header-group:not(.section-header) {
   display: none;
 }
+
+/* ---------- Estética ecom: tipografía, botones, precios y etiquetas ---------- */
+body {
+  letter-spacing: 0.01rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.h0,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.hxl {
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.button,
+.shopify-payment-button__button--unbranded,
+.customer button {
+  font-weight: 700;
+  letter-spacing: 0.02rem;
+}
+
+.button--primary,
+.product-form__submit {
+  font-size: 1.6rem;
+}
+
+.price .price-item {
+  font-weight: 700;
+}
+
+.price .price__sale s.price-item,
+.price--on-sale .price-item--regular {
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.product .price .price-item--sale,
+.product .price__regular .price-item--regular {
+  font-size: 2.4rem;
+}
+
+@media screen and (min-width: 750px) {
+  .product .price .price-item--sale,
+  .product .price__regular .price-item--regular {
+    font-size: 2.8rem;
+  }
+}
+
+.badge {
+  font-weight: 700;
+  letter-spacing: 0.02rem;
+}
+
+.card__heading,
+.card-information > .price {
+  font-weight: 600;
+}
+
+.header__menu-item {
+  font-weight: 500;
+}
+
+.field__input:focus,
+.select__select:focus,
+.customer .field input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(var(--color-button), 0.35);
+}
+
+.announcement-bar__message {
+  font-weight: 600;
+  letter-spacing: 0.02rem;
+}
+
+.product-form .shopify-payment-button__button--unbranded {
+  border-radius: var(--buttons-radius-outset, var(--buttons-radius));
+  box-shadow: inset 0 0 0 0.2rem rgb(var(--color-foreground));
+}
+
+.product-form .shopify-payment-button__button--unbranded::after,
+.product-form .shopify-payment-button__button--unbranded::before {
+  box-shadow: none;
+}
+
+.quantity,
+.quantity::before,
+.quantity::after {
+  border-radius: var(--inputs-radius);
+}
+
+.quantity__input {
+  font-weight: 600;
+}
+
+.gad-offer__tick,
+.gad-cl__items .gad-icon,
+.gad-gr__points .gad-icon,
+.gad-qz__benefits .gad-icon,
+.gad-plans__check,
+.gad-p-qgifts__item.is-unlocked .gad-icon {
+  --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
+  color: rgb(var(--color-accent, var(--color-button)));
+}

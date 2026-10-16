@@ -20,7 +20,7 @@
 }
 
 .gad-title--sm h1 {
-  font-size: calc(var(--font-heading-scale) * 2rem);
+  font-size: calc(var(--font-heading-scale) * 1.9rem);
 }
 
 .gad-title--md h1 {
@@ -33,7 +33,7 @@
 
 @media screen and (min-width: 750px) {
   .gad-title--sm h1 {
-    font-size: calc(var(--font-heading-scale) * 2.4rem);
+    font-size: calc(var(--font-heading-scale) * 2.2rem);
   }
 
   .gad-title--md h1 {
@@ -144,9 +144,10 @@
 /* ---------- PX6 botones de compra ---------- */
 .gad-buy__label {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--icon-gap, 1rem);
+  gap: 0 var(--icon-gap, 1rem);
 }
 
 .gad-buy__label > span {
@@ -160,6 +161,7 @@
 
 .gad-buy__price {
   font-weight: 400;
+  white-space: nowrap;
   opacity: 0.9;
 }
 
