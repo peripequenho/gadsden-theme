@@ -44,7 +44,8 @@
 
     <div class="gad-ba-layout__media{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
       <gad-before-after
-        class="gad-ba gad-ba--{{ s.handle_style }}"
+        class="gad-ba gad-ba--{{ s.handle_style }}{% if s.elastic %} gad-ba--elastic{% endif %}"
+        data-start="{{ s.start }}"
         style="--pos: {{ s.start }}%; --ratio: {{ ratio }}; --line: rgb(var(--color-{{ s.line_color }}));"
       >
         <div class="gad-ba__img gad-ba__img--before">
@@ -70,6 +71,7 @@
           <span class="gad-ba__label gad-ba__label--after color-{{ s.labels_scheme }}">{{ s.after_label }}</span>
         {%- endif -%}
         <span class="gad-ba__line" aria-hidden="true"></span>
+        {%- if s.elastic -%}<svg class="gad-ba__curve" aria-hidden="true"><path></path></svg>{%- endif -%}
         <span class="gad-ba__handle" aria-hidden="true">
           {%- render 'gad-icon', name: 'arrow_left', filled: true, class: 'gad-ba__arrow' -%}
           {%- render 'gad-icon', name: 'arrow_right', filled: true, class: 'gad-ba__arrow' -%}
@@ -255,6 +257,30 @@
     backdrop-filter: blur(2px);
   }
 
+  .gad-ba__curve {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .gad-ba__curve path {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 3;
+  }
+
+  gad-before-after.is-elastic .gad-ba__line {
+    display: none;
+  }
+
+  gad-before-after.is-elastic .gad-ba__handle {
+    top: var(--hy, 50%);
+  }
+
   .gad-ba--simple .gad-ba__handle {
     filter: drop-shadow(0 0 0.3rem rgba(0, 0, 0, 0.5));
   }
@@ -287,23 +313,95 @@
       this.range = this.querySelector('.gad-ba__range');
       this.range.addEventListener('input', () => this.set(parseFloat(this.range.value)));
       this.addEventListener('pointerdown', (e) => this.down(e));
+      this.elastic = this.classList.contains('gad-ba--elastic') && !(window.Gadsden && Gadsden.reduceMotion());
+      if (this.elastic) this.setupElastic();
     }
 
-    set(pct) {
+    set(pct, yFrac) {
       const v = Math.max(0, Math.min(100, pct));
       this.style.setProperty('--pos', `${v}%`);
       this.range.value = Math.round(v);
+      if (this.elastic) {
+        this.target = v;
+        if (yFrac != null) this.hy = Math.max(0.1, Math.min(0.9, yFrac));
+        this.style.setProperty('--hy', `${this.hy * 100}%`);
+        this.kick();
+      }
     }
 
     fromEvent(e) {
       const r = this.getBoundingClientRect();
+      this.lastY = (e.clientY - r.top) / r.height;
       return ((e.clientX - r.left) / r.width) * 100;
+    }
+
+    /* Línea elástica: los extremos de la línea siguen a la manija con un resorte. */
+    setupElastic() {
+      this.classList.add('is-elastic');
+      this.after = this.querySelector('.gad-ba__img--after');
+      this.curve = this.querySelector('.gad-ba__curve path');
+      const start = parseFloat(this.dataset.start) || 50;
+      this.target = start;
+      this.hy = 0.5;
+      this.ends = { top: start, bot: start, vt: 0, vb: 0 };
+      this.draw();
+      new ResizeObserver(() => this.draw()).observe(this);
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        setTimeout(() => this.set(start + 14), 150);
+        setTimeout(() => this.set(start), 650);
+      }, { threshold: 0.5 });
+      io.observe(this);
+    }
+
+    kick() {
+      if (this.raf) return;
+      let last = performance.now();
+      const step = (now) => {
+        const dt = Math.min(0.032, (now - last) / 1000);
+        last = now;
+        const e = this.ends;
+        const k = 620;
+        const c = 44;
+        e.vt += (k * (this.target - e.top) - c * e.vt) * dt;
+        e.vb += (k * (this.target - e.bot) - c * e.vb) * dt;
+        e.top += e.vt * dt;
+        e.bot += e.vb * dt;
+        this.draw();
+        const still = Math.abs(this.target - e.top) < 0.05 && Math.abs(this.target - e.bot) < 0.05 && Math.abs(e.vt) < 0.5 && Math.abs(e.vb) < 0.5;
+        if (still) {
+          e.top = e.bot = this.target;
+          e.vt = e.vb = 0;
+          this.draw();
+          this.raf = 0;
+          return;
+        }
+        this.raf = requestAnimationFrame(step);
+      };
+      this.raf = requestAnimationFrame(step);
+    }
+
+    draw() {
+      const W = this.clientWidth;
+      const H = this.clientHeight;
+      if (!W || !H) return;
+      const xt = (this.ends.top / 100) * W;
+      const xb = (this.ends.bot / 100) * W;
+      const xh = (this.target / 100) * W;
+      const yh = this.hy * H;
+      const t = this.hy;
+      const cx = (xh - (1 - t) * (1 - t) * xt - t * t * xb) / (2 * t * (1 - t));
+      const cy = (yh - t * t * H) / (2 * t * (1 - t));
+      const d = `M ${xt.toFixed(1)} 0 Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${xb.toFixed(1)} ${H}`;
+      this.curve.setAttribute('d', d);
+      this.after.style.clipPath = `path('${d} L ${W} ${H} L ${W} 0 Z')`;
     }
 
     down(e) {
       if (e.button > 0) return;
       const start = { x: e.clientX, y: e.clientY, decided: e.pointerType === 'mouse' };
-      if (start.decided) this.set(this.fromEvent(e));
+      if (start.decided) this.set(this.fromEvent(e), this.lastY);
       const move = (ev) => {
         if (!start.decided) {
           const dx = Math.abs(ev.clientX - start.x);
@@ -313,7 +411,7 @@
           if (dy > dx) return end();
         }
         ev.preventDefault();
-        this.set(this.fromEvent(ev));
+        this.set(this.fromEvent(ev), this.lastY);
       };
       const end = () => {
         window.removeEventListener('pointermove', move);
@@ -624,6 +722,13 @@
       "unit": "%",
       "label": "Posición inicial de la línea",
       "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "elastic",
+      "label": "Línea elástica",
+      "default": false,
+      "info": "La línea se curva al arrastrar rápido y vuelve, y al aparecer hace un barrido corto. Con \"reducir movimiento\" queda recta."
     },
     {
       "type": "header",

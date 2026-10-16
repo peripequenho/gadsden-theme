@@ -39,10 +39,14 @@
           {%- for block in section.blocks -%}
             {%- assign pct = block.settings.percent | at_least: 0 | at_most: 100 -%}
             <li class="gad-results__row" {{ block.shopify_attributes }}>
-              <gad-ring class="gad-ring" data-value="{{ pct }}" style="--p: {{ pct }};">
-                <span class="gad-ring__value" aria-hidden="true"><span class="gad-ring__num">{{ pct }}</span>%</span>
-                <span class="visually-hidden">{{ pct }}%</span>
-              </gad-ring>
+              {%- if block.settings.figure != blank -%}
+                <gad-count class="gad-results__figure">{{ block.settings.figure | escape }}</gad-count>
+              {%- else -%}
+                <gad-ring class="gad-ring" data-value="{{ pct }}" style="--p: {{ pct }};">
+                  <span class="gad-ring__value" aria-hidden="true"><span class="gad-ring__num">{{ pct }}</span>%</span>
+                  <span class="visually-hidden">{{ pct }}%</span>
+                </gad-ring>
+              {%- endif -%}
               <div class="gad-results__text rte">{{ block.settings.text }}</div>
             </li>
           {%- endfor -%}
@@ -150,6 +154,19 @@
     justify-content: center;
   }
 
+  .gad-results__figure {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    min-width: 9.6rem;
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
   gad-ring {
     position: relative;
     display: grid;
@@ -240,6 +257,38 @@
   }
 
   if (!customElements.get('gad-ring')) customElements.define('gad-ring', GadRing);
+
+  /* Dato libre (S10): si tiene un número, cuenta desde cero conservando lo que lo rodea. */
+  class GadCount extends HTMLElement {
+    connectedCallback() {
+      if (this._ready || (window.Gadsden && (Gadsden.reduceMotion() || Gadsden.designMode))) return;
+      this._ready = true;
+      const text = this.textContent.trim();
+      const m = text.match(/\d[\d.,]*/);
+      if (!m) return;
+      const raw = m[0];
+      const sep = /[.,]\d{3}(\D|$)/.test(raw) ? raw.match(/[.,]/)[0] : '';
+      const target = parseInt(raw.replace(/[.,]/g, ''), 10);
+      if (!target) return;
+      const fmt = (n) => (sep ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep) : String(n));
+      const paint = (n) => (this.textContent = text.replace(raw, fmt(n)));
+      paint(0);
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        const start = performance.now();
+        const step = (now) => {
+          const t = Math.min(1, (now - start) / 1200);
+          paint(Math.round(target * (1 - Math.pow(1 - t, 3))));
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      });
+      io.observe(this);
+    }
+  }
+
+  if (!customElements.get('gad-count')) customElements.define('gad-count', GadCount);
 {% endjavascript %}
 
 {% schema %}
@@ -563,6 +612,12 @@
           "unit": "%",
           "label": "Porcentaje",
           "default": 90
+        },
+        {
+          "type": "text",
+          "id": "figure",
+          "label": "O un dato libre",
+          "info": "Ej. +2.000, 4G o 24/7. Si lo completás, se muestra en lugar del porcentaje; si tiene un número, cuenta al aparecer."
         },
         {
           "type": "richtext",

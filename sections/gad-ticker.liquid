@@ -30,7 +30,7 @@
 {%- else -%}
   {%- render 'gad-colors', s: s, key: section.id -%}
   <gad-ticker
-    class="gad-ticker {% render 'gad-scheme', s: s, key: section.id %}{% if s.pause_hover %} gad-ticker--pause{% endif %}{% if s.direction == 'reverse' or s.direction == 'down' %} gad-ticker--reverse{% endif %}{% if s.direction == 'up' or s.direction == 'down' %} gad-ticker--vertical{% endif %}"
+    class="gad-ticker {% render 'gad-scheme', s: s, key: section.id %}{% if s.pause_hover %} gad-ticker--pause{% endif %}{% if s.text_effect != blank and s.text_effect != 'none' %} gad-ticker--fx-{{ s.text_effect }}{% endif %}{% if s.direction == 'reverse' or s.direction == 'down' %} gad-ticker--reverse{% endif %}{% if s.direction == 'up' or s.direction == 'down' %} gad-ticker--vertical{% endif %}"
     data-speed="{{ s.speed }}"
     style="--h-m: {{ s.height_m }}px; --h-d: {{ s.height_d }}px; --gap-m: {{ s.gap_m }}px; --gap-d: {{ s.gap_d }}px; --size-m: {{ s.text_size_m }}px; --size-d: {{ s.text_size_d }}px; --img-m: {{ s.image_height_m }}px; --img-d: {{ s.image_height_d }}px; --rv-m: {{ s.review_width_m }}px; --rv-d: {{ s.review_width_d }}px; --pt-m: {{ s.padding_top_m }}px; --pb-m: {{ s.padding_bottom_m }}px; --pt-d: {{ s.padding_top_d }}px; --pb-d: {{ s.padding_bottom_d }}px;"
     {% render 'gad-section-attrs', s: s %}
@@ -221,6 +221,12 @@
     white-space: nowrap;
     line-height: 1.2;
     color: rgb(var(--color-foreground));
+  }
+
+  .gad-ticker--fx-outline .gad-ticker__text,
+  .gad-ticker--fx-outline_alt .gad-ticker__item--text:nth-child(even) .gad-ticker__text {
+    color: transparent;
+    -webkit-text-stroke: max(1px, 0.025em) rgb(var(--color-foreground));
   }
 
   .gad-ticker__text--italic {
@@ -577,7 +583,7 @@
       "type": "range",
       "id": "text_size_m",
       "min": 8,
-      "max": 30,
+      "max": 80,
       "step": 1,
       "unit": "px",
       "label": "Tamaño en mobile",
@@ -587,11 +593,32 @@
       "type": "range",
       "id": "text_size_d",
       "min": 10,
-      "max": 40,
+      "max": 110,
       "step": 1,
       "unit": "px",
       "label": "Tamaño en desktop",
       "default": 18
+    },
+    {
+      "type": "select",
+      "id": "text_effect",
+      "label": "Efecto del texto",
+      "options": [
+        {
+          "value": "none",
+          "label": "Lleno"
+        },
+        {
+          "value": "outline",
+          "label": "Sólo contorno"
+        },
+        {
+          "value": "outline_alt",
+          "label": "Contorno y lleno alternados"
+        }
+      ],
+      "default": "none",
+      "info": "El contorno luce con texto grande, por ejemplo 60 px o más."
     },
     {
       "type": "checkbox",

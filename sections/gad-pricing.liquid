@@ -27,6 +27,9 @@
         -%}
         <div class="gad-plans__card color-{{ scheme }}{% if b.highlight %} gad-plans__card--hl{% endif %}" role="listitem" {{ block.shopify_attributes }}>
           {%- if b.badge != blank -%}<span class="gad-plans__badge">{{ b.badge | escape }}</span>{%- endif -%}
+          {%- if b.image != blank -%}
+            <div class="gad-plans__img">{{ b.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 25vw, 80vw', widths: '300, 600' }}</div>
+          {%- endif -%}
           <h3 class="gad-plans__name h4">{{ b.name | escape }}</h3>
           <p class="gad-plans__price">
             {%- if b.compare_price != blank -%}
@@ -39,6 +42,7 @@
             </span>
             {%- if b.period != blank -%}<span class="gad-plans__period">{{ b.period | escape }}</span>{%- endif -%}
           </p>
+          {%- if b.installments != blank -%}<p class="gad-plans__inst">{{ b.installments }}</p>{%- endif -%}
           {%- if b.description != blank -%}<div class="gad-plans__desc rte">{{ b.description }}</div>{%- endif -%}
           {%- if b.features != blank -%}
             <ul class="gad-plans__features list-unstyled" role="list">
@@ -152,6 +156,19 @@
   .gad-plans__period {
     font-size: 1.4rem;
     opacity: 0.7;
+  }
+
+  .gad-plans__img img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 18rem;
+    object-fit: contain;
+  }
+
+  .gad-plans__inst {
+    margin: -0.6rem 0 0;
+    font-size: 1.3rem;
   }
 
   .gad-plans__desc p {
@@ -431,6 +448,17 @@
           "type": "text",
           "id": "compare_price",
           "label": "Precio tachado"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "installments",
+          "label": "Cuotas",
+          "info": "Ej. 3 cuotas sin interés."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
         },
         {
           "type": "text",
