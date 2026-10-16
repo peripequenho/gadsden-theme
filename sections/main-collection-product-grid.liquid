@@ -151,7 +151,7 @@
                 id="product-grid"
                 data-id="{{ section.id }}"
                 class="
-                  grid product-grid grid--{{ section.settings.columns_mobile }}-col-tablet-down
+                  grid product-grid{% if section.settings.equal_height %} gad-cards--equal{% endif %} grid--{{ section.settings.columns_mobile }}-col-tablet-down
                   grid--{{ section.settings.columns_desktop }}-col-desktop
                   {% if section.settings.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %}
                 "
@@ -180,7 +180,13 @@
                       skip_styles: skip_card_product_styles,
                       quick_add: section.settings.quick_add,
                       section_id: section.id,
-                      product_view_context: 'collection'
+                      product_view_context: 'collection',
+                      badges: section.settings.badges,
+                      swatch_option: section.settings.swatch_option,
+                      swatch_position: section.settings.swatch_position,
+                      swatch_size_d: section.settings.swatch_size_d,
+                      swatch_size_m: section.settings.swatch_size_m,
+                      swatch_max: section.settings.swatch_max
                     %}
                   </li>
                   {%- assign skip_card_product_styles = true -%}
@@ -349,6 +355,91 @@
           "label": "t:sections.main-collection-product-grid.settings.quick_add.options.option_3"
         }
       ]
+    },
+    {
+      "type": "header",
+      "content": "Tarjetas"
+    },
+    {
+      "type": "checkbox",
+      "id": "equal_height",
+      "label": "Todas las tarjetas de la misma altura",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "badges",
+      "label": "Etiquetas",
+      "options": [
+        {
+          "value": "none",
+          "label": "Desactivadas"
+        },
+        {
+          "value": "sale",
+          "label": "Oferta y agotado"
+        },
+        {
+          "value": "custom",
+          "label": "Oferta, agotado y propias"
+        }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "header",
+      "content": "Muestras de color"
+    },
+    {
+      "type": "text",
+      "id": "swatch_option",
+      "label": "Opción con muestras",
+      "info": "El nombre de la opción, ej. Color. Vacío: sin muestras."
+    },
+    {
+      "type": "select",
+      "id": "swatch_position",
+      "label": "Ubicación",
+      "options": [
+        {
+          "value": "top",
+          "label": "Arriba del título"
+        },
+        {
+          "value": "bottom",
+          "label": "Debajo del precio"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "swatch_size_d",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño en desktop",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "swatch_size_m",
+      "min": 10,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño en mobile",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "swatch_max",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Cuántas mostrar",
+      "default": 5
     },
     {
       "type": "header",

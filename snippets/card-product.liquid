@@ -16,6 +16,12 @@
   - horizontal_class: {Boolean} Add a card--horizontal class if set to true. Default: false (optional)
   - horizontal_quick_add: {Boolean} Changes the quick add button styles when set to true. Default: false (optional)
   - placeholder_image: {String} The placeholder image to use when no product exists. Default: 'product-apparel-2' (optional)
+  - card_scheme: {String} Gadsden: combinación de la tarjeta; pisa a la global (opcional)
+  - badges: {String} Gadsden: 'none', 'sale' o 'custom' (etiquetas propias A11, por defecto)
+  - swatch_option: {String} Gadsden: nombre de la opción con muestras (vacío: sin muestras)
+  - swatch_position: {String} Gadsden: 'top' (arriba del título) o 'bottom' (debajo del precio)
+  - swatch_size_d / swatch_size_m: {Number} Gadsden: tamaño de las muestras
+  - swatch_max: {Number} Gadsden: cuántas muestras antes del "+N"
 
   Usage:
   {% render 'card-product', show_vendor: section.settings.show_vendor %}
@@ -28,6 +34,7 @@
   {{ 'quick-order-list.css' | asset_url | stylesheet_tag }}
   {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
 {%- endunless -%}
+{%- assign gad_card_scheme = card_scheme | default: settings.card_color_scheme -%}
 {%- if card_product and card_product != empty -%}
   {%- liquid
     assign ratio = 1
@@ -47,7 +54,7 @@
         class="
           card card--{{ settings.card_style }}
           {% if card_product.featured_media %} card--media{% else %} card--text{% endif %}
-          {% if settings.card_style == 'card' %} color-{{ settings.card_color_scheme }} gradient{% endif %}
+          {% if settings.card_style == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
           {% if image_shape and image_shape != 'default' %} card--shape{% endif %}
           {% if extend_height %} card--extend-height{% endif %}
           {% if card_product.featured_media == nil and settings.card_style == 'card' %} ratio{% endif %}
@@ -56,11 +63,11 @@
         style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
       >
         <div
-          class="card__inner {% if settings.card_style == 'standard' %}color-{{ settings.card_color_scheme }} gradient{% endif %}{% if card_product.featured_media or settings.card_style == 'standard' %} ratio{% endif %}"
+          class="card__inner {% if settings.card_style == 'standard' %}color-{{ gad_card_scheme }} gradient{% endif %}{% if card_product.featured_media or settings.card_style == 'standard' %} ratio{% endif %}"
           style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
         >
           {%- if card_product.featured_media -%}
-            <div class="card__media{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }} gradient{% endif %}">
+            <div class="card__media{% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ gad_card_scheme }} gradient{% endif %}">
               <div class="media media--transparent media--hover-effect">
                 {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
                 <img
@@ -128,12 +135,15 @@
             </div>
             <div class="card__badge {{ settings.badge_position }}">
               {%- assign gad_badge_id = 'NoMediaStandardBadge-' | append: section_id | append: '-' | append: card_product.id -%}
-              {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id -%}
+              {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id, mode: badges -%}
             </div>
           </div>
         </div>
         <div class="card__content">
           <div class="card__information">
+            {%- if swatch_option != blank and swatch_position == 'top' -%}
+              {%- render 'gad-card-swatches', product: card_product, option: swatch_option, size_d: swatch_size_d, size_m: swatch_size_m, max: swatch_max -%}
+            {%- endif -%}
             <h3
               class="card__heading{% if card_product.featured_media or settings.card_style == 'standard' %} h5{% endif %}"
               {% if card_product.featured_media or settings.card_style == 'card' %}
@@ -194,6 +204,9 @@
               {%- endif -%}
 
               {% render 'price', product: card_product, price_class: '', show_compare_at_price: true %}
+              {%- if swatch_option != blank and swatch_position != 'top' -%}
+                {%- render 'gad-card-swatches', product: card_product, option: swatch_option, size_d: swatch_size_d, size_m: swatch_size_m, max: swatch_max -%}
+              {%- endif -%}
               {%- if card_product.quantity_price_breaks_configured? -%}
                 {% if card_product.variants_count == 1 and quick_add == 'bulk' %}
                   {% liquid
@@ -539,7 +552,7 @@
           {% endif %}
           <div class="card__badge {{ settings.badge_position }}">
             {%- assign gad_badge_id = 'Badge-' | append: section_id | append: '-' | append: card_product.id -%}
-            {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id -%}
+            {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id, mode: badges -%}
           </div>
         </div>
       </div>
@@ -559,15 +572,15 @@
         card card--{{ settings.card_style }}
         {% if extend_height %} card--extend-height{% endif %}
         {% if image_shape and image_shape != 'default' %} card--shape{% endif %}
-        {% if settings.card_style == 'card' %} color-{{ settings.card_color_scheme }} gradient{% endif %}
+        {% if settings.card_style == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
       "
       style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
     >
       <div
-        class="card__inner{% if settings.card_style == 'standard' %} color-{{ settings.card_color_scheme }} gradient{% endif %} ratio"
+        class="card__inner{% if settings.card_style == 'standard' %} color-{{ gad_card_scheme }} gradient{% endif %} ratio"
       >
         <div
-          class="card__media {% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ settings.card_color_scheme }} gradient{% endif %}"
+          class="card__media {% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ gad_card_scheme }} gradient{% endif %}"
         >
           <div
             class="media media--transparent"

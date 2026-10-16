@@ -5,6 +5,7 @@
   Accepts:
   - card_product: {Object} producto de la tarjeta
   - id: {String} id del primer badge, el que lee aria-labelledby de la tarjeta
+  - mode: {String} 'none' (sin etiquetas), 'sale' (agotado y oferta) o 'custom' (además las propias; por defecto)
 
   Usage:
   {% render 'gad-card-badges', card_product: card_product, id: badge_id %}
@@ -24,7 +25,8 @@
     assign pct = pct_num | append: '%'
   endif
 -%}
-{%- if card_product.available == false -%}
+{%- if mode == 'none' -%}
+{%- elsif card_product.available == false -%}
   <span id="{{ id }}" class="badge badge--bottom-left color-{{ settings.sold_out_badge_color_scheme }}">
     {{- 'products.product.sold_out' | t -}}
   </span>
@@ -33,7 +35,7 @@
     {%- render 'gad-sale-label', price: price, compare_at_price: compare -%}
   </span>
 {%- endif -%}
-{%- if settings.card_badges_tags != blank and card_product.tags.size > 0 -%}
+{%- if mode != 'none' and mode != 'sale' and settings.card_badges_tags != blank and card_product.tags.size > 0 -%}
   {%- assign wanted = settings.card_badges_tags | split: ',' -%}
   {%- assign product_tags = card_product.tags | join: '|' | downcase | split: '|' -%}
   {%- for entry in wanted -%}

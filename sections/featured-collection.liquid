@@ -58,15 +58,25 @@
     assign max_columns_to_show = columns_desktop_int
   endif
 
+  assign show_mobile_slider = false
   assign show_desktop_slider = false
-  if section.settings.enable_desktop_slider and products_to_display > section.settings.columns_desktop
-    assign show_desktop_slider = true
+  assign s = section.settings
+  assign gad_carousel = false
+  if s.d_carousel or s.m_carousel
+    assign gad_carousel = true
+  endif
+  assign item_tag = 'li'
+  if gad_carousel
+    assign item_tag = 'div'
+  endif
+  assign card_scheme = nil
+  if s.card_scheme_on
+    assign card_scheme = s.card_scheme
   endif
 -%}
 
-<div
-  class="color-{{ section.settings.color_scheme }} isolate gradient"
->
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div class="{% render 'gad-scheme', s: s, key: section.id %} isolate" {% render 'gad-section-attrs', s: s %}>
   <div
     class="collection{% if section.settings.quick_add == 'bulk' %} collection-quick-add-bulk{% endif %} section-{{ section.id }}-padding{% if section.settings.full_width %} collection--full-width{% endif %}"
     id="collection-{{ section.id }}"
@@ -74,7 +84,12 @@
   >
     <div class="collection__title title-wrapper title-wrapper--no-top-margin page-width{% if show_mobile_slider %} title-wrapper--self-padded-tablet-down{% endif %}{% if show_desktop_slider %} collection__title--desktop-slider{% endif %}">
       {%- if section.settings.title != blank -%}
-        <h2 class="title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <h2
+          class="title inline-richtext gad-hl {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+          {% if s.title_accent != blank %}
+            style="--gad-hl: {{ s.title_accent }};"
+          {% endif %}
+        >
           {{ section.settings.title }}
         </h2>
       {%- endif -%}
@@ -92,14 +107,7 @@
       {%- endif -%}
     </div>
 
-    <slider-component class="slider-mobile-gutter{% if section.settings.full_width %} slider-component-full-width{% endif %}{% if show_mobile_slider == false %} page-width{% endif %}{% if show_desktop_slider == false and section.settings.full_width == false %} page-width-desktop{% endif %}{% if show_desktop_slider %} slider-component-desktop{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-      <ul
-        id="Slider-{{ section.id }}"
-        data-id="{{ section.id }}"
-        class="grid product-grid contains-card contains-card--product{% if settings.card_style == 'standard' %} contains-card--standard{% endif %} grid--{{ section.settings.columns_desktop }}-col-desktop{% if section.settings.collection == blank %} grid--2-col-tablet-down{% else %} grid--{{ section.settings.columns_mobile }}-col-tablet-down{% endif %}{% if show_mobile_slider or show_desktop_slider %} slider{% if show_desktop_slider %} slider--desktop{% endif %}{% if show_mobile_slider %} slider--tablet grid--peek{% endif %}{% endif %}"
-        role="list"
-        aria-label="{{ 'general.slider.name' | t }}"
-      >
+    {%- capture gad_items -%}
         {% assign skip_card_product_styles = false %}
 
         {%- if section.settings.collection.products.size > 0 -%}
@@ -109,9 +117,9 @@
               {% if lazy_load == false and forloop.index > max_columns_to_show %}
                 {% assign lazy_load = true %}
               {% endif %}
-              <li
+              <{{ item_tag }}
                 id="Slide-{{ section.id }}-{{ forloop.index }}"
-                class="grid__item{% if show_mobile_slider or show_desktop_slider %} slider__slide{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                class="{% unless gad_carousel %}grid__item{% endunless %}{% if show_mobile_slider or show_desktop_slider %} slider__slide{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
                 {% if settings.animations_reveal_on_scroll %}
                   data-cascade
                   style="--animation-order: {{ forloop.index }};"
@@ -128,16 +136,23 @@
                   skip_styles: skip_card_product_styles,
                   section_id: section.id,
                   quick_add: section.settings.quick_add,
-                  product_view_context: 'collection'
+                  product_view_context: 'collection',
+                  card_scheme: card_scheme,
+                  badges: s.badges,
+                  swatch_option: s.swatch_option,
+                  swatch_position: s.swatch_position,
+                  swatch_size_d: s.swatch_size_d,
+                  swatch_size_m: s.swatch_size_m,
+                  swatch_max: s.swatch_max
                 %}
-              </li>
+              </{{ item_tag }}>
               {%- assign skip_card_product_styles = true -%}
             {%- endfor -%}
           {% endpaginate %}
         {%- else -%}
           {%- for i in (1..section.settings.columns_desktop) -%}
-            <li
-              class="grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            <{{ item_tag }}
+              class="{% unless gad_carousel %}grid__item{% endunless %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
               {% if settings.animations_reveal_on_scroll %}
                 data-cascade
                 style="--animation-order: {{ forloop.index }};"
@@ -160,9 +175,32 @@
                 lazy_load: false,
                 placeholder_image: placeholder_image
               %}
-            </li>
+            </{{ item_tag }}>
           {%- endfor -%}
         {%- endif -%}
+    {%- endcapture -%}
+    {%- if gad_carousel -%}
+      <div class="{% unless s.full_width %}page-width{% else %}gad-full-width{% endunless %} gad-fc-carousel{% if s.equal_height %} gad-cards--equal{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {%- render 'gad-carousel',
+          s: s,
+          key: section.id,
+          slides: gad_items,
+          d_per_view: columns_desktop_int,
+          m_per_view: columns_mobile_int,
+          label: section.settings.title,
+          class: 'product-grid contains-card contains-card--product'
+        -%}
+      </div>
+    {%- else -%}
+    <slider-component class="slider-mobile-gutter{% if section.settings.full_width %} slider-component-full-width{% endif %}{% if show_mobile_slider == false %} page-width{% endif %}{% if show_desktop_slider == false and section.settings.full_width == false %} page-width-desktop{% endif %}{% if show_desktop_slider %} slider-component-desktop{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <ul
+        id="Slider-{{ section.id }}"
+        data-id="{{ section.id }}"
+        class="grid product-grid{% if s.equal_height %} gad-cards--equal{% endif %} contains-card contains-card--product{% if settings.card_style == 'standard' %} contains-card--standard{% endif %} grid--{{ section.settings.columns_desktop }}-col-desktop{% if section.settings.collection == blank %} grid--2-col-tablet-down{% else %} grid--{{ section.settings.columns_mobile }}-col-tablet-down{% endif %}{% if show_mobile_slider or show_desktop_slider %} slider{% if show_desktop_slider %} slider--desktop{% endif %}{% if show_mobile_slider %} slider--tablet grid--peek{% endif %}{% endif %}"
+        role="list"
+        aria-label="{{ 'general.slider.name' | t }}"
+      >
+        {{ gad_items }}
       </ul>
       {%- if show_mobile_slider or show_desktop_slider -%}
         <div class="slider-buttons">
@@ -197,6 +235,7 @@
         </div>
       {%- endif -%}
     </slider-component>
+    {%- endif -%}
 
     {%- if section.settings.show_view_all and more_in_collection -%}
       <div class="center collection__view-all{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
@@ -221,7 +260,10 @@
   "tag": "section",
   "class": "section",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -237,11 +279,11 @@
       "step": 1,
       "default": 4,
       "label": "t:sections.featured-collection.settings.products_to_show.label"
-    },     
+    },
     {
       "type": "header",
       "content": "t:sections.featured-collection.settings.header_text.content"
-    },   
+    },
     {
       "type": "inline_richtext",
       "id": "title",
@@ -277,6 +319,12 @@
       "label": "t:sections.all.heading_size.label"
     },
     {
+      "type": "color",
+      "id": "title_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Marcá en negrita las palabras del título. Vacío: el acento de la combinación."
+    },
+    {
       "type": "richtext",
       "id": "description",
       "label": "t:sections.featured-collection.settings.description.label"
@@ -285,7 +333,7 @@
       "type": "checkbox",
       "id": "show_description",
       "label": "t:sections.featured-collection.settings.show_description.label",
-      "default": false   
+      "default": false
     },
     {
       "type": "select",
@@ -310,7 +358,7 @@
     {
       "type": "header",
       "content": "t:sections.featured-collection.settings.header_collection.content"
-    },    
+    },
     {
       "type": "range",
       "id": "columns_desktop",
@@ -319,12 +367,6 @@
       "step": 1,
       "default": 4,
       "label": "t:sections.featured-collection.settings.columns_desktop.label"
-    },
-        {
-      "type": "checkbox",
-      "id": "enable_desktop_slider",
-      "label": "t:sections.featured-collection.settings.enable_desktop_slider.label",
-      "default": false
     },
     {
       "type": "checkbox",
@@ -358,13 +400,78 @@
         }
       ],
       "default": "solid"
-    }, 
+    },
     {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
       "info": "t:sections.all.colors.has_cards_info",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
     },
     {
       "type": "header",
@@ -471,6 +578,106 @@
     },
     {
       "type": "header",
+      "content": "Tarjetas"
+    },
+    {
+      "type": "checkbox",
+      "id": "equal_height",
+      "label": "Todas las tarjetas de la misma altura",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "card_scheme_on",
+      "label": "Combinación propia de las tarjetas",
+      "default": false,
+      "info": "Si no, la de Configuración del tema > Tarjetas de producto."
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_scheme",
+      "label": "Combinación de las tarjetas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "badges",
+      "label": "Etiquetas",
+      "options": [
+        {
+          "value": "none",
+          "label": "Desactivadas"
+        },
+        {
+          "value": "sale",
+          "label": "Oferta y agotado"
+        },
+        {
+          "value": "custom",
+          "label": "Oferta, agotado y propias"
+        }
+      ],
+      "default": "custom",
+      "info": "Las propias se configuran en Configuración del tema > Insignias."
+    },
+    {
+      "type": "header",
+      "content": "Muestras de color"
+    },
+    {
+      "type": "text",
+      "id": "swatch_option",
+      "label": "Opción con muestras",
+      "info": "El nombre de la opción, ej. Color. Vacío: sin muestras."
+    },
+    {
+      "type": "select",
+      "id": "swatch_position",
+      "label": "Ubicación",
+      "options": [
+        {
+          "value": "top",
+          "label": "Arriba del título"
+        },
+        {
+          "value": "bottom",
+          "label": "Debajo del precio"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "swatch_size_d",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño en desktop",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "swatch_size_m",
+      "min": 10,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño en mobile",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "swatch_max",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "label": "Cuántas mostrar",
+      "default": 5,
+      "info": "Las que sobran se resumen en \"+N\"."
+    },
+    {
+      "type": "header",
       "content": "t:sections.featured-collection.settings.header_mobile.content"
     },
     {
@@ -488,13 +695,269 @@
           "label": "t:sections.featured-collection.settings.columns_mobile.options__2.label"
         }
       ]
-    },    
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "select",
+      "id": "car_type",
+      "label": "Tipo",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Clásico (se frena en los extremos)"
+        },
+        {
+          "value": "loop",
+          "label": "Infinito"
+        }
+      ],
+      "default": "classic"
+    },
+    {
+      "type": "select",
+      "id": "car_drag",
+      "label": "Arrastre con mouse o dedo",
+      "options": [
+        {
+          "value": "off",
+          "label": "Desactivado"
+        },
+        {
+          "value": "on",
+          "label": "Activado"
+        },
+        {
+          "value": "free",
+          "label": "Libre (sin encastre)"
+        }
+      ],
+      "default": "on"
+    },
     {
       "type": "checkbox",
-      "id": "swipe_on_mobile",
+      "id": "car_autoplay",
+      "label": "Pase automático",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "car_speed",
+      "min": 1,
+      "max": 15,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Velocidad del pase",
+      "default": 5
+    },
+    {
+      "type": "color_scheme",
+      "id": "car_arrows_scheme",
+      "label": "Colores de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "car_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "d_carousel",
+      "label": "Mostrar como carrusel en desktop",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "d_per_move",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "d_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "d_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_auto_height",
+      "label": "Alto adaptable",
       "default": false,
-      "label": "t:sections.featured-collection.settings.swipe_on_mobile.label"
-    },          
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "d_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "select",
+      "id": "d_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "sides"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_carousel",
+      "label": "Mostrar como carrusel en mobile",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "m_per_move",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "m_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "m_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "m_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "hidden"
+    },
     {
       "type": "header",
       "content": "t:sections.all.padding.section_padding_heading"
@@ -518,6 +981,38 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
     }
   ],
   "presets": [

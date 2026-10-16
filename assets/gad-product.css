@@ -13,36 +13,6 @@
   margin-top: var(--mt, 1.5rem);
 }
 
-.gad-p-align--left {
-  display: flex;
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.gad-p-align--center {
-  display: flex;
-  justify-content: center;
-  text-align: center;
-}
-
-.gad-p-align--right {
-  display: flex;
-  justify-content: flex-end;
-  text-align: right;
-}
-
-@media screen and (max-width: 749px) {
-  .gad-p-bleed {
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-  }
-
-  .gad-p-bleed img,
-  .gad-p-bleed .gad-p-divider__line {
-    border-radius: 0 !important;
-  }
-}
-
 /* ---------- PX2 título ---------- */
 .gad-title h1 {
   margin: 0;
@@ -216,62 +186,6 @@
   background-color: rgb(var(--color-secondary-button));
   color: rgb(var(--color-secondary-button-text));
   box-shadow: inset 0 0 0 0.1rem rgb(var(--color-secondary-button-text)) !important;
-}
-
-/* ---------- PX7 pestañas desplegables ---------- */
-.gad-acc--sm .accordion__title {
-  font-size: 1.4rem;
-}
-
-.gad-acc--md .accordion__title {
-  font-size: 1.6rem;
-}
-
-.gad-acc--lg .accordion__title {
-  font-size: 1.9rem;
-}
-
-.gad-acc.gad-acc--no-border {
-  border-top: 0;
-}
-
-.gad-acc__plus {
-  position: relative;
-  flex: 0 0 auto;
-  width: 1.4rem;
-  height: 1.4rem;
-  margin-left: 1rem;
-}
-
-.gad-acc__plus::before,
-.gad-acc__plus::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  background: currentColor;
-  transform: translate(-50%, -50%);
-}
-
-.gad-acc__plus::before {
-  width: 1.4rem;
-  height: 0.2rem;
-}
-
-.gad-acc__plus::after {
-  width: 0.2rem;
-  height: 1.4rem;
-  transition: transform var(--duration-default) ease;
-}
-
-details[open] > summary .gad-acc__plus::after {
-  transform: translate(-50%, -50%) rotate(90deg);
-}
-
-.gad-acc-icon {
-  display: inline-grid;
-  place-items: center;
-  font-size: 2rem;
 }
 
 /* ---------- PX9 cierre del popup ---------- */
@@ -533,66 +447,6 @@ html.gad-reduce gad-sticky-bar {
   color: rgb(var(--color-button));
   font-weight: 600;
   line-height: 1.35;
-}
-
-/* ---------- P07 imagen ---------- */
-.gad-p-image img,
-.gad-p-image svg {
-  display: block;
-  width: var(--img-w, 100%);
-  height: auto;
-  border-radius: var(--img-r, 0);
-}
-
-/* ---------- P10 estrellas ---------- */
-.gad-p-stars-wrap,
-.gad-p-stars-link {
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.gad-p-stars-wrap {
-  display: flex;
-}
-
-.gad-p-stars-link {
-  display: inline-flex;
-  color: inherit;
-  text-decoration: none;
-}
-
-.gad-p-stars {
-  position: relative;
-  display: inline-flex;
-  font-size: var(--star-size, 18px);
-  line-height: 1;
-}
-
-.gad-p-stars__base {
-  display: inline-flex;
-  color: var(--star-off, #e1e1e1);
-}
-
-.gad-p-stars--outline .gad-p-stars__base {
-  color: var(--star, #f5b301);
-}
-
-.gad-p-stars--outline .gad-p-stars__base .gad-icon {
-  font-variation-settings: 'FILL' 0;
-}
-
-.gad-p-stars__fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: inline-flex;
-  overflow: hidden;
-  color: var(--star, #f5b301);
-  white-space: nowrap;
-}
-
-.gad-p-stars__text {
-  font-size: 1.4rem;
 }
 
 /* ---------- P08/P09 slider de características ---------- */

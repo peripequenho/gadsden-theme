@@ -587,6 +587,11 @@
     "cart": {
       "gift_badge": "Regalo",
       "upsell_add": "Sumar {{ product }} al carrito"
+    },
+    "contact": {
+      "field": "Campo",
+      "required": "Completá este campo.",
+      "email": "Ingresá un email válido."
     }
   }
 }

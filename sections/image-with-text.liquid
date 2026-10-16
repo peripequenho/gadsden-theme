@@ -2,8 +2,8 @@
 
 {%- style -%}
   .section-{{ section.id }}-padding {
-    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    padding-top: {{ section.settings.m_padding_top }}px;
+    padding-bottom: {{ section.settings.m_padding_bottom }}px;
   }
 
   @media screen and (min-width: 750px) {
@@ -22,20 +22,40 @@
   if section.settings.color_scheme == section.settings.section_color_scheme and section.settings.content_layout == 'no-overlap'
     assign remove_color_classes = true
   endif
+  assign s = section.settings
+  assign full = false
+  if s.full_width and s.content_layout == 'no-overlap'
+    assign full = true
+  endif
+  assign media_w = s.media_width | default: 50
 -%}
 
-<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.section_color_scheme }}">
-  <div class="page-width">
-    <div class="image-with-text image-with-text--{{ section.settings.content_layout }} isolate{% if settings.text_boxes_border_thickness > 0 and settings.text_boxes_border_opacity > 0 and settings.media_border_thickness > 0 and settings.media_border_opacity > 0 %} collapse-borders{% endif %}{% unless section.settings.color_scheme == section.settings.section_color_scheme and settings.media_border_thickness > 0 and settings.text_boxes_shadow_opacity == 0 and settings.text_boxes_border_thickness == 0 or settings.text_boxes_border_opacity == 0 %} collapse-corners{% endunless %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-      <div class="image-with-text__grid grid grid--gapless grid--1-col grid--{% if section.settings.desktop_image_width == 'medium' %}2-col-tablet{% else %}3-col-tablet{% endif %}{% if section.settings.layout == 'text_first' %} image-with-text__grid--reverse{% endif %}">
-        <div class="image-with-text__media-item image-with-text__media-item--{{ section.settings.desktop_image_width }} image-with-text__media-item--{{ section.settings.desktop_content_position }} grid__item">
+<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.section_color_scheme }}" {% render 'gad-section-attrs', s: s %}>
+  <div class="{% if full %}gad-iwt-full{% else %}page-width{% endif %}">
+    <div
+      style="--media-w: {{ media_w }}%;"
+      class="image-with-text gad-iwt-w image-with-text--{{ section.settings.content_layout }}{% if s.m_media_full %} gad-iwt--m-full{% endif %}{% if s.m_media_order == 'second' %} gad-iwt--m-second{% endif %} isolate{% if settings.text_boxes_border_thickness > 0 and settings.text_boxes_border_opacity > 0 and settings.media_border_thickness > 0 and settings.media_border_opacity > 0 %} collapse-borders{% endif %}{% unless section.settings.color_scheme == section.settings.section_color_scheme and settings.media_border_thickness > 0 and settings.text_boxes_shadow_opacity == 0 and settings.text_boxes_border_thickness == 0 or settings.text_boxes_border_opacity == 0 %} collapse-corners{% endunless %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <div class="image-with-text__grid grid grid--gapless grid--1-col grid--2-col-tablet{% if section.settings.layout == 'text_first' %} image-with-text__grid--reverse{% endif %}">
+        <div class="image-with-text__media-item image-with-text__media-item--medium image-with-text__media-item--{{ section.settings.desktop_content_position }} grid__item">
           <div
-            class="image-with-text__media image-with-text__media--{{ section.settings.height }} global-media-settings{% unless remove_color_classes %} gradient color-{{ section.settings.color_scheme }}{% else %} background-transparent{% endunless %}{% if section.settings.image != blank %} media{% else %} image-with-text__media--placeholder placeholder{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}"
-            {% if section.settings.height == 'adapt' and section.settings.image != blank %}
+            class="image-with-text__media image-with-text__media--{{ section.settings.height }} global-media-settings{% unless remove_color_classes %} gradient color-{{ section.settings.color_scheme }}{% else %} background-transparent{% endunless %}{% if section.settings.image != blank or s.video != blank %} media{% else %} image-with-text__media--placeholder placeholder{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}"
+            {% if section.settings.height == 'adapt' and s.video != blank %}
+              style="padding-bottom: {{ 1 | divided_by: s.video.aspect_ratio | times: 100 }}%;"
+            {% elsif section.settings.height == 'adapt' and section.settings.image != blank %}
               style="padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;"
             {% endif %}
           >
-            {%- if section.settings.image != blank -%}
+            {%- if s.video != blank -%}
+              {%- render 'gad-video',
+                video: s.video,
+                poster: section.settings.image,
+                autoplay: s.video_autoplay,
+                loop: true,
+                tap: true,
+                cover: true,
+                eager: true
+              -%}
+            {%- elsif section.settings.image != blank -%}
               {%- if section.settings.image_behavior == 'ambient' or section.settings.image_behavior == 'zoom-in' -%}
                 {%- assign widths = '198, 432, 642, 900, 1284, 1800' -%}
                 {%- capture sizes -%}
@@ -48,6 +68,10 @@
               (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px,
               (min-width: 750px) calc((100vw - 130px) / 2), calc((100vw - 50px) / 2)
             {%- endcapture -%}
+              {%- endif -%}
+              {%- if s.m_quality == 'enhanced' -%}
+                {%- assign widths = '360, 535, 750, 1070, 1500, 2000' -%}
+                {%- capture sizes -%}(min-width: 750px) {{ media_w | times: 0.01 | times: settings.page_width | round }}px, 100vw{%- endcapture -%}
               {%- endif -%}
               {{
                 section.settings.image
@@ -68,7 +92,10 @@
               {% case block.type %}
                 {%- when 'heading' -%}
                   <h2
-                    class="image-with-text__heading inline-richtext {{ block.settings.heading_size }}"
+                    class="image-with-text__heading inline-richtext gad-hl {{ block.settings.heading_size }}"
+                    {% if block.settings.heading_accent != blank %}
+                      style="--gad-hl: {{ block.settings.heading_accent }};"
+                    {% endif %}
                     {{ block.shopify_attributes }}
                   >
                     {{ block.settings.heading }}
@@ -98,6 +125,8 @@
                       {{ block.settings.button_label | escape }}
                     </a>
                   {%- endif -%}
+                {%- else -%}
+                  {%- render 'gad-product-block', block: block, product: product, section: section -%}
               {%- endcase -%}
             {%- endfor -%}
           </div>
@@ -112,13 +141,28 @@
   "name": "t:sections.image-with-text.name",
   "class": "section",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "settings": [
     {
       "type": "image_picker",
       "id": "image",
       "label": "t:sections.image-with-text.settings.image.label"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Reemplaza a la imagen; la imagen queda como miniatura. Se repite en bucle."
+    },
+    {
+      "type": "checkbox",
+      "id": "video_autoplay",
+      "label": "Reproducción automática sin sonido",
+      "default": true
     },
     {
       "type": "select",
@@ -145,24 +189,25 @@
       "label": "t:sections.image-with-text.settings.height.label"
     },
     {
-      "type": "select",
-      "id": "desktop_image_width",
-      "options": [
-        {
-          "value": "small",
-          "label": "t:sections.image-with-text.settings.desktop_image_width.options__1.label"
-        },
-        {
-          "value": "medium",
-          "label": "t:sections.image-with-text.settings.desktop_image_width.options__2.label"
-        },
-        {
-          "value": "large",
-          "label": "t:sections.image-with-text.settings.desktop_image_width.options__3.label"
-        }
-      ],
-      "default": "medium",
-      "label": "t:sections.image-with-text.settings.desktop_image_width.label"
+      "type": "header",
+      "content": "Desktop"
+    },
+    {
+      "type": "range",
+      "id": "media_width",
+      "min": 25,
+      "max": 75,
+      "step": 5,
+      "unit": "%",
+      "label": "Ancho del medio",
+      "default": 50
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Usar todo el ancho de la página",
+      "default": false,
+      "info": "Sólo sin superposición del texto."
     },
     {
       "type": "select",
@@ -203,7 +248,7 @@
     {
       "type": "header",
       "content": "t:sections.image-with-text.settings.header.content"
-    }, 
+    },
     {
       "type": "select",
       "id": "content_layout",
@@ -219,7 +264,7 @@
       ],
       "default": "no-overlap",
       "label": "t:sections.image-with-text.settings.content_layout.label"
-    },       
+    },
     {
       "type": "select",
       "id": "desktop_content_position",
@@ -283,7 +328,7 @@
     {
       "type": "header",
       "content": "t:sections.image-with-text.settings.header_colors.content"
-    },        
+    },
     {
       "type": "color_scheme",
       "id": "section_color_scheme",
@@ -318,7 +363,103 @@
       "step": 4,
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
-      "default": 36
+      "default": 36,
+      "info": "En desktop. El de mobile va aparte."
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_media_full",
+      "label": "Medio a todo el ancho",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "m_media_order",
+      "label": "Medio",
+      "options": [
+        {
+          "value": "first",
+          "label": "Primero"
+        },
+        {
+          "value": "second",
+          "label": "Después del texto"
+        }
+      ],
+      "default": "first"
+    },
+    {
+      "type": "select",
+      "id": "m_quality",
+      "label": "Calidad de imagen",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Estándar"
+        },
+        {
+          "value": "enhanced",
+          "label": "Mejorada"
+        }
+      ],
+      "default": "standard",
+      "info": "Mejorada: pide la imagen al ancho de la pantalla. Pesa más."
+    },
+    {
+      "type": "range",
+      "id": "m_padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "m_padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
     }
   ],
   "blocks": [
@@ -360,6 +501,12 @@
           ],
           "default": "h1",
           "label": "t:sections.all.heading_size.label"
+        },
+        {
+          "type": "color",
+          "id": "heading_accent",
+          "label": "Color de las palabras resaltadas",
+          "info": "Marcá en negrita las palabras del título. Vacío: el acento de la combinación."
         }
       ]
     },
@@ -463,6 +610,632 @@
           "id": "button_style_secondary",
           "default": false,
           "label": "t:sections.image-with-text.blocks.button.settings.outline_button.label"
+        }
+      ]
+    },
+    {
+      "type": "stars",
+      "name": "Estrellas",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 0.1,
+          "label": "Calificación",
+          "default": 4.8
+        },
+        {
+          "type": "select",
+          "id": "empty_style",
+          "label": "Estrellas vacías",
+          "options": [
+            {
+              "value": "filled",
+              "label": "Llenas de otro color"
+            },
+            {
+              "value": "outline",
+              "label": "En contorno"
+            }
+          ],
+          "default": "filled"
+        },
+        {
+          "type": "color",
+          "id": "star_color",
+          "label": "Color de las estrellas",
+          "default": "#F5B301"
+        },
+        {
+          "type": "color",
+          "id": "empty_color",
+          "label": "Color de las vacías",
+          "default": "#E1E1E1"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 12,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 18
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto al lado",
+          "default": "4,8 (120 reseñas)"
+        },
+        {
+          "type": "text",
+          "id": "scroll_target",
+          "label": "Al tocarlas, ir a",
+          "placeholder": "resenas",
+          "info": "Opcional: el nombre del ancla de una sección (sin #)."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "trustpilot",
+      "name": "Estrellas Trustpilot",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 0,
+          "max": 5,
+          "step": 0.1,
+          "label": "Calificación",
+          "default": 4.8
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Excelente · <strong>4,8</strong> de 5"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color de los cuadros",
+          "default": "#00B67A"
+        },
+        {
+          "type": "color",
+          "id": "empty_color",
+          "label": "Color de los cuadros vacíos",
+          "default": "#DCDCE6"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 14,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 22
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "scroll_target",
+          "label": "Ancla a la que llevan",
+          "info": "Opcional, ej. resenas: un toque baja hasta la sección con ese ancla."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "text_icons",
+      "name": "Texto con íconos",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Renglón 1"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_1",
+          "label": "Texto",
+          "default": "Texto del renglón",
+          "info": "Acepta metacampos. Sin texto, el renglón no aparece."
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_1",
+          "label": "Ícono",
+          "default": "check_circle",
+          "info": "Nombre en inglés de Material Symbols, ej. local_shipping. Acepta metacampos."
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_1",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_1",
+          "label": "Ícono propio (imagen)",
+          "info": "Si cargás una imagen, reemplaza al ícono por nombre."
+        },
+        {
+          "type": "header",
+          "content": "Renglón 2"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_2",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_2",
+          "label": "Ícono"
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_2",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_2",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "header",
+          "content": "Renglón 3"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_3",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_3",
+          "label": "Ícono"
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_3",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_3",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "header",
+          "content": "Estilo de los renglones"
+        },
+        {
+          "type": "range",
+          "id": "ti_size_m",
+          "min": 8,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto en mobile",
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "ti_size_d",
+          "min": 10,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto en desktop",
+          "default": 16
+        },
+        {
+          "type": "select",
+          "id": "ti_align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "color",
+          "id": "ti_color",
+          "label": "Color del texto",
+          "info": "Vacío: el de la combinación."
+        },
+        {
+          "type": "range",
+          "id": "ti_icon_scale",
+          "min": 100,
+          "max": 200,
+          "step": 5,
+          "unit": "%",
+          "label": "Escala de los íconos",
+          "default": 120
+        },
+        {
+          "type": "color",
+          "id": "ti_icon_color",
+          "label": "Color de los íconos",
+          "info": "Vacío: el del texto."
+        },
+        {
+          "type": "select",
+          "id": "ti_width",
+          "label": "Ancho",
+          "options": [
+            {
+              "value": "fit",
+              "label": "Ajustado al texto"
+            },
+            {
+              "value": "full",
+              "label": "Completo"
+            }
+          ],
+          "default": "fit"
+        },
+        {
+          "type": "select",
+          "id": "ti_stack",
+          "label": "Apilado",
+          "options": [
+            {
+              "value": "vertical",
+              "label": "En columna"
+            },
+            {
+              "value": "horizontal",
+              "label": "En fila"
+            }
+          ],
+          "default": "vertical"
+        },
+        {
+          "type": "range",
+          "id": "ti_gap",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación",
+          "default": 8
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_bg",
+          "label": "Fondo tipo pastilla",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "ti_bg_color",
+          "label": "Color del fondo",
+          "default": "#F3F3F3"
+        },
+        {
+          "type": "range",
+          "id": "ti_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Redondeo del fondo",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "ti_padding",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Relleno del fondo",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "ti_border",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "unit": "px",
+          "label": "Borde",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "ti_border_color",
+          "label": "Color del borde",
+          "default": "#121212"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 45,
+          "step": 3,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 45,
+          "step": 3,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Imagen",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Acepta metacampos. Sin imagen, el bloque no deja hueco."
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "unit": "%",
+          "label": "Ancho",
+          "default": 100
+        },
+        {
+          "type": "checkbox",
+          "id": "full_mobile",
+          "label": "De borde a borde en mobile",
+          "default": false,
+          "info": "Sólo con ancho 100 %."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Redondeo",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "atc",
+      "name": "Botón de agregar",
+      "settings": [
+        {
+          "type": "text",
+          "id": "atc_label",
+          "label": "Texto del botón",
+          "default": "Agregar al carrito"
+        },
+        {
+          "type": "product",
+          "id": "atc_product",
+          "label": "Producto",
+          "info": "En una ficha, vacío agrega el producto de la ficha con la variante y la cantidad elegidas. Fuera de una ficha hace falta elegirlo."
+        },
+        {
+          "type": "checkbox",
+          "id": "atc_skip_cart",
+          "label": "Ir directo al pago",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary",
+          "label": "Botón con contorno",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 10
         }
       ]
     }

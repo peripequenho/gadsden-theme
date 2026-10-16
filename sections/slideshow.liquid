@@ -26,7 +26,8 @@
 {%- endif -%}
 
 <slideshow-component
-  class="slider-mobile-gutter{% if section.settings.layout == 'grid' %} page-width{% endif %}{% if section.settings.show_text_below %} mobile-text-below{% endif %}"
+  class="slider-mobile-gutter gad-ss gad-ss--pag-d-{{ section.settings.pagination_d }} gad-ss--pag-m-{{ section.settings.pagination_m }}{% if section.settings.layout == 'grid' %} page-width{% endif %}{% if section.settings.show_text_below %} mobile-text-below{% endif %}"
+  {% render 'gad-section-attrs', s: section.settings %}
   role="region"
   aria-roledescription="{{ 'sections.slideshow.carousel' | t }}"
   aria-label="{{ section.settings.accessibility_info | escape }}"
@@ -137,17 +138,51 @@
               endif
             -%}
             {%- if forloop.first %}
-              {{
-                block.settings.image
-                | image_url: width: 3840
-                | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
-              }}
+              {%- if block.settings.image_mobile != blank -%}
+                <picture class="gad-ss__pic">
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w, {{ block.settings.image_mobile | image_url: width: 1500 }} 1500w"
+                    sizes="100vw"
+                    width="{{ block.settings.image_mobile.width }}"
+                    height="{{ block.settings.image_mobile.height }}"
+                  >
+                  {{
+                    block.settings.image
+                    | image_url: width: 3840
+                    | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                  }}
+                </picture>
+              {%- else -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 3840
+                  | image_tag: height: height, sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                }}
+              {%- endif -%}
             {%- else -%}
-              {{
-                block.settings.image
-                | image_url: width: 3840
-                | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
-              }}
+              {%- if block.settings.image_mobile != blank -%}
+                <picture class="gad-ss__pic">
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="{{ block.settings.image_mobile | image_url: width: 375 }} 375w, {{ block.settings.image_mobile | image_url: width: 750 }} 750w, {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w, {{ block.settings.image_mobile | image_url: width: 1500 }} 1500w"
+                    sizes="100vw"
+                    width="{{ block.settings.image_mobile.width }}"
+                    height="{{ block.settings.image_mobile.height }}"
+                  >
+                  {{
+                    block.settings.image
+                    | image_url: width: 3840
+                    | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                  }}
+                </picture>
+              {%- else -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 3840
+                  | image_tag: loading: 'lazy', height: height, sizes: sizes, widths: widths
+                }}
+              {%- endif -%}
             {%- endif -%}
           {%- else -%}
             {%- assign placeholder_slide = forloop.index | modulo: 2 -%}
@@ -158,10 +193,15 @@
             {%- endif -%}
           {%- endif -%}
         </div>
-        <div class="slideshow__text-wrapper banner__content banner__content--{{ block.settings.box_align }} page-width{% if block.settings.show_text_box == false %} banner--desktop-transparent{% endif %}{% if settings.animations_reveal_on_scroll and forloop.index == 1 %} scroll-trigger animate--slide-in{% endif %}">
+        <div class="slideshow__text-wrapper banner__content banner__content--{{ block.settings.box_align }} page-width{% if block.settings.show_text_box == false %} banner--desktop-transparent gad-ss__tx--{{ block.settings.transparent_text }}{% endif %}{% if settings.animations_reveal_on_scroll and forloop.index == 1 %} scroll-trigger animate--slide-in{% endif %}">
           <div class="slideshow__text banner__box content-container content-container--full-width-mobile color-{{ block.settings.color_scheme }} gradient slideshow__text--{{ block.settings.text_alignment }} slideshow__text-mobile--{{ block.settings.text_alignment_mobile }}">
             {%- if block.settings.heading != blank -%}
-              <h2 class="banner__heading inline-richtext {{ block.settings.heading_size }}">
+              <h2
+                class="banner__heading inline-richtext gad-hl {{ block.settings.heading_size }}"
+                {% if block.settings.heading_accent != blank %}
+                  style="--gad-hl: {{ block.settings.heading_accent }};"
+                {% endif %}
+              >
                 {{ block.settings.heading }}
               </h2>
             {%- endif -%}
@@ -170,8 +210,10 @@
                 <p>{{ block.settings.subheading }}</p>
               </div>
             {%- endif -%}
-            {%- if block.settings.button_label != blank -%}
-              <div class="banner__buttons">
+            {%- if block.settings.button_label != blank or block.settings.atc_label != blank -%}
+              <div class="banner__buttons gad-ss__buttons">
+                {%- render 'gad-atc-button', label: block.settings.atc_label, product: block.settings.atc_product, skip_cart: block.settings.atc_skip_cart -%}
+                {%- if block.settings.button_label != blank -%}
                 <a
                   {% if block.settings.link %}
                     href="{{ block.settings.link }}"
@@ -182,6 +224,7 @@
                 >
                   {{- block.settings.button_label | escape -}}
                 </a>
+                {%- endif -%}
               </div>
             {%- endif -%}
           </div>
@@ -267,7 +310,10 @@
   "tag": "section",
   "class": "section",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -331,6 +377,38 @@
       "label": "t:sections.slideshow.settings.slider_visual.label"
     },
     {
+      "type": "select",
+      "id": "pagination_d",
+      "label": "Paginación en desktop",
+      "options": [
+        {
+          "value": "under",
+          "label": "Debajo de la sección"
+        },
+        {
+          "value": "over",
+          "label": "Encima de la sección"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "pagination_m",
+      "label": "Paginación en mobile",
+      "options": [
+        {
+          "value": "under",
+          "label": "Debajo de la sección"
+        },
+        {
+          "value": "over",
+          "label": "Encima de la sección"
+        }
+      ],
+      "default": "under"
+    },
+    {
       "type": "checkbox",
       "id": "auto_rotate",
       "label": "t:sections.slideshow.settings.auto_rotate.label",
@@ -382,6 +460,38 @@
       "label": "t:sections.slideshow.settings.accessibility.label",
       "info": "t:sections.slideshow.settings.accessibility.info",
       "default": "t:sections.slideshow.settings.accessibility.default"
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
     }
   ],
   "blocks": [
@@ -394,6 +504,12 @@
           "type": "image_picker",
           "id": "image",
           "label": "t:sections.slideshow.blocks.slide.settings.image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen para mobile",
+          "info": "Opcional. Vacía: la misma de desktop."
         },
         {
           "type": "range",
@@ -444,6 +560,12 @@
           "label": "t:sections.all.heading_size.label"
         },
         {
+          "type": "color",
+          "id": "heading_accent",
+          "label": "Color de las palabras resaltadas",
+          "info": "Marcá en negrita las palabras del título. Vacío: el acento de la combinación."
+        },
+        {
           "type": "inline_richtext",
           "id": "subheading",
           "default": "t:sections.slideshow.blocks.slide.settings.subheading.default",
@@ -452,12 +574,12 @@
         {
           "type": "header",
           "content": "t:sections.slideshow.blocks.slide.settings.header_button.content"
-        },        
+        },
         {
           "type": "text",
           "id": "button_label",
           "default": "t:sections.slideshow.blocks.slide.settings.button_label.default",
-          "label": "t:sections.slideshow.blocks.slide.settings.button_label.label", 
+          "label": "t:sections.slideshow.blocks.slide.settings.button_label.label",
           "info": "t:sections.slideshow.blocks.slide.settings.button_label.info"
         },
         {
@@ -474,12 +596,33 @@
         {
           "type": "header",
           "content": "t:sections.slideshow.blocks.slide.settings.header_layout.content"
-        },         
+        },
         {
           "type": "checkbox",
           "id": "show_text_box",
           "label": "t:sections.slideshow.blocks.slide.settings.show_text_box.label",
           "default": true
+        },
+        {
+          "type": "select",
+          "id": "transparent_text",
+          "label": "Texto sin recuadro",
+          "options": [
+            {
+              "value": "scheme",
+              "label": "El de la combinación"
+            },
+            {
+              "value": "light",
+              "label": "Blanco"
+            },
+            {
+              "value": "dark",
+              "label": "Negro"
+            }
+          ],
+          "default": "scheme",
+          "info": "Con el recuadro apagado (desktop)."
         },
         {
           "type": "select",
@@ -564,12 +707,34 @@
           ],
           "default": "center",
           "label": "t:sections.slideshow.blocks.slide.settings.text_alignment_mobile.label"
-        },        
+        },
         {
           "type": "color_scheme",
           "id": "color_scheme",
           "label": "t:sections.all.colors.label",
           "default": "scheme-1"
+        },
+        {
+          "type": "header",
+          "content": "Botón de agregar al carrito"
+        },
+        {
+          "type": "text",
+          "id": "atc_label",
+          "label": "Texto del botón",
+          "info": "Sin texto, el botón no aparece."
+        },
+        {
+          "type": "product",
+          "id": "atc_product",
+          "label": "Producto",
+          "info": "Fuera de una ficha hace falta elegirlo."
+        },
+        {
+          "type": "checkbox",
+          "id": "atc_skip_cart",
+          "label": "Ir directo al pago",
+          "default": false
         }
       ]
     }

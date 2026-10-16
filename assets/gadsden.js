@@ -961,3 +961,72 @@ if (!customElements.get('gad-copy'))
       }
     }
   );
+
+/* ---------- E05: formulario de contacto, aviso por campo antes de enviar ---------- */
+if (!customElements.get('gad-contact-form'))
+  customElements.define(
+    'gad-contact-form',
+    class GadContactForm extends HTMLElement {
+      connectedCallback() {
+        const form = this.querySelector('form');
+        if (!form || form.dataset.gadReady) return;
+        form.dataset.gadReady = '1';
+        form.noValidate = true;
+        form.addEventListener('submit', (event) => {
+          let first = null;
+          this.querySelectorAll('[data-gad-required]').forEach((input) => {
+            const value = input.value.trim();
+            const bad = !value || (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+            this.mark(input, bad);
+            if (bad && !first) first = input;
+          });
+          if (first) {
+            event.preventDefault();
+            first.focus();
+          }
+        });
+        this.addEventListener('input', (event) => {
+          if (event.target.matches('[data-gad-required]')) this.mark(event.target, false);
+        });
+      }
+      mark(input, bad) {
+        const error = document.getElementById(input.dataset.gadError);
+        if (error) error.hidden = !bad;
+        if (bad) {
+          input.setAttribute('aria-invalid', 'true');
+          input.setAttribute('aria-describedby', input.dataset.gadError);
+        } else {
+          input.removeAttribute('aria-invalid');
+          input.removeAttribute('aria-describedby');
+        }
+      }
+    }
+  );
+
+/* ---------- E09/E10: la muestra de la tarjeta muestra la foto de su variante ---------- */
+(() => {
+  const swap = (link, on) => {
+    const card = link.closest('.card-wrapper');
+    const img = card && card.querySelector('.card__media img');
+    if (!img) return;
+    if (on) {
+      if (!img.dataset.gadSrc) {
+        img.dataset.gadSrc = img.getAttribute('src') || '';
+        img.dataset.gadSrcset = img.getAttribute('srcset') || '';
+      }
+      img.removeAttribute('srcset');
+      img.src = link.dataset.gadSwImg;
+    } else if (img.dataset.gadSrc) {
+      img.src = img.dataset.gadSrc;
+      if (img.dataset.gadSrcset) img.setAttribute('srcset', img.dataset.gadSrcset);
+    }
+  };
+  document.addEventListener('mouseover', (event) => {
+    const link = event.target.closest && event.target.closest('[data-gad-sw-img]');
+    if (link) swap(link, true);
+  });
+  document.addEventListener('mouseout', (event) => {
+    const link = event.target.closest && event.target.closest('[data-gad-sw-img]');
+    if (link && !link.contains(event.relatedTarget)) swap(link, false);
+  });
+})();

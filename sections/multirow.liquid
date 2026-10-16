@@ -21,7 +21,9 @@
     assign even_class = ' image-with-text__grid--reverse'
   endif
 
-  if section.settings.row_color_scheme == section.settings.section_color_scheme
+  assign s = section.settings
+  assign row_key = section.id | append: '-row'
+  if section.settings.row_color_scheme == section.settings.section_color_scheme and s.row_custom_colors == false and s.section_custom_colors == false
     assign no_content_background = true
   endif
 
@@ -42,22 +44,36 @@
   endunless
 -%}
 
-<div class="multirow section-{{ section.id }}-padding gradient color-{{ section.settings.section_color_scheme }}">
+{%- render 'gad-colors', s: s, key: section.id, prefix: 'section_' -%}
+{%- render 'gad-colors', s: s, key: row_key, prefix: 'row_' -%}
+{%- capture row_scheme -%}{% render 'gad-scheme', s: s, key: row_key, prefix: 'row_' %}{%- endcapture -%}
+<div class="multirow section-{{ section.id }}-padding {% render 'gad-scheme', s: s, key: section.id, prefix: 'section_' %}" {% render 'gad-section-attrs', s: s %}>
   <div class="multirow__inner page-width">
     {%- for block in section.blocks -%}
       <div
-        class="image-with-text isolate{{ borders_class }}{{ corners_class }}{{ padding_class }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+        class="image-with-text isolate{% if s.m_media_full %} gad-iwt--m-full{% endif %}{% if s.m_media_order == 'second' %} gad-iwt--m-second{% endif %}{{ borders_class }}{{ corners_class }}{{ padding_class }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
         {{ block.shopify_attributes }}
       >
         <div class="image-with-text__grid grid grid--gapless grid--1-col grid--{% if section.settings.desktop_image_width == 'medium' %}2-col-tablet{% else %}3-col-tablet{% endif %}{% if section.settings.image_layout contains 'alternate' %}{% cycle odd_class, even_class %}{% else %}{{ odd_class }}{% endif %}">
           <div class="image-with-text__media-item image-with-text__media-item--{{ section.settings.desktop_image_width }} image-with-text__media-item--{{ section.settings.desktop_content_position }} grid__item">
             <div
-              class="image-with-text__media image-with-text__media--{{ section.settings.image_height }} gradient color-{{ section.settings.row_color_scheme }} global-media-settings{% if block.settings.image != blank %} media{% else %} image-with-text__media--placeholder placeholder{% endif %}"
-              {% if section.settings.image_height == 'adapt' and block.settings.image != blank %}
+              class="image-with-text__media image-with-text__media--{{ section.settings.image_height }} {{ row_scheme }} global-media-settings{% if block.settings.image != blank or block.settings.video != blank %} media{% else %} image-with-text__media--placeholder placeholder{% endif %}"
+              {% if section.settings.image_height == 'adapt' and block.settings.video != blank %}
+                style="padding-bottom: {{ 1 | divided_by: block.settings.video.aspect_ratio | times: 100 }}%;"
+              {% elsif section.settings.image_height == 'adapt' and block.settings.image != blank %}
                 style="padding-bottom: {{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;"
               {% endif %}
             >
-              {%- if block.settings.image != blank -%}
+              {%- if block.settings.video != blank -%}
+                {%- render 'gad-video',
+                  video: block.settings.video,
+                  poster: block.settings.image,
+                  autoplay: block.settings.video_autoplay,
+                  loop: true,
+                  tap: true,
+                  cover: true
+                -%}
+              {%- elsif block.settings.image != blank -%}
                 {%- capture sizes -%}
                   (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px,
                   (min-width: 750px) calc((100vw - 130px) / 2), calc((100vw - 50px) / 2)
@@ -73,14 +89,19 @@
             </div>
           </div>
           <div class="image-with-text__text-item grid__item">
-            <div class="image-with-text__content image-with-text__content--{{ section.settings.desktop_content_position }} image-with-text__content--desktop-{{ section.settings.desktop_content_alignment }} image-with-text__content--mobile-{{ section.settings.mobile_content_alignment }} image-with-text__content--{{ section.settings.image_height }} content-container{% unless no_content_background and no_content_styles %} gradient color-{{ section.settings.row_color_scheme }}{% else %} background-transparent{% endunless %}">
+            <div class="image-with-text__content image-with-text__content--{{ section.settings.desktop_content_position }} image-with-text__content--desktop-{{ section.settings.desktop_content_alignment }} image-with-text__content--mobile-{{ section.settings.mobile_content_alignment }} image-with-text__content--{{ section.settings.image_height }} content-container{% unless no_content_background and no_content_styles %} {{ row_scheme }}{% else %} background-transparent{% endunless %}">
               {%- if block.settings.caption -%}
                 <p class="image-with-text__text image-with-text__text--caption caption-with-letter-spacing caption-with-letter-spacing--medium">
                   {{ block.settings.caption | escape }}
                 </p>
               {%- endif -%}
               {%- if block.settings.heading -%}
-                <h2 class="image-with-text__heading {{ section.settings.heading_size }} rte">
+                <h2
+                  class="image-with-text__heading gad-hl {{ section.settings.heading_size }} rte"
+                  {% if block.settings.heading_accent != blank %}
+                    style="--gad-hl: {{ block.settings.heading_accent }};"
+                  {% endif %}
+                >
                   {{ block.settings.heading }}
                 </h2>
               {%- endif -%}
@@ -112,7 +133,10 @@
   "name": "t:sections.multirow.name",
   "class": "section",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -322,10 +346,154 @@
       "default": "scheme-1"
     },
     {
+      "type": "header",
+      "content": "Colores propios de la sección"
+    },
+    {
+      "type": "checkbox",
+      "id": "section_custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "section_cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "section_cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "section_cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "section_cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "section_cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "section_cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "section_cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "section_cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "section_cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
       "type": "color_scheme",
       "id": "row_color_scheme",
       "label": "t:sections.multirow.settings.container_color_scheme.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios de las filas"
+    },
+    {
+      "type": "checkbox",
+      "id": "row_custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "row_cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "row_cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "color",
+      "id": "row_cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "row_cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "row_cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "row_cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "row_cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_media_full",
+      "label": "Medio a todo el ancho",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "m_media_order",
+      "label": "Medio",
+      "options": [
+        {
+          "value": "first",
+          "label": "Primero"
+        },
+        {
+          "value": "second",
+          "label": "Después del texto"
+        }
+      ],
+      "default": "first"
     },
     {
       "type": "header",
@@ -350,6 +518,38 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
     }
   ],
   "blocks": [
@@ -361,6 +561,18 @@
           "type": "image_picker",
           "id": "image",
           "label": "t:sections.multirow.blocks.row.settings.image.label"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Reemplaza a la imagen; la imagen queda como miniatura."
+        },
+        {
+          "type": "checkbox",
+          "id": "video_autoplay",
+          "label": "Reproducción automática sin sonido",
+          "default": true
         },
         {
           "type": "text",
@@ -375,6 +587,12 @@
           "label": "t:sections.multirow.blocks.row.settings.heading.label"
         },
         {
+          "type": "color",
+          "id": "heading_accent",
+          "label": "Color de las palabras resaltadas",
+          "info": "Marcá en negrita las palabras del título. Vacío: el acento de la combinación."
+        },
+        {
           "type": "richtext",
           "id": "text",
           "default": "t:sections.multirow.blocks.row.settings.text.default",
@@ -384,7 +602,7 @@
           "type": "text",
           "id": "button_label",
           "default": "t:sections.multirow.blocks.row.settings.button_label.default",
-          "label": "t:sections.multirow.blocks.row.settings.button_label.label", 
+          "label": "t:sections.multirow.blocks.row.settings.button_label.label",
           "info": "t:sections.multirow.blocks.row.settings.button_label.info"
         },
         {

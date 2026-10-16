@@ -23,10 +23,21 @@
   endif
 -%}
 
-{%- render 'gad-colors', s: section.settings, key: section.id -%}
-<div class="multicolumn {% render 'gad-scheme', s: section.settings, key: section.id %}{% unless section.settings.background_style == 'none' and settings.text_boxes_border_thickness > 0 or settings.text_boxes_shadow_opacity > 0 %} background-{{ section.settings.background_style }}{% endunless %}{% if section.settings.title == blank %} no-heading{% endif %}" {% render 'gad-section-attrs', s: section.settings %}>
+{%- liquid
+  assign s = section.settings
+  assign card_key = section.id | append: '-card'
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+{%- if s.card_style == 'custom' -%}
+  {%- render 'gad-colors', s: s, key: card_key, prefix: 'card_', force: true -%}
+{%- endif -%}
+<div
+  class="multicolumn gad-mc gad-mc--media-{{ s.media_position }} gad-mc--valign-{{ s.valign }}{% if s.equal_height %} gad-mc--equal{% endif %}{% if s.card_style != 'none' %} gad-mc--cards{% else %} background-none{% endif %} {% render 'gad-scheme', s: s, key: section.id %}{% if section.settings.title == blank %} no-heading{% endif %}"
+  style="--mc-t-d: {{ s.title_size_d }}px; --mc-t-m: {{ s.title_size_m }}px; --mc-x-d: {{ s.text_size_d }}px; --mc-x-m: {{ s.text_size_m }}px; --mc-gap: {{ s.title_gap }}px; --mc-pad-d: {{ s.card_pad_d }}px; --mc-pad-m: {{ s.card_pad_m }}px; --mc-r: {{ s.card_radius }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
   <div
-    class="page-width section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+    class="{% if s.full_width %}gad-full-width{% else %}page-width{% endif %} section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
     {% if settings.animations_reveal_on_scroll %}
       data-cascade
     {% endif %}
@@ -77,8 +88,20 @@
                 style="--animation-order: {{ forloop.index }};"
               {% endif %}
             >
-              <div class="multicolumn-card content-container">
-                {%- if block.settings.image != blank -%}
+              <div class="multicolumn-card content-container{% if s.card_style != 'none' %} {% render 'gad-card-class', s: s, key: card_key %}{% endif %}">
+                {%- if block.settings.video != blank -%}
+                  <div class="multicolumn-card__image-wrapper multicolumn-card__image-wrapper--{{ section.settings.image_width }}-width{% if section.settings.image_width != 'full' %} multicolumn-card-spacing{% endif %} gad-mc__video">
+                    {%- render 'gad-video',
+                      video: block.settings.video,
+                      poster: block.settings.image,
+                      autoplay: block.settings.video_autoplay,
+                      loop: true,
+                      tap: true,
+                      sound: false,
+                      width: 1000
+                    -%}
+                  </div>
+                {%- elsif block.settings.image != blank -%}
                   {% if section.settings.image_ratio == 'adapt' or section.settings.image_ratio == 'circle' %}
                     {% assign spaced_image = true %}
                   {% endif %}
@@ -168,7 +191,8 @@
         {{- gad_items -}}
       </ul>
     {%- endif -%}
-    <div class="center">
+    <div class="center gad-mc__buttons">
+      {%- render 'gad-atc-button', label: s.atc_label, product: s.atc_product, skip_cart: s.atc_skip_cart -%}
       {%- if section.settings.button_label != blank -%}
         <a
           class="button button--primary"
@@ -331,20 +355,225 @@
       "label": "t:sections.multicolumn.settings.column_alignment.label"
     },
     {
+      "type": "header",
+      "content": "Tarjetas"
+    },
+    {
       "type": "select",
-      "id": "background_style",
+      "id": "card_style",
+      "label": "Estilo de las tarjetas",
       "options": [
         {
           "value": "none",
-          "label": "t:sections.multicolumn.settings.background_style.options__1.label"
+          "label": "Sin tarjeta"
         },
         {
-          "value": "primary",
-          "label": "t:sections.multicolumn.settings.background_style.options__2.label"
+          "value": "scheme",
+          "label": "Combinación de la paleta"
+        },
+        {
+          "value": "tint",
+          "label": "Velo claro"
+        },
+        {
+          "value": "custom",
+          "label": "Colores propios"
         }
       ],
-      "default": "primary",
-      "label": "t:sections.multicolumn.settings.background_style.label"
+      "default": "none",
+      "info": "Velo claro: un fondo apenas más oscuro que el de la sección."
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_color_scheme",
+      "label": "Combinación de las tarjetas",
+      "default": "scheme-2",
+      "info": "Sólo con \"Combinación de la paleta\"."
+    },
+    {
+      "type": "color",
+      "id": "card_cc_bg",
+      "label": "Fondo de las tarjetas",
+      "default": "#F3F3F3",
+      "info": "Sólo con \"Colores propios\"."
+    },
+    {
+      "type": "color_background",
+      "id": "card_cc_bg_gradient",
+      "label": "Degradé de las tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "card_cc_text",
+      "label": "Texto de las tarjetas",
+      "default": "#121212"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeo de las tarjetas",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_pad_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Relleno de las tarjetas en desktop",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_pad_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Relleno de las tarjetas en mobile",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Medio y alto"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "label": "Medio",
+      "options": [
+        {
+          "value": "top",
+          "label": "Arriba del texto"
+        },
+        {
+          "value": "bottom",
+          "label": "Abajo del texto"
+        }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "checkbox",
+      "id": "equal_height",
+      "label": "Todas las tarjetas de la misma altura",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "valign",
+      "label": "Contenido dentro de la tarjeta",
+      "options": [
+        {
+          "value": "top",
+          "label": "Arriba"
+        },
+        {
+          "value": "center",
+          "label": "Al medio"
+        },
+        {
+          "value": "bottom",
+          "label": "Abajo"
+        },
+        {
+          "value": "spread",
+          "label": "Repartido"
+        }
+      ],
+      "default": "top",
+      "info": "Con la misma altura: dónde queda el contenido sobrante."
+    },
+    {
+      "type": "header",
+      "content": "Textos"
+    },
+    {
+      "type": "range",
+      "id": "title_size_d",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Títulos en desktop",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "title_size_m",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Títulos en mobile",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "text_size_d",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Textos en desktop",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size_m",
+      "min": 8,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Textos en mobile",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre título y texto",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Ancho"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Usar todo el ancho de la página",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Botón de agregar al carrito"
+    },
+    {
+      "type": "text",
+      "id": "atc_label",
+      "label": "Texto del botón",
+      "info": "Sin texto, el botón no aparece. En una ficha agrega ese producto con la variante y la cantidad elegidas."
+    },
+    {
+      "type": "product",
+      "id": "atc_product",
+      "label": "Producto",
+      "info": "Opcional. Si elegís uno, el botón agrega ése. Fuera de una ficha hace falta elegirlo."
+    },
+    {
+      "type": "checkbox",
+      "id": "atc_skip_cart",
+      "label": "Ir directo al pago",
+      "default": false
     },
     {
       "type": "color_scheme",
@@ -761,6 +990,18 @@
           "type": "image_picker",
           "id": "image",
           "label": "t:sections.multicolumn.blocks.column.settings.image.label"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Reemplaza a la imagen; la imagen queda como miniatura."
+        },
+        {
+          "type": "checkbox",
+          "id": "video_autoplay",
+          "label": "Reproducción automática sin sonido",
+          "default": true
         },
         {
           "type": "inline_richtext",

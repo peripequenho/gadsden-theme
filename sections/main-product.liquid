@@ -2099,6 +2099,99 @@
       ]
     },
     {
+      "type": "trustpilot",
+      "name": "Estrellas Trustpilot",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 0,
+          "max": 5,
+          "step": 0.1,
+          "label": "Calificación",
+          "default": 4.8
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Excelente · <strong>4,8</strong> de 5"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color de los cuadros",
+          "default": "#00B67A"
+        },
+        {
+          "type": "color",
+          "id": "empty_color",
+          "label": "Color de los cuadros vacíos",
+          "default": "#DCDCE6"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 14,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 22
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "text",
+          "id": "scroll_target",
+          "label": "Ancla a la que llevan",
+          "info": "Opcional, ej. resenas: un toque baja hasta la sección con ese ancla."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
       "type": "text_icons",
       "name": "Texto con íconos",
       "settings": [

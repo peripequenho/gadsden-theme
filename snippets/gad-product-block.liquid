@@ -1,7 +1,9 @@
 {%- comment -%}
   Bloques Gadsden de la ficha de producto (main-product): los dibuja según block.type.
   sticky_bar (P01), reviews (P02), benefits (P03), divider (P04), urgency (P05), icons (P06),
-  image (P07), features + feature (P08/P09), stars (P10), text_icons (PX8), quantity_offers (PX10).
+  image (P07), features + feature (P08/P09), stars (P10), trustpilot (P11), text_icons (PX8),
+  quantity_offers (PX10), atc (T11). Los de contenido (stars, trustpilot, image, text_icons, atc, icons)
+  también los usan imagen con texto (E03), texto enriquecido (E07) y el carrito.
 
   Accepts:
   - block: {Object} bloque
@@ -172,6 +174,43 @@
         <span class="gad-p-stars__text">{{ b.text }}</span>
       {%- endif -%}
       {%- if target != blank -%}</a>{%- endif -%}
+    </div>
+
+  {%- when 'trustpilot' -%}
+    {%- liquid
+      assign rating = b.rating | at_least: 0 | at_most: 5
+      assign target = b.scroll_target | remove: '#' | strip
+    -%}
+    {%- capture tp_stars -%}
+      <span class="gad-tp__stars" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: rating }}">
+        {%- for i in (1..5) -%}
+          {%- liquid
+            assign part = rating | minus: forloop.index0 | at_least: 0 | at_most: 1 | times: 100 | round
+          -%}
+          <span class="gad-tp__star" style="--f: {{ part }}%;" aria-hidden="true">
+            {%- render 'gad-icon', name: 'star', filled: true -%}
+          </span>
+        {%- endfor -%}
+      </span>
+      {%- if b.text != blank -%}
+        <span class="gad-tp__text">{{ b.text }}</span>
+      {%- endif -%}
+    {%- endcapture -%}
+    <div
+      class="gad-pblock gad-tp gad-p-align--{{ b.align }}"
+      style="{{ margins }} --tp: {{ b.color }}; --tp-off: {{ b.empty_color }}; --tp-size: {{ b.size }}px;"
+      {{ block.shopify_attributes }}
+    >
+      {%- if target != blank -%}
+        <a href="#{{ target }}" class="gad-p-stars-link" data-gad-scroll>{{ tp_stars }}</a>
+      {%- else -%}
+        {{ tp_stars }}
+      {%- endif -%}
+    </div>
+
+  {%- when 'atc' -%}
+    <div class="gad-pblock gad-atc-block gad-p-align--{{ b.align }}" style="{{ margins }}" {{ block.shopify_attributes }}>
+      {%- render 'gad-atc-button', label: b.atc_label, product: b.atc_product, skip_cart: b.atc_skip_cart, secondary: b.secondary -%}
     </div>
 
   {%- when 'text_icons' -%}

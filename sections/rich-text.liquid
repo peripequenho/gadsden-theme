@@ -88,7 +88,9 @@
                   </a>
                 {%- endif -%}
               </div>
-          {%- endcase -%}
+          {%- else -%}
+            {%- render 'gad-product-block', block: block, product: product, section: section -%}
+        {%- endcase -%}
         {%- endfor -%}
       </div>
     </div>
@@ -438,6 +440,283 @@
           "id": "button_style_secondary_2",
           "default": false,
           "label": "t:sections.rich-text.blocks.buttons.settings.button_style_secondary_2.label"
+        }
+      ]
+    },
+    {
+      "type": "stars",
+      "name": "Estrellas",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 0.1,
+          "label": "Calificación",
+          "default": 4.8
+        },
+        {
+          "type": "select",
+          "id": "empty_style",
+          "label": "Estrellas vacías",
+          "options": [
+            {
+              "value": "filled",
+              "label": "Llenas de otro color"
+            },
+            {
+              "value": "outline",
+              "label": "En contorno"
+            }
+          ],
+          "default": "filled"
+        },
+        {
+          "type": "color",
+          "id": "star_color",
+          "label": "Color de las estrellas",
+          "default": "#F5B301"
+        },
+        {
+          "type": "color",
+          "id": "empty_color",
+          "label": "Color de las vacías",
+          "default": "#E1E1E1"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 12,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 18
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto al lado",
+          "default": "4,8 (120 reseñas)"
+        },
+        {
+          "type": "text",
+          "id": "scroll_target",
+          "label": "Al tocarlas, ir a",
+          "placeholder": "resenas",
+          "info": "Opcional: el nombre del ancla de una sección (sin #)."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "trustpilot",
+      "name": "Estrellas Trustpilot",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 0,
+          "max": 5,
+          "step": 0.1,
+          "label": "Calificación",
+          "default": 4.8
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Excelente · <strong>4,8</strong> de 5"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color de los cuadros",
+          "default": "#00B67A"
+        },
+        {
+          "type": "color",
+          "id": "empty_color",
+          "label": "Color de los cuadros vacíos",
+          "default": "#DCDCE6"
+        },
+        {
+          "type": "range",
+          "id": "size",
+          "min": 14,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 22
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "text",
+          "id": "scroll_target",
+          "label": "Ancla a la que llevan",
+          "info": "Opcional, ej. resenas: un toque baja hasta la sección con ese ancla."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 15
+        }
+      ]
+    },
+    {
+      "type": "atc",
+      "name": "Botón de agregar",
+      "settings": [
+        {
+          "type": "text",
+          "id": "atc_label",
+          "label": "Texto del botón",
+          "default": "Agregar al carrito"
+        },
+        {
+          "type": "product",
+          "id": "atc_product",
+          "label": "Producto",
+          "info": "En una ficha, vacío agrega el producto de la ficha con la variante y la cantidad elegidas. Fuera de una ficha hace falta elegirlo."
+        },
+        {
+          "type": "checkbox",
+          "id": "atc_skip_cart",
+          "label": "Ir directo al pago",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary",
+          "label": "Botón con contorno",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 10
         }
       ]
     }

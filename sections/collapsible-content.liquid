@@ -15,9 +15,16 @@
   }
 {%- endstyle -%}
 
-<div class="color-{{ section.settings.color_scheme }} gradient">
+{%- liquid
+  assign s = section.settings
+  assign box_key = section.id | append: '-box'
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+{%- render 'gad-colors', s: s, key: box_key, prefix: 'container_' -%}
+{%- capture box_scheme -%}{% render 'gad-scheme', s: s, key: box_key, prefix: 'container_' %}{%- endcapture -%}
+<div class="{% render 'gad-scheme', s: s, key: section.id %}" {% render 'gad-section-attrs', s: s %}>
   <div class="collapsible-content collapsible-{{ section.settings.layout }}-layout isolate{% if section.settings.layout == 'section' %} page-width{% elsif section.settings.layout == 'none' %} content-container content-container--full-width{% endif %}">
-    <div class="collapsible-content__wrapper section-{{ section.id }}-padding{% if section.settings.layout == 'section' %} content-container color-{{ section.settings.container_color_scheme }} gradient{% endif %}">
+    <div class="collapsible-content__wrapper section-{{ section.id }}-padding{% if section.settings.layout == 'section' %} content-container {{ box_scheme }}{% endif %}">
       <div class="{% if section.settings.image == blank %}collapsible-content-wrapper-narrow{% else %}page-width{% endif %}">
         <div
           class="collapsible-content__header{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
@@ -29,7 +36,12 @@
             </p>
           {% endif %}
           {%- if section.settings.heading != blank -%}
-            <h2 class="collapsible-content__heading inline-richtext {{ section.settings.heading_size }}">
+            <h2
+              class="collapsible-content__heading inline-richtext gad-hl {{ section.settings.heading_size }}"
+              {% if s.heading_accent != blank %}
+                style="--gad-hl: {{ s.heading_accent }};"
+              {% endif %}
+            >
               {{ section.settings.heading }}
             </h2>
           {%- else -%}
@@ -37,14 +49,19 @@
           {% endif %}
         </div>
         <div class="grid grid--1-col grid--2-col-tablet collapsible-content__grid{% if section.settings.desktop_layout == 'image_second' %} collapsible-content__grid--reverse{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-          {%- if section.settings.image != blank -%}
+          {%- if section.settings.image != blank or s.video != blank -%}
             <div class="grid__item collapsible-content__grid-item">
               <div
                 class="collapsible-content__media collapsible-content__media--{{ section.settings.image_ratio }} media global-media-settings gradient"
-                {% if section.settings.image_ratio == 'adapt' %}
+                {% if section.settings.image_ratio == 'adapt' and s.video != blank %}
+                  style="padding-bottom: {{ 1 | divided_by: s.video.aspect_ratio | times: 100 }}%;"
+                {% elsif section.settings.image_ratio == 'adapt' %}
                   style="padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;"
                 {% endif %}
               >
+                {%- if s.video != blank -%}
+                  {%- render 'gad-video', video: s.video, poster: section.settings.image, autoplay: s.video_autoplay, loop: true, tap: true, cover: true -%}
+                {%- else -%}
                 {%- liquid
                   assign padding_multiplier = 1
                   if section.settings.layout == 'section'
@@ -65,13 +82,14 @@
                     sizes: sizes,
                     widths: '50, 75, 100, 150, 200, 300, 400, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3200'
                 }}
+                {%- endif -%}
               </div>
             </div>
           {% endif %}
           <div class="grid__item">
             {%- for block in section.blocks -%}
               <div
-                class="accordion{% if section.settings.layout == 'row' %} content-container color-{{ section.settings.container_color_scheme }} gradient{% endif %}"
+                class="accordion gad-acc gad-acc--{{ s.title_size }} gad-acc--{{ s.toggle_icon }}{% unless s.top_border %} gad-acc--no-border{% endunless %}{% if section.settings.layout == 'row' %} content-container {{ box_scheme }}{% endif %}"
                 {{ block.shopify_attributes }}
               >
                 <details
@@ -81,11 +99,16 @@
                   {% endif %}
                 >
                   <summary id="Summary-{{ block.id }}-{{ section.id }}">
-                    {% render 'icon-accordion', icon: block.settings.icon %}
+                    {%- assign row_icon = block.settings.icon_name | default: block.settings.icon -%}
+                    {% render 'icon-accordion', icon: row_icon, filled: block.settings.icon_filled, image: block.settings.icon_image %}
                     <h3 class="accordion__title inline-richtext h4">
                       {{ block.settings.heading | default: block.settings.page.title | escape }}
                     </h3>
-                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                    {%- if s.toggle_icon == 'plus' -%}
+                      <span class="gad-acc__plus" aria-hidden="true"></span>
+                    {%- else -%}
+                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    {%- endif -%}
                   </summary>
                   <div
                     class="accordion__content rte"
@@ -112,7 +135,10 @@
   "tag": "section",
   "class": "section",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -155,6 +181,12 @@
       "label": "t:sections.all.heading_size.label"
     },
     {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Marcá en negrita las palabras del título. Vacío: el acento de la combinación."
+    },
+    {
       "type": "select",
       "id": "heading_alignment",
       "label": "t:sections.collapsible_content.settings.heading_alignment.label",
@@ -177,7 +209,7 @@
     {
       "type": "header",
       "content": "t:sections.collapsible_content.settings.layout_header.content"
-    },    
+    },
     {
       "type": "select",
       "id": "layout",
@@ -203,12 +235,130 @@
       "id": "container_color_scheme",
       "label": "t:sections.collapsible_content.settings.container_color_scheme.label",
       "default": "scheme-2"
-    },    
+    },
+    {
+      "type": "header",
+      "content": "Colores propios del contenedor"
+    },
+    {
+      "type": "checkbox",
+      "id": "container_custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "container_cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "container_cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "color",
+      "id": "container_cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "container_cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "container_cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "container_cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "container_cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
     {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:sections.collapsible_content.settings.section_color_scheme.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
     },
     {
       "type": "checkbox",
@@ -218,12 +368,70 @@
     },
     {
       "type": "header",
+      "content": "Filas"
+    },
+    {
+      "type": "select",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "sm",
+          "label": "Chico"
+        },
+        {
+          "value": "md",
+          "label": "Mediano"
+        },
+        {
+          "value": "lg",
+          "label": "Grande"
+        }
+      ],
+      "default": "md"
+    },
+    {
+      "type": "select",
+      "id": "toggle_icon",
+      "label": "Ícono de abrir y cerrar",
+      "options": [
+        {
+          "value": "caret",
+          "label": "Flecha"
+        },
+        {
+          "value": "plus",
+          "label": "Signo más"
+        }
+      ],
+      "default": "caret"
+    },
+    {
+      "type": "checkbox",
+      "id": "top_border",
+      "label": "Borde arriba de cada fila",
+      "default": true
+    },
+    {
+      "type": "header",
       "content": "t:sections.collapsible_content.settings.header.content"
     },
     {
       "type": "image_picker",
       "id": "image",
       "label": "t:sections.collapsible_content.settings.image.label"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Reemplaza a la imagen; la imagen queda como miniatura."
+    },
+    {
+      "type": "checkbox",
+      "id": "video_autoplay",
+      "label": "Reproducción automática sin sonido",
+      "default": true
     },
     {
       "type": "select",
@@ -284,6 +492,38 @@
       "unit": "px",
       "label": "t:sections.all.padding.padding_bottom",
       "default": 36
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
     }
   ],
   "blocks": [
@@ -480,6 +720,23 @@
           ],
           "default": "check_mark",
           "label": "t:sections.collapsible_content.blocks.collapsible_row.settings.icon.label"
+        },
+        {
+          "type": "text",
+          "id": "icon_name",
+          "label": "Ícono por nombre",
+          "info": "Gana sobre la lista de arriba. Un nombre de esa lista o de Material Symbols (en inglés). Acepta metacampos."
+        },
+        {
+          "type": "checkbox",
+          "id": "icon_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Ícono propio (imagen)"
         },
         {
           "type": "richtext",

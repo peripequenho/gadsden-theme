@@ -1382,3 +1382,549 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
 .gad-copyright a {
   color: inherit;
 }
+
+/* ---------- bloques de contenido compartidos (ficha, imagen con texto, texto enriquecido) ---------- */
+.gad-pblock {
+  margin-top: var(--mt, 0);
+  margin-bottom: var(--mb, 0);
+}
+
+.gad-p-align--left {
+  display: flex;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.gad-p-align--center {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.gad-p-align--right {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+@media screen and (max-width: 749px) {
+  .gad-p-bleed {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
+
+  .gad-p-bleed img,
+  .gad-p-bleed .gad-p-divider__line {
+    border-radius: 0 !important;
+  }
+}
+
+/* imagen (P07, E03) */
+.gad-p-image img,
+.gad-p-image svg {
+  display: block;
+  width: var(--img-w, 100%);
+  height: auto;
+  border-radius: var(--img-r, 0);
+}
+
+/* estrellas (P10, E03, E07) */
+.gad-p-stars-wrap,
+.gad-p-stars-link {
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.gad-p-stars-wrap {
+  display: flex;
+}
+
+.gad-p-stars-link {
+  display: inline-flex;
+  color: inherit;
+  text-decoration: none;
+}
+
+.gad-p-stars {
+  position: relative;
+  display: inline-flex;
+  font-size: var(--star-size, 18px);
+  line-height: 1;
+}
+
+.gad-p-stars__base {
+  display: inline-flex;
+  color: var(--star-off, #e1e1e1);
+}
+
+.gad-p-stars--outline .gad-p-stars__base {
+  color: var(--star, #f5b301);
+}
+
+.gad-p-stars--outline .gad-p-stars__base .gad-icon {
+  font-variation-settings: 'FILL' 0;
+}
+
+.gad-p-stars__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  overflow: hidden;
+  color: var(--star, #f5b301);
+  white-space: nowrap;
+}
+
+.gad-p-stars__text {
+  font-size: 1.4rem;
+}
+
+/* estrellas estilo Trustpilot (P11, E03, E07) */
+.gad-tp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.gad-tp__stars {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.gad-tp__star {
+  display: grid;
+  place-items: center;
+  width: var(--tp-size, 22px);
+  height: var(--tp-size, 22px);
+  background: linear-gradient(90deg, var(--tp, #00b67a) var(--f, 100%), var(--tp-off, #dcdce6) var(--f, 100%));
+  color: #fff;
+  font-size: calc(var(--tp-size, 22px) * 0.75);
+  --gad-icon-color: #fff;
+}
+
+.gad-tp__text {
+  font-size: 1.4rem;
+}
+
+/* botón de agregar al carrito como bloque (T11) */
+.gad-pblock.gad-atc-block .button {
+  min-width: min(100%, 24rem);
+}
+
+/* ---------- ancho completo de página (secciones de Dawn ampliadas) ---------- */
+.gad-full-width {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-full-width {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+/* ---------- E01 multicolumna ---------- */
+.gad-mc .multicolumn-card__info h3 {
+  margin-top: 0;
+  font-size: var(--mc-t-m);
+}
+
+.gad-mc .multicolumn-card__info > :nth-child(2) {
+  margin-top: var(--mc-gap);
+}
+
+.gad-mc .multicolumn-card__info .rte {
+  font-size: var(--mc-x-m);
+}
+
+.gad-mc--cards .multicolumn-card {
+  overflow: hidden;
+  border-radius: var(--mc-r);
+}
+
+.gad-mc--cards .multicolumn-card.gad-tint {
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+.gad-mc--cards .multicolumn-card__info {
+  padding: var(--mc-pad-m);
+}
+
+.gad-mc--equal .multicolumn-card {
+  height: 100%;
+}
+
+.gad-mc .multicolumn-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.gad-mc--media-bottom .multicolumn-card {
+  flex-direction: column-reverse;
+}
+
+.gad-mc--media-bottom .multicolumn-card-spacing {
+  padding-top: 0;
+  padding-bottom: 2.5rem;
+}
+
+.gad-mc .multicolumn-card__info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.gad-mc--valign-center .multicolumn-card__info {
+  justify-content: center;
+}
+
+.gad-mc--valign-bottom .multicolumn-card__info {
+  justify-content: flex-end;
+}
+
+.gad-mc--valign-spread .multicolumn-card__info {
+  justify-content: space-between;
+}
+
+.gad-mc__video gad-video,
+.gad-mc__video .gad-video {
+  display: block;
+}
+
+.gad-mc__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.gad-mc__buttons:empty {
+  display: none;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-mc .multicolumn-card__info h3 {
+    font-size: var(--mc-t-d);
+  }
+
+  .gad-mc .multicolumn-card__info .rte {
+    font-size: var(--mc-x-d);
+  }
+
+  .gad-mc--cards .multicolumn-card__info {
+    padding: var(--mc-pad-d);
+  }
+}
+
+/* ---------- E02 y E03 imagen con texto y multifila: medio en mobile y ancho del medio ---------- */
+@media screen and (max-width: 749px) {
+  .gad-iwt--m-second .image-with-text__media-item {
+    order: 2;
+  }
+
+  .page-width .gad-iwt--m-full .image-with-text__media-item {
+    width: calc(100% + 3rem);
+    max-width: none;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
+
+  .gad-iwt--m-full .image-with-text__media {
+    border-radius: 0;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .gad-iwt-w .image-with-text__grid > .image-with-text__media-item.grid__item {
+    width: var(--media-w, 50%);
+    max-width: var(--media-w, 50%);
+    flex-grow: 0;
+  }
+
+  .gad-iwt-w .image-with-text__grid > .image-with-text__text-item.grid__item {
+    width: calc(100% - var(--media-w, 50%));
+    max-width: calc(100% - var(--media-w, 50%));
+    flex-grow: 1;
+  }
+}
+
+.gad-iwt-full .image-with-text__media {
+  border-radius: 0;
+}
+
+/* ---------- pestañas desplegables (PX7 en la ficha, E04) ---------- */
+.gad-acc--sm .accordion__title {
+  font-size: 1.4rem;
+}
+
+.gad-acc--md .accordion__title {
+  font-size: 1.6rem;
+}
+
+.gad-acc--lg .accordion__title {
+  font-size: 1.9rem;
+}
+
+.gad-acc.gad-acc--no-border {
+  border-top: 0;
+}
+
+.gad-acc__plus {
+  position: relative;
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-left: 1rem;
+}
+
+.gad-acc__plus::before,
+.gad-acc__plus::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.gad-acc__plus::before {
+  width: 1.4rem;
+  height: 0.2rem;
+}
+
+.gad-acc__plus::after {
+  width: 0.2rem;
+  height: 1.4rem;
+  transition: transform var(--duration-default) ease;
+}
+
+details[open] > summary .gad-acc__plus::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.gad-acc-icon {
+  display: inline-grid;
+  place-items: center;
+  font-size: 2rem;
+}
+
+/* ---------- E05 formulario de contacto ---------- */
+.gad-cf__row {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 2rem;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-cf__row--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.contact .gad-cf__cell {
+  margin-bottom: 1.5rem;
+}
+
+.contact .gad-cf__cell .field {
+  margin-bottom: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .contact .gad-cf__cell {
+    margin-bottom: 2rem;
+  }
+}
+
+.gad-cf__error {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--err-fg, #b42318);
+  font-size: 1.3rem;
+  line-height: 1.3;
+}
+
+.gad-cf__error[hidden] {
+  display: none;
+}
+
+.gad-form-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2.4rem;
+  padding: 1.4rem 1.6rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+}
+
+.gad-form-msg--ok {
+  border: var(--ok-bw, 1px) solid var(--ok-bc, #1e7a33);
+  border-radius: var(--ok-r, 8px);
+  background: var(--ok-bg, #e9f7ec);
+  color: var(--ok-fg, #1e7a33);
+  --gad-icon-color: var(--ok-fg, #1e7a33);
+}
+
+.gad-form-msg--err {
+  border: var(--err-bw, 1px) solid var(--err-bc, #b42318);
+  border-radius: var(--err-r, 8px);
+  background: var(--err-bg, #fdecea);
+  color: var(--err-fg, #b42318);
+  --gad-icon-color: var(--err-fg, #b42318);
+}
+
+.gad-form-msg__icon {
+  flex: none;
+  font-size: 2.2rem;
+}
+
+.gad-form-msg__icon.gad-icon--image img {
+  width: 2.2rem;
+  height: auto;
+}
+
+.gad-form-msg__text p,
+.gad-form-msg__text ul {
+  margin: 0;
+}
+
+/* ---------- E08 presentación de diapositivas ---------- */
+.gad-ss__pic img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gad-ss__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: inherit;
+  gap: 1rem;
+}
+
+/* paginación arriba de la sección: los controles pasan primero en la columna */
+@media screen and (max-width: 749px) {
+  .gad-ss--pag-m-over .slideshow__controls {
+    order: -1;
+    border-top: 0;
+    border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.08);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .gad-ss--pag-d-over .slideshow__controls {
+    order: -1;
+    border-top: 0;
+    border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .banner--desktop-transparent.gad-ss__tx--light .banner__box {
+    --color-foreground: 255, 255, 255;
+    color: rgb(255, 255, 255);
+  }
+
+  .banner--desktop-transparent.gad-ss__tx--dark .banner__box {
+    --color-foreground: 18, 18, 18;
+    color: rgb(18, 18, 18);
+  }
+}
+
+/* ---------- E09 y E10 tarjetas: muestras y altura pareja ---------- */
+.gad-card-sw {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+
+.gad-card-sw__item {
+  display: inline-flex;
+  color: inherit;
+  text-decoration: none;
+}
+
+.gad-card-sw__item .swatch {
+  --swatch--size: var(--sw-m, 16px);
+}
+
+.gad-card-sw__item--text {
+  padding: 0.1rem 0.7rem;
+  border: 0.1rem solid rgba(var(--color-foreground), 0.25);
+  border-radius: 10rem;
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.gad-card-sw__item:hover .swatch,
+.gad-card-sw__item:focus-visible .swatch {
+  outline: 0.1rem solid rgb(var(--color-foreground));
+  outline-offset: 0.2rem;
+}
+
+.gad-card-sw__more {
+  color: inherit;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-card-sw__item .swatch {
+    --swatch--size: var(--sw-d, 20px);
+  }
+}
+
+.gad-cards--equal product-component {
+  display: block;
+  height: 100%;
+}
+
+.gad-cards--equal .card-wrapper,
+.gad-cards--equal .card-wrapper > .card {
+  height: 100%;
+}
+
+.gad-cards--equal .card__content {
+  flex-grow: 1;
+}
+
+/* ---------- E11 lista de colecciones ---------- */
+@media screen and (max-width: 749px) {
+  .gad-lc-title-m .card__heading {
+    font-size: var(--lc-t-m, 16px);
+  }
+}
+
+/* el más de las filas desplegables va a la derecha, donde Dawn pone la flecha */
+summary .gad-acc__plus {
+  position: absolute;
+  top: calc(50% - 0.7rem);
+  right: 1.5rem;
+  margin: 0;
+}
+
+/* velo claro en las tarjetas de la multicolumna (section-multicolumn.css se carga después) */
+.multicolumn.gad-mc--cards .multicolumn-card.gad-tint {
+  background: rgba(var(--color-foreground), 0.05);
+}
+
+/* altura pareja: el contenido de la tarjeta crece y el agregado rápido queda abajo */
+.gad-cards--equal .card__content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.gad-cards--equal .card__content .card__information {
+  flex-grow: 1;
+}
+
+.gad-cards--equal .card__content .quick-add {
+  margin-top: auto;
+}
