@@ -623,6 +623,9 @@
     },
     "stamps": {
       "media": "Subí un video o una imagen para la parte de arriba de esta sección."
+    },
+    "legal": {
+      "missing": "Falta: completalo o conectá un metacampo."
     }
   }
 }

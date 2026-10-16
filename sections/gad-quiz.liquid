@@ -1,0 +1,692 @@
+{%- comment -%}
+  Cuestionario con resultado (L11): preguntas de a una por pantalla con "Pregunta X de N", opciones
+  grandes, volver atrás y un aliento a mitad de camino. Cada opción puede sumar a un perfil o marcar
+  un corte; al final muestra el resultado del perfil con más puntos (una pantalla tipo ficha), o el
+  de derivación si se marcó un corte. No guarda ni envía respuestas.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign questions = section.blocks | where: 'type', 'question'
+  assign results = section.blocks | where: 'type', 'result'
+  assign total = questions.size
+  assign mid = total | divided_by: 2
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-quiz
+  class="gad-qz gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  data-mid="{{ mid }}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width page-width--narrow">
+    <div class="gad-qz__screen" data-gad-qz="intro">
+      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      <div class="gad-qz__center">
+        <button type="button" class="button" data-gad-qz-start>{{ s.start_label | escape }}</button>
+        {%- if s.intro_note != blank -%}<p class="gad-qz__note">{{ s.intro_note }}</p>{%- endif -%}
+      </div>
+    </div>
+
+    {%- for block in questions -%}
+      {%- assign b = block.settings -%}
+      <div class="gad-qz__screen" data-gad-qz="q" data-n="{{ forloop.index }}" hidden {{ block.shopify_attributes }}>
+        <div class="gad-qz__top">
+          <button type="button" class="gad-qz__back link" data-gad-qz-back{% if forloop.first %} hidden{% endif %}>{%- render 'gad-icon', name: 'arrow_back' -%}{{ s.back_label | escape }}</button>
+          {%- liquid
+            assign n_str = forloop.index | append: ''
+            assign total_str = total | append: ''
+            assign count_txt = s.count_label | replace: '{n}', n_str | replace: '{total}', total_str
+          -%}
+          <span class="gad-qz__count">{{ count_txt | escape }}</span>
+        </div>
+        <div class="gad-qz__bar"><span style="width: {{ forloop.index0 | times: 100 | divided_by: total }}%;"></span></div>
+        {%- if forloop.index0 == mid and s.cheer != blank and total > 3 -%}<p class="gad-qz__cheer">{{ s.cheer }}</p>{%- endif -%}
+        <h3 class="gad-qz__q h2">{{ b.question }}</h3>
+        {%- if b.help != blank -%}<p class="gad-qz__help">{{ b.help }}</p>{%- endif -%}
+        <div class="gad-qz__options">
+          {%- assign lines = b.options | newline_to_br | split: '<br />' -%}
+          {%- for line in lines -%}
+            {%- assign row = line | strip -%}
+            {%- if row == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign parts = row | split: '|' -%}
+            {%- assign tag = parts[1] | strip | downcase -%}
+            <button type="button" class="gad-qz__opt" data-gad-qz-opt data-tag="{{ tag | escape }}">{{ parts[0] | strip | escape }}</button>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endfor -%}
+
+    <div class="gad-qz__screen gad-qz__result color-{{ s.cut_scheme }}" data-gad-qz="cut" hidden>
+      <h3 class="h2">{{ s.cut_title | escape }}</h3>
+      <div class="rte">{{ s.cut_text }}</div>
+      <button type="button" class="link gad-qz__restart" data-gad-qz-restart>{{ s.restart_label | escape }}</button>
+    </div>
+
+    {%- for block in results -%}
+      {%- assign b = block.settings -%}
+      {%- assign p = b.product -%}
+      <div class="gad-qz__screen gad-qz__result" data-gad-qz="result" data-profile="{{ b.profile | strip | downcase | escape }}" hidden {{ block.shopify_attributes }}>
+        {%- if b.kicker != blank -%}<span class="gad-qz__kicker">{{ b.kicker | escape }}</span>{%- endif -%}
+        <h3 class="h1 gad-qz__rtitle">{{ b.title }}</h3>
+        <div class="gad-qz__card">
+          {%- assign img = b.image | default: p.featured_media.preview_image -%}
+          {%- if img != blank -%}
+            <div class="gad-qz__img">{{ img | image_url: width: 900 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 750px) 40vw, 90vw', widths: '400, 600, 900' }}</div>
+          {%- endif -%}
+          <div class="gad-qz__info">
+            {%- if b.text != blank -%}<div class="rte">{{ b.text }}</div>{%- endif -%}
+            {%- if b.benefits != blank -%}
+              <ul class="gad-qz__benefits list-unstyled" role="list">
+                {%- assign bl = b.benefits | newline_to_br | split: '<br />' -%}
+                {%- for x in bl -%}
+                  {%- assign x = x | strip -%}
+                  {%- if x != blank -%}<li>{%- render 'gad-icon', name: 'check_circle', filled: true -%}<span>{{ x | escape }}</span></li>{%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            {%- if p != blank -%}
+              <p class="gad-qz__price">{{ p.price | money }}</p>
+              {%- render 'gad-atc-button', label: b.button_label, product: p -%}
+            {%- elsif b.button_label != blank -%}
+              <a href="{{ b.link | default: '#' }}" class="button">{{ b.button_label | escape }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+        <button type="button" class="link gad-qz__restart" data-gad-qz-restart>{{ s.restart_label | escape }}</button>
+      </div>
+    {%- endfor -%}
+  </div>
+</gad-quiz>
+
+{% stylesheet %}
+  .gad-qz__center {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .gad-qz__note {
+    margin: 0;
+    font-size: 1.3rem;
+    opacity: 0.75;
+  }
+
+  .gad-qz__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.2rem;
+    font-size: 1.3rem;
+  }
+
+  .gad-qz__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .gad-qz__count {
+    margin-left: auto;
+    font-weight: 600;
+  }
+
+  .gad-qz__bar {
+    height: 0.6rem;
+    margin: 0.6rem 0 2rem;
+    overflow: hidden;
+    border-radius: 99rem;
+    background: rgba(var(--color-foreground), 0.1);
+  }
+
+  .gad-qz__bar span {
+    display: block;
+    height: 100%;
+    background: rgb(var(--color-button));
+    transition: width 0.3s;
+  }
+
+  .gad-qz__cheer {
+    margin: 0 0 1.2rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 0.8rem;
+    background: rgba(var(--color-button), 0.1);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .gad-qz__q {
+    margin: 0 0 0.6rem;
+  }
+
+  .gad-qz__help {
+    margin: 0 0 1.6rem;
+    opacity: 0.8;
+  }
+
+  .gad-qz__options {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.6rem;
+  }
+
+  .gad-qz__opt {
+    min-height: 5.6rem;
+    padding: 1.2rem 1.6rem;
+    border: 0.15rem solid rgba(var(--color-foreground), 0.2);
+    border-radius: 1rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    font: inherit;
+    font-size: 1.6rem;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .gad-qz__opt:hover,
+  .gad-qz__opt.is-picked {
+    border-color: rgb(var(--color-button));
+    background: rgba(var(--color-button), 0.06);
+  }
+
+  .gad-qz__result {
+    padding: 2.4rem 2rem;
+    border-radius: 1.6rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    text-align: center;
+  }
+
+  .gad-qz__kicker {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+  }
+
+  .gad-qz__rtitle {
+    margin: 0.4rem 0 2rem;
+  }
+
+  .gad-qz__card {
+    display: grid;
+    gap: 2rem;
+    text-align: left;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-qz__card {
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+  }
+
+  .gad-qz__img img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 1.2rem;
+  }
+
+  .gad-qz__info {
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .gad-qz__benefits {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+  }
+
+  .gad-qz__benefits li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .gad-qz__price {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+  }
+
+  .gad-qz__info .button {
+    width: 100%;
+  }
+
+  .gad-qz__restart {
+    margin-top: 2rem;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadQuiz extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.screens = [...this.querySelectorAll('[data-gad-qz]')];
+      this.qs = this.screens.filter((s) => s.dataset.gadQz === 'q');
+      this.answers = [];
+      this.addEventListener('click', (e) => {
+        const t = e.target.closest('[data-gad-qz-start], [data-gad-qz-opt], [data-gad-qz-back], [data-gad-qz-restart]');
+        if (!t) return;
+        if (t.hasAttribute('data-gad-qz-start')) this.show(this.qs[0]);
+        else if (t.hasAttribute('data-gad-qz-back')) this.back();
+        else if (t.hasAttribute('data-gad-qz-restart')) this.restart();
+        else this.pick(t);
+      });
+      this.addEventListener('shopify:block:select', (e) => this.show(e.target));
+    }
+
+    show(screen) {
+      this.screens.forEach((s) => (s.hidden = s !== screen));
+      if (this.getBoundingClientRect().top < 0) this.scrollIntoView({ block: 'start', behavior: window.Gadsden && Gadsden.reduceMotion() ? 'auto' : 'smooth' });
+      const focusable = screen.querySelector('h3');
+      if (focusable) {
+        focusable.setAttribute('tabindex', '-1');
+        focusable.focus({ preventScroll: true });
+      }
+    }
+
+    pick(btn) {
+      const screen = btn.closest('[data-gad-qz]');
+      const i = this.qs.indexOf(screen);
+      screen.querySelectorAll('[data-gad-qz-opt]').forEach((o) => o.classList.toggle('is-picked', o === btn));
+      this.answers[i] = btn.dataset.tag || '';
+      this.answers.length = i + 1;
+      setTimeout(() => (i + 1 < this.qs.length ? this.show(this.qs[i + 1]) : this.finish()), 220);
+    }
+
+    back() {
+      const cur = this.qs.findIndex((s) => !s.hidden);
+      if (cur > 0) this.show(this.qs[cur - 1]);
+    }
+
+    restart() {
+      this.answers = [];
+      this.querySelectorAll('.is-picked').forEach((o) => o.classList.remove('is-picked'));
+      this.show(this.screens[0]);
+    }
+
+    finish() {
+      if (this.answers.includes('!')) return this.show(this.screens.find((s) => s.dataset.gadQz === 'cut'));
+      const score = {};
+      this.answers.filter((t) => t && t !== '!').forEach((t) => (score[t] = (score[t] || 0) + 1));
+      const results = this.screens.filter((s) => s.dataset.gadQz === 'result');
+      let best = null;
+      results.forEach((r) => {
+        const p = r.dataset.profile;
+        if (p && (score[p] || 0) > 0 && (!best || score[p] > (score[best.dataset.profile] || 0))) best = r;
+      });
+      if (!best) best = results.find((r) => !r.dataset.profile) || results[0];
+      if (best) this.show(best);
+    }
+  }
+
+  if (!customElements.get('gad-quiz')) customElements.define('gad-quiz', GadQuiz);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Cuestionario",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "¿Cuál es <strong>para vos</strong>?",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "text",
+      "id": "start_label",
+      "label": "Botón para empezar",
+      "default": "Empezar"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "intro_note",
+      "label": "Nota debajo del botón",
+      "default": "Son pocas preguntas. Menos de un minuto."
+    },
+    {
+      "type": "text",
+      "id": "count_label",
+      "label": "Contador",
+      "default": "Pregunta {n} de {total}"
+    },
+    {
+      "type": "text",
+      "id": "back_label",
+      "label": "Volver",
+      "default": "Volver"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "cheer",
+      "label": "Aliento a mitad de camino",
+      "default": "Vas por la mitad. Ya casi."
+    },
+    {
+      "type": "text",
+      "id": "restart_label",
+      "label": "Empezar de nuevo",
+      "default": "Hacer el test de nuevo"
+    },
+    {
+      "type": "header",
+      "content": "Resultado de derivación"
+    },
+    {
+      "type": "paragraph",
+      "content": "Se muestra si se elige una opción marcada con \"| !\". Sirve para no venderle a quien el producto no le corresponde."
+    },
+    {
+      "type": "text",
+      "id": "cut_title",
+      "label": "Título",
+      "default": "Esto conviene verlo con un profesional"
+    },
+    {
+      "type": "richtext",
+      "id": "cut_text",
+      "label": "Texto",
+      "default": "<p>Por lo que contaste, lo mejor es consultar antes de usar cualquier producto.</p>"
+    },
+    {
+      "type": "color_scheme",
+      "id": "cut_scheme",
+      "label": "Combinación",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Pregunta",
+      "limit": 15,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "question",
+          "label": "Pregunta",
+          "default": "¿Cuándo lo usarías?"
+        },
+        {
+          "type": "text",
+          "id": "help",
+          "label": "Ayuda"
+        },
+        {
+          "type": "textarea",
+          "id": "options",
+          "label": "Opciones",
+          "default": "Todos los días | diario\nDe vez en cuando | ocasional\nTodavía no sé",
+          "info": "Una por renglón. Para sumar a un perfil: Opción | perfil. Para un corte: Opción | !"
+        }
+      ]
+    },
+    {
+      "type": "result",
+      "name": "Resultado",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "text",
+          "id": "profile",
+          "label": "Perfil",
+          "default": "diario",
+          "info": "La misma palabra que usaste en las opciones. Vacío: el resultado por defecto."
+        },
+        {
+          "type": "text",
+          "id": "kicker",
+          "label": "Volanta",
+          "default": "Tu resultado"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Lo tuyo es el uso diario"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Por qué este es el indicado para vos.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Vacía: la foto del producto."
+        },
+        {
+          "type": "textarea",
+          "id": "benefits",
+          "label": "Beneficios",
+          "info": "Uno por renglón."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Producto"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Agregar al carrito"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace sin producto"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cuestionario",
+      "blocks": [
+        {
+          "type": "question"
+        },
+        {
+          "type": "question",
+          "settings": {
+            "question": "¿Qué es lo que más te importa?",
+            "options": "Que dure | diario\nQue sea práctico | ocasional\nOtra cosa"
+          }
+        },
+        {
+          "type": "result"
+        },
+        {
+          "type": "result",
+          "settings": {
+            "profile": "",
+            "title": "Te recomendamos empezar por acá"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

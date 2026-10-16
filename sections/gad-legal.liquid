@@ -1,0 +1,337 @@
+{%- comment -%}
+  Aviso y datos legales (L18): una franja compacta con un aviso siempre visible y una línea de datos;
+  el resto (advertencias, modo de uso, composición, titular, registro) va en un desplegable cerrado.
+  Cada texto se puede conectar a un metacampo del producto desde el editor (origen dinámico). Si un
+  dato marcado como obligatorio está vacío, en el editor se ve un aviso.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-lg gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width page-width--narrow">
+    {%- if s.notice != blank -%}
+      <div class="gad-lg__notice">{%- render 'gad-icon', name: s.notice_icon, filled: true -%}<div class="rte">{{ s.notice }}</div></div>
+    {%- endif -%}
+    {%- if s.data_line != blank -%}<p class="gad-lg__line">{{ s.data_line }}</p>{%- endif -%}
+    {%- if section.blocks.size > 0 -%}
+      <details class="gad-lg__more"{% if s.open %} open{% endif %}>
+        <summary>{{ s.details_label | escape }}{%- render 'gad-icon', name: 'expand_more' -%}</summary>
+        <dl class="gad-lg__rows">
+          {%- for block in section.blocks -%}
+            {%- assign b = block.settings -%}
+            {%- if b.text != blank -%}
+              <div class="gad-lg__row" {{ block.shopify_attributes }}>
+                <dt>{{ b.title | escape }}</dt>
+                <dd class="rte">{{ b.text }}</dd>
+              </div>
+            {%- elsif b.required and request.design_mode -%}
+              <div class="gad-lg__row gad-lg__row--missing" {{ block.shopify_attributes }}>
+                <dt>{{ b.title | escape }}</dt>
+                <dd>{{ 'gadsden.legal.missing' | t }}</dd>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </dl>
+      </details>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-lg {
+    font-size: 1.3rem;
+  }
+
+  .gad-lg__notice {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-weight: 600;
+  }
+
+  .gad-lg__notice .gad-icon {
+    flex: 0 0 auto;
+    font-size: 2rem;
+  }
+
+  .gad-lg__notice p {
+    margin: 0;
+  }
+
+  .gad-lg__line {
+    margin: 0.8rem 0 0;
+    opacity: 0.75;
+  }
+
+  .gad-lg__more {
+    margin-top: 1.2rem;
+    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
+  }
+
+  .gad-lg__more summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    font-weight: 600;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .gad-lg__more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .gad-lg__more[open] summary .gad-icon {
+    transform: rotate(180deg);
+  }
+
+  .gad-lg__rows {
+    display: grid;
+    gap: 1.2rem;
+    margin: 0 0 1rem;
+  }
+
+  .gad-lg__row dt {
+    font-weight: 700;
+  }
+
+  .gad-lg__row dd {
+    margin: 0.2rem 0 0;
+  }
+
+  .gad-lg__row dd p {
+    margin: 0;
+  }
+
+  .gad-lg__row--missing dd {
+    color: rgb(200, 40, 40);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Aviso y datos legales",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "notice",
+      "label": "Aviso siempre visible",
+      "default": "<p>Uso externo. Leé las indicaciones antes de usar.</p>"
+    },
+    {
+      "type": "text",
+      "id": "notice_icon",
+      "label": "Ícono del aviso",
+      "default": "info",
+      "info": "Nombre en inglés de Material Symbols."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "data_line",
+      "label": "Línea de datos",
+      "default": "Contenido neto · Origen · Registro"
+    },
+    {
+      "type": "text",
+      "id": "details_label",
+      "label": "Título del desplegable",
+      "default": "Información completa"
+    },
+    {
+      "type": "checkbox",
+      "id": "open",
+      "label": "Desplegable abierto de entrada",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "En una ficha, cada texto se puede conectar a un metacampo del producto con el botón de origen dinámico del editor."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 16,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Dato",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Advertencias"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto"
+        },
+        {
+          "type": "checkbox",
+          "id": "required",
+          "label": "Obligatorio",
+          "default": false,
+          "info": "Si está vacío, el editor avisa. En la tienda no se muestra."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Aviso y datos legales",
+      "blocks": [
+        {
+          "type": "row",
+          "settings": {
+            "required": true
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "title": "Modo de uso"
+          }
+        },
+        {
+          "type": "row",
+          "settings": {
+            "title": "Composición"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

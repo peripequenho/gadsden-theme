@@ -1,0 +1,1306 @@
+{%- comment -%}
+  Nota / advertorial (L12): una sección para páginas de tipo nota. Cabecera de nota y el texto en
+  bloques: subtítulo, párrafo, frase destacada, imagen, tira de 3 imágenes, video, citas, firma,
+  índice automático, botón, caja de producto, puente a un cuestionario, "versus" (dos columnas de
+  pasos que se tildan) y "ciclo" (4 pasos en círculo). Barra fija opcional abajo con un botón.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-article
+  class="gad-ar gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <article class="page-width gad-ar__body">
+    <header class="gad-ar__head">
+      {%- if s.ribbon != blank -%}<span class="gad-ar__ribbon">{{ s.ribbon | escape }}</span>{%- endif -%}
+      {%- if s.kicker != blank -%}<span class="gad-ar__kicker">{{ s.kicker | escape }}</span>{%- endif -%}
+      <h1 class="gad-ar__title {{ s.heading_size }} gad-hl"{% if s.heading_accent != blank %} style="--gad-hl: {{ s.heading_accent }};"{% endif %}>{{ s.heading }}</h1>
+      {%- if s.dek != blank -%}<p class="gad-ar__dek">{{ s.dek }}</p>{%- endif -%}
+      {%- if s.author != blank or s.meta != blank -%}
+        <p class="gad-ar__byline">{% if s.author != blank %}<b>{{ s.author | escape }}</b>{% endif %}{% if s.meta != blank %}<span>{{ s.meta | escape }}</span>{% endif %}</p>
+      {%- endif -%}
+    </header>
+
+    {%- for block in section.blocks -%}
+      {%- assign b = block.settings -%}
+      {%- case block.type -%}
+        {%- when 'subtitle' -%}
+          <h2 class="gad-ar__h2 h3" id="GadAr-{{ block.id }}" {{ block.shopify_attributes }}>{{ b.text }}</h2>
+
+        {%- when 'paragraph' -%}
+          <div class="gad-ar__p rte" {{ block.shopify_attributes }}>{{ b.text }}</div>
+
+        {%- when 'highlight' -%}
+          <p class="gad-ar__hl" {{ block.shopify_attributes }}>{{ b.text }}</p>
+
+        {%- when 'image' -%}
+          <figure class="gad-ar__fig" {{ block.shopify_attributes }}>
+            {%- if b.image != blank -%}
+              {{ b.image | image_url: width: 1400 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 750px) 720px, 100vw', widths: '500, 800, 1100, 1400' }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-ar__ph' }}
+            {%- endif -%}
+            {%- if b.caption != blank -%}<figcaption>{{ b.caption }}</figcaption>{%- endif -%}
+          </figure>
+
+        {%- when 'strip' -%}
+          <div class="gad-ar__strip" {{ block.shopify_attributes }}>
+            {%- for i in (1..3) -%}
+              {%- liquid
+                assign ki = 'image_' | append: i
+                assign kc = 'caption_' | append: i
+              -%}
+              <figure>
+                {%- if b[ki] != blank -%}
+                  {{ b[ki] | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '33vw', widths: '300, 600' }}
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'gad-ar__ph' }}
+                {%- endif -%}
+                {%- if b[kc] != blank -%}<figcaption>{{ b[kc] | escape }}</figcaption>{%- endif -%}
+              </figure>
+            {%- endfor -%}
+          </div>
+
+        {%- when 'video' -%}
+          <figure class="gad-ar__fig" {{ block.shopify_attributes }}>
+            {%- if b.video != blank -%}
+              {%- render 'gad-video', video: b.video, autoplay: b.autoplay, loop: true, tap: true, sound: true -%}
+            {%- elsif b.video_url != blank -%}
+              {%- liquid
+                if b.video_url.type == 'youtube'
+                  assign embed = 'https://www.youtube-nocookie.com/embed/' | append: b.video_url.id | append: '?rel=0&playsinline=1'
+                else
+                  assign embed = 'https://player.vimeo.com/video/' | append: b.video_url.id | append: '?dnt=1'
+                endif
+              -%}
+              <div class="gad-ar__embed"><iframe src="{{ embed }}" title="{{ b.caption | strip_html | default: 'Video' | escape }}" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>
+            {%- elsif request.design_mode -%}
+              {{ 'hero-apparel-1' | placeholder_svg_tag: 'gad-ar__ph' }}
+            {%- endif -%}
+            {%- if b.caption != blank -%}<figcaption>{{ b.caption }}</figcaption>{%- endif -%}
+          </figure>
+
+        {%- when 'quotes' -%}
+          <div class="gad-ar__quotes" {{ block.shopify_attributes }}>
+            {%- if b.title != blank -%}<p class="gad-ar__qt">{{ b.title | escape }}</p>{%- endif -%}
+            {%- for i in (1..3) -%}
+              {%- liquid
+                assign kq = 'quote_' | append: i
+                assign ks = 'source_' | append: i
+              -%}
+              {%- if b[kq] != blank -%}
+                <blockquote><p>{{ b[kq] }}</p>{%- if b[ks] != blank -%}<cite>{{ b[ks] | escape }}</cite>{%- endif -%}</blockquote>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
+          </div>
+
+        {%- when 'signature' -%}
+          <div class="gad-ar__sign" {{ block.shopify_attributes }}>
+            {%- if b.image != blank -%}{{ b.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}{%- endif -%}
+            <span><b>{{ b.name | escape }}</b>{%- if b.role != blank -%}<small>{{ b.role | escape }}</small>{%- endif -%}</span>
+          </div>
+
+        {%- when 'index' -%}
+          {%- assign subs = section.blocks | where: 'type', 'subtitle' -%}
+          {%- if subs.size > 0 -%}
+            <nav class="gad-ar__index" aria-label="{{ b.title | escape }}" {{ block.shopify_attributes }}>
+              {%- if b.title != blank -%}<p>{{ b.title | escape }}</p>{%- endif -%}
+              <ol>
+                {%- for sub in subs -%}
+                  <li><a href="#GadAr-{{ sub.id }}" class="link">{{ sub.settings.text | strip_html }}</a></li>
+                {%- endfor -%}
+              </ol>
+            </nav>
+          {%- endif -%}
+
+        {%- when 'button' -%}
+          <div class="gad-ar__btn" {{ block.shopify_attributes }}>
+            <a href="{{ b.link | default: '#' }}" class="button">{{ b.label | escape }}</a>
+          </div>
+
+        {%- when 'product_box' -%}
+          {%- assign p = b.product -%}
+          <div class="gad-ar__box color-{{ b.scheme }}" {{ block.shopify_attributes }}>
+            {%- if p.featured_media -%}
+              <div class="gad-ar__box-img">{{ p.featured_media | image_url: width: 500 | image_tag: loading: 'lazy', alt: p.title }}</div>
+            {%- endif -%}
+            <div class="gad-ar__box-info">
+              <p class="gad-ar__box-title h4">{{ b.title | default: p.title }}</p>
+              {%- if b.text != blank -%}<div class="rte">{{ b.text }}</div>{%- endif -%}
+              {%- if p != blank -%}
+                <p class="gad-ar__box-price">{{ p.price | money }}</p>
+                {%- render 'gad-atc-button', label: b.button_label, product: p -%}
+              {%- elsif request.design_mode -%}
+                <p class="gad-ar__small">{{ 'gadsden.offer.pick' | t }}</p>
+              {%- endif -%}
+            </div>
+          </div>
+
+        {%- when 'quiz_bridge' -%}
+          <div class="gad-ar__bridge" {{ block.shopify_attributes }}>
+            <p class="h4">{{ b.title }}</p>
+            {%- if b.text != blank -%}<p>{{ b.text }}</p>{%- endif -%}
+            <a href="{{ b.link | default: '#' }}" class="button button--secondary">{{ b.label | escape }}</a>
+          </div>
+
+        {%- when 'versus' -%}
+          <div class="gad-ar__vs" data-gad-ar-ticks {{ block.shopify_attributes }}>
+            {%- if b.title != blank -%}<p class="gad-ar__vs-title h4">{{ b.title }}</p>{%- endif -%}
+            <div class="gad-ar__vs-cols">
+              {%- for side in (1..2) -%}
+                {%- liquid
+                  if side == 1
+                    assign col = b.col_a
+                    assign steps = b.steps_a
+                  else
+                    assign col = b.col_b
+                    assign steps = b.steps_b
+                  endif
+                -%}
+                <div class="gad-ar__vs-col gad-ar__vs-col--{{ side }}">
+                  <p class="gad-ar__vs-head">{{ col | escape }}</p>
+                  <ol class="list-unstyled">
+                    {%- assign sl = steps | newline_to_br | split: '<br />' -%}
+                    {%- for x in sl -%}
+                      {%- assign x = x | strip -%}
+                      {%- if x != blank -%}<li style="--d: {{ forloop.index0 }};">{%- render 'gad-icon', name: 'check_circle', filled: true -%}<span>{{ x | escape }}</span></li>{%- endif -%}
+                    {%- endfor -%}
+                  </ol>
+                </div>
+              {%- endfor -%}
+            </div>
+            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
+          </div>
+
+        {%- when 'cycle' -%}
+          <div class="gad-ar__cycle" {{ block.shopify_attributes }}>
+            {%- if b.title != blank -%}<p class="gad-ar__vs-title h4">{{ b.title }}</p>{%- endif -%}
+            <div class="gad-ar__ring">
+              <span class="gad-ar__dot" aria-hidden="true"></span>
+              {%- for i in (1..4) -%}
+                {%- assign k = 'step_' | append: i -%}
+                <span class="gad-ar__node gad-ar__node--{{ i }}">{{ b[k] | escape }}</span>
+              {%- endfor -%}
+            </div>
+            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+
+    {%- if s.legal != blank -%}<div class="gad-ar__legal rte">{{ s.legal }}</div>{%- endif -%}
+  </article>
+
+  {%- if s.bar_on and s.bar_button != blank -%}
+    <div class="gad-ar__bar color-{{ s.bar_scheme }}" data-gad-ar-bar hidden>
+      <span class="gad-ar__bar-title">{{ s.bar_title | escape }}</span>
+      <a href="{{ s.bar_link | default: '#oferta' }}" class="button">{{ s.bar_button | escape }}</a>
+    </div>
+  {%- endif -%}
+</gad-article>
+
+{% stylesheet %}
+  .gad-ar__body {
+    max-width: 72rem;
+  }
+
+  .gad-ar__head {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2.8rem;
+  }
+
+  .gad-ar__ribbon {
+    width: fit-content;
+    padding: 0.3rem 1rem;
+    background: rgb(var(--color-button));
+    color: rgb(var(--color-button-text));
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+  }
+
+  .gad-ar__kicker {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .gad-ar__title {
+    margin: 0;
+  }
+
+  .gad-ar__dek {
+    margin: 0;
+    font-size: 1.9rem;
+    line-height: 1.45;
+  }
+
+  .gad-ar__byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin: 0;
+    padding-top: 1.2rem;
+    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    font-size: 1.3rem;
+  }
+
+  .gad-ar__byline span {
+    opacity: 0.7;
+  }
+
+  .gad-ar__body > * + * {
+    margin-top: 2rem;
+  }
+
+  .gad-ar__h2 {
+    margin-top: 3.6rem;
+    scroll-margin-top: 10rem;
+  }
+
+  .gad-ar__p {
+    font-size: 1.7rem;
+    line-height: 1.7;
+  }
+
+  .gad-ar__hl {
+    margin: 3.2rem 0;
+    padding-left: 1.6rem;
+    border-left: 0.4rem solid rgb(var(--color-button));
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .gad-ar__fig {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .gad-ar__fig img,
+  .gad-ar__ph {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.8rem;
+  }
+
+  .gad-ar__ph {
+    aspect-ratio: 16 / 9;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-ar__fig figcaption,
+  .gad-ar__strip figcaption,
+  .gad-ar__small {
+    margin-top: 0.6rem;
+    font-size: 1.3rem;
+    opacity: 0.75;
+  }
+
+  .gad-ar__embed {
+    position: relative;
+    aspect-ratio: 16 / 9;
+  }
+
+  .gad-ar__embed iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0.8rem;
+  }
+
+  .gad-ar__strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .gad-ar__strip figure {
+    margin: 0;
+  }
+
+  .gad-ar__strip img,
+  .gad-ar__strip .gad-ar__ph {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 0.6rem;
+  }
+
+  .gad-ar__quotes {
+    padding: 2rem;
+    border-radius: 1.2rem;
+    background: rgba(var(--color-foreground), 0.05);
+  }
+
+  .gad-ar__qt {
+    margin: 0 0 1rem;
+    font-weight: 700;
+  }
+
+  .gad-ar__quotes blockquote {
+    margin: 0 0 1.2rem;
+    padding: 0 0 0 1.2rem;
+    border-left: 0.3rem solid rgba(var(--color-foreground), 0.25);
+    font-style: italic;
+  }
+
+  .gad-ar__quotes blockquote p {
+    margin: 0;
+  }
+
+  .gad-ar__quotes cite {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 1.2rem;
+    font-style: normal;
+    opacity: 0.7;
+  }
+
+  .gad-ar__sign {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .gad-ar__sign img {
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .gad-ar__sign small {
+    display: block;
+    opacity: 0.7;
+  }
+
+  .gad-ar__index {
+    padding: 1.6rem 2rem;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    border-radius: 1rem;
+  }
+
+  .gad-ar__index p {
+    margin: 0 0 0.6rem;
+    font-weight: 700;
+  }
+
+  .gad-ar__index ol {
+    margin: 0;
+    padding-left: 2rem;
+  }
+
+  .gad-ar__btn {
+    text-align: center;
+  }
+
+  .gad-ar__box {
+    display: grid;
+    gap: 1.6rem;
+    padding: 2rem;
+    border-radius: 1.4rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    box-shadow: 0 0.6rem 2.4rem rgba(0, 0, 0, 0.08);
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-ar__box {
+      grid-template-columns: 2fr 3fr;
+      align-items: center;
+    }
+  }
+
+  .gad-ar__box-img img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.8rem;
+  }
+
+  .gad-ar__box-info {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .gad-ar__box-title,
+  .gad-ar__box-price {
+    margin: 0;
+  }
+
+  .gad-ar__box-price {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .gad-ar__box .button {
+    width: 100%;
+  }
+
+  .gad-ar__bridge {
+    padding: 2rem;
+    border: 0.2rem dashed rgb(var(--color-button));
+    border-radius: 1.2rem;
+    text-align: center;
+  }
+
+  .gad-ar__bridge .h4 {
+    margin: 0 0 0.6rem;
+  }
+
+  .gad-ar__vs-title {
+    margin: 0 0 1.2rem;
+  }
+
+  .gad-ar__vs-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .gad-ar__vs-col {
+    padding: 1.4rem;
+    border-radius: 1rem;
+    background: rgba(var(--color-foreground), 0.05);
+  }
+
+  .gad-ar__vs-col--2 {
+    background: rgba(var(--color-button), 0.1);
+  }
+
+  .gad-ar__vs-head {
+    margin: 0 0 0.8rem;
+    font-weight: 700;
+  }
+
+  .gad-ar__vs-col ol {
+    display: grid;
+    gap: 0.6rem;
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .gad-ar__vs-col li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .gad-ar__vs-col--1 .gad-icon {
+    opacity: 0.4;
+  }
+
+  .gad-ar__vs.is-armed li .gad-icon {
+    transform: scale(0);
+  }
+
+  .gad-ar__vs.is-armed.is-in li .gad-icon {
+    transform: scale(1);
+    transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
+    transition-delay: calc(var(--d, 0) * 250ms);
+  }
+
+  .gad-ar__cycle {
+    overflow-x: clip;
+    padding: 1.6rem 0;
+  }
+
+  .gad-ar__ring {
+    position: relative;
+    width: min(32rem, 66%);
+    aspect-ratio: 1;
+    margin: 0 auto;
+    border: 0.2rem dashed rgba(var(--color-foreground), 0.3);
+    border-radius: 50%;
+  }
+
+  .gad-ar__dot {
+    position: absolute;
+    inset: 0;
+    animation: gadArSpin 8s linear infinite;
+  }
+
+  .gad-ar__dot::before {
+    content: '';
+    position: absolute;
+    top: -0.8rem;
+    left: 50%;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-left: -0.7rem;
+    border-radius: 50%;
+    background: rgb(var(--color-button));
+  }
+
+  html.gad-reduce .gad-ar__dot {
+    animation: none;
+  }
+
+  @keyframes gadArSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .gad-ar__node {
+    position: absolute;
+    max-width: 50%;
+    padding: 0.4rem 1rem;
+    border-radius: 99rem;
+    background: rgb(var(--color-background));
+    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    translate: -50% -50%;
+  }
+
+  .gad-ar__node--1 {
+    top: 0;
+    left: 50%;
+  }
+
+  .gad-ar__node--2 {
+    top: 50%;
+    left: 100%;
+  }
+
+  .gad-ar__node--3 {
+    top: 100%;
+    left: 50%;
+  }
+
+  .gad-ar__node--4 {
+    top: 50%;
+    left: 0;
+  }
+
+  .gad-ar__legal {
+    margin-top: 4rem;
+    font-size: 1.2rem;
+    opacity: 0.7;
+  }
+
+  .gad-ar__bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.6rem calc(1rem + env(safe-area-inset-bottom));
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    box-shadow: 0 -0.4rem 1.6rem rgba(0, 0, 0, 0.12);
+  }
+
+  .gad-ar__bar[hidden] {
+    display: none;
+  }
+
+  .gad-ar__bar-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .gad-ar__bar .button {
+    flex: 0 0 auto;
+    min-height: 4.2rem;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadArticle extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      const reduce = window.Gadsden && Gadsden.reduceMotion();
+      if (!reduce) {
+        this.querySelectorAll('[data-gad-ar-ticks]').forEach((vs) => {
+          vs.classList.add('is-armed');
+          const io = new IntersectionObserver((entries) => {
+            if (!entries[0].isIntersecting) return;
+            io.disconnect();
+            vs.classList.add('is-in');
+          }, { threshold: 0.4 });
+          io.observe(vs);
+        });
+      }
+      const bar = this.querySelector('[data-gad-ar-bar]');
+      const head = this.querySelector('.gad-ar__head');
+      if (bar && head) {
+        const body = this.querySelector('.gad-ar__body');
+        const sync = () => {
+          this.raf = 0;
+          const h = head.getBoundingClientRect();
+          const end = body.getBoundingClientRect();
+          bar.hidden = !(h.bottom < 0 && end.bottom > window.innerHeight * 0.6);
+        };
+        this.onScroll = () => this.raf || (this.raf = requestAnimationFrame(sync));
+        window.addEventListener('scroll', this.onScroll, { passive: true });
+        sync();
+      }
+    }
+
+    disconnectedCallback() {
+      if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+      this._ready = false;
+    }
+  }
+
+  if (!customElements.get('gad-article')) customElements.define('gad-article', GadArticle);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Nota",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "ribbon",
+      "label": "Cinta",
+      "default": "Nota"
+    },
+    {
+      "type": "text",
+      "id": "kicker",
+      "label": "Volanta",
+      "default": "Salud y bienestar"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "El título de la nota, como en un diario"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "dek",
+      "label": "Bajada",
+      "default": "Dos líneas que cuentan de qué se trata y por qué leerla."
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "Autor"
+    },
+    {
+      "type": "text",
+      "id": "meta",
+      "label": "Dato",
+      "default": "5 min de lectura"
+    },
+    {
+      "type": "richtext",
+      "id": "legal",
+      "label": "Aclaración al final"
+    },
+    {
+      "type": "header",
+      "content": "Barra fija abajo"
+    },
+    {
+      "type": "checkbox",
+      "id": "bar_on",
+      "label": "Mostrar al bajar",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "bar_title",
+      "label": "Texto",
+      "default": "¿Querés probarlo?"
+    },
+    {
+      "type": "text",
+      "id": "bar_button",
+      "label": "Botón",
+      "default": "Ver oferta"
+    },
+    {
+      "type": "url",
+      "id": "bar_link",
+      "label": "Enlace",
+      "info": "Vacío: baja a la sección con el ancla \"oferta\"."
+    },
+    {
+      "type": "color_scheme",
+      "id": "bar_scheme",
+      "label": "Combinación",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 48,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subtitle",
+      "name": "Subtítulo",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Un subtítulo"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "name": "Párrafo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Un párrafo de la nota. Frases cortas, una idea por párrafo.</p>"
+        }
+      ]
+    },
+    {
+      "type": "highlight",
+      "name": "Frase destacada",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Frase",
+          "default": "La frase que querés que quede."
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Imagen",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "caption",
+          "label": "Pie"
+        }
+      ]
+    },
+    {
+      "type": "strip",
+      "name": "Tira de 3 imágenes",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Imagen 1"
+        },
+        {
+          "type": "text",
+          "id": "caption_1",
+          "label": "Pie 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Imagen 2"
+        },
+        {
+          "type": "text",
+          "id": "caption_2",
+          "label": "Pie 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Imagen 3"
+        },
+        {
+          "type": "text",
+          "id": "caption_3",
+          "label": "Pie 3"
+        }
+      ]
+    },
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video subido"
+        },
+        {
+          "type": "checkbox",
+          "id": "autoplay",
+          "label": "Reproducción automática sin sonido",
+          "default": false
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "O de YouTube o Vimeo",
+          "accept": [
+            "youtube",
+            "vimeo"
+          ]
+        },
+        {
+          "type": "inline_richtext",
+          "id": "caption",
+          "label": "Pie"
+        }
+      ]
+    },
+    {
+      "type": "quotes",
+      "name": "Citas",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Lo que se dice"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "quote_1",
+          "label": "Cita 1",
+          "default": "Una cita textual."
+        },
+        {
+          "type": "text",
+          "id": "source_1",
+          "label": "Fuente 1"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "quote_2",
+          "label": "Cita 2"
+        },
+        {
+          "type": "text",
+          "id": "source_2",
+          "label": "Fuente 2"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "quote_3",
+          "label": "Cita 3"
+        },
+        {
+          "type": "text",
+          "id": "source_3",
+          "label": "Fuente 3"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "footer",
+          "label": "Aclaración",
+          "default": "Citas textuales de publicaciones públicas."
+        }
+      ]
+    },
+    {
+      "type": "signature",
+      "name": "Firma",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Nombre y apellido"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Rol"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        }
+      ]
+    },
+    {
+      "type": "index",
+      "name": "Índice",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "En esta nota"
+        },
+        {
+          "type": "paragraph",
+          "content": "Lista los subtítulos de la nota con un enlace a cada uno."
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Botón",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Texto",
+          "default": "Ver la oferta"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace"
+        }
+      ]
+    },
+    {
+      "type": "product_box",
+      "name": "Caja de producto",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Producto"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "info": "Vacío: el nombre del producto."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Agregar al carrito"
+        },
+        {
+          "type": "color_scheme",
+          "id": "scheme",
+          "label": "Combinación",
+          "default": "scheme-1"
+        }
+      ]
+    },
+    {
+      "type": "quiz_bridge",
+      "name": "Puente al cuestionario",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "¿No sabés si es para vos?"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Hacé el test: son pocas preguntas."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Botón",
+          "default": "Hacer el test"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace"
+        }
+      ]
+    },
+    {
+      "type": "versus",
+      "name": "Versus",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Comparalo"
+        },
+        {
+          "type": "text",
+          "id": "col_a",
+          "label": "Columna 1",
+          "default": "Lo de siempre"
+        },
+        {
+          "type": "textarea",
+          "id": "steps_a",
+          "label": "Pasos de la columna 1",
+          "default": "Paso uno\nPaso dos\nPaso tres\nPaso cuatro",
+          "info": "Uno por renglón."
+        },
+        {
+          "type": "text",
+          "id": "col_b",
+          "label": "Columna 2",
+          "default": "Con esto"
+        },
+        {
+          "type": "textarea",
+          "id": "steps_b",
+          "label": "Pasos de la columna 2",
+          "default": "Un solo paso"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "footer",
+          "label": "Aclaración"
+        }
+      ]
+    },
+    {
+      "type": "cycle",
+      "name": "Ciclo",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "El círculo que se repite"
+        },
+        {
+          "type": "text",
+          "id": "step_1",
+          "label": "Paso 1",
+          "default": "Empieza"
+        },
+        {
+          "type": "text",
+          "id": "step_2",
+          "label": "Paso 2",
+          "default": "Probás algo"
+        },
+        {
+          "type": "text",
+          "id": "step_3",
+          "label": "Paso 3",
+          "default": "Mejora"
+        },
+        {
+          "type": "text",
+          "id": "step_4",
+          "label": "Paso 4",
+          "default": "Vuelve"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "footer",
+          "label": "Aclaración"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Nota",
+      "blocks": [
+        {
+          "type": "index"
+        },
+        {
+          "type": "subtitle"
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "highlight"
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "versus"
+        },
+        {
+          "type": "subtitle",
+          "settings": {
+            "text": "Otro subtítulo"
+          }
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "product_box"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

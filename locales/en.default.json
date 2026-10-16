@@ -611,6 +611,9 @@
     },
     "stamps": {
       "media": "Upload a video or an image for the top of this section."
+    },
+    "legal": {
+      "missing": "Missing: fill it in or connect a metafield."
     }
   }
 }
