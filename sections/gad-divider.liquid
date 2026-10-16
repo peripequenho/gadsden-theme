@@ -1,0 +1,228 @@
+{%- comment -%}
+  Separador de secciones (S26): una forma (ola, curva, ángulo, pico o zigzag) que une el color de la
+  sección de arriba con el de la de abajo. Los colores salen de dos combinaciones o de colores propios.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  case s.shape
+    when 'wave'
+      assign path = 'M0,60 C300,130 900,-10 1200,60 L1200,120 L0,120 Z'
+    when 'waves'
+      assign path = 'M0,70 C150,20 250,20 400,70 C550,120 650,120 800,70 C950,20 1050,20 1200,70 L1200,120 L0,120 Z'
+    when 'curve'
+      assign path = 'M0,0 Q600,240 1200,0 L1200,120 L0,120 Z'
+    when 'angle'
+      assign path = 'M0,120 L1200,0 L1200,120 Z'
+    when 'peak'
+      assign path = 'M0,0 L600,120 L1200,0 L1200,120 L0,120 Z'
+  endcase
+-%}
+{%- if s.shape == 'zigzag' -%}
+  {%- capture path -%}
+    M0,120 L0,60
+    {%- for i in (1..24) -%}
+      {%- assign zy = i | modulo: 2 | times: 50 | plus: 60 %} L{{ i | times: 50 }},{{ zy }}
+    {%- endfor %} L1200,120 Z
+  {%- endcapture -%}
+{%- endif -%}
+{%- liquid
+  assign sch_out = s.scheme_top
+  assign sch_in = s.scheme_bottom
+  assign col_out = s.color_top
+  assign col_in = s.color_bottom
+  if s.invert
+    assign sch_out = s.scheme_bottom
+    assign sch_in = s.scheme_top
+    assign col_out = s.color_bottom
+    assign col_in = s.color_top
+  endif
+-%}
+<div
+  class="gad-div color-{{ sch_out }}{% if s.invert %} gad-div--invert{% endif %}{% if s.flip %} gad-div--flip{% endif %}"
+  style="--div-m: {{ s.height_m }}px; --div-d: {{ s.height_d }}px;{% if col_out != blank %} --div-top: {{ col_out }};{% endif %}{% if col_in != blank %} --div-bottom: {{ col_in }};{% endif %}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="gad-div__shape color-{{ sch_in }}">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d="{{ path | strip }}"/>
+    </svg>
+  </div>
+</div>
+
+{% stylesheet %}
+  div.gad-div {
+    background: var(--div-top, rgb(var(--color-background)));
+    line-height: 0;
+  }
+
+  .gad-div div.gad-div__shape {
+    background: none;
+  }
+
+  .gad-div svg {
+    display: block;
+    width: 100%;
+    height: var(--div-m, 40px);
+    fill: var(--div-bottom, rgb(var(--color-background)));
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-div svg {
+      height: var(--div-d, 80px);
+    }
+  }
+
+  .gad-div--flip svg {
+    transform: scaleX(-1);
+  }
+
+  .gad-div--invert svg {
+    transform: rotate(180deg);
+  }
+
+  .gad-div--invert.gad-div--flip svg {
+    transform: rotate(180deg) scaleX(-1);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Separador de secciones",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "select",
+      "id": "shape",
+      "label": "Forma",
+      "options": [
+        {
+          "value": "wave",
+          "label": "Ola"
+        },
+        {
+          "value": "waves",
+          "label": "Olas"
+        },
+        {
+          "value": "curve",
+          "label": "Curva"
+        },
+        {
+          "value": "angle",
+          "label": "Ángulo"
+        },
+        {
+          "value": "peak",
+          "label": "Pico"
+        },
+        {
+          "value": "zigzag",
+          "label": "Zigzag"
+        }
+      ],
+      "default": "wave"
+    },
+    {
+      "type": "range",
+      "id": "height_m",
+      "min": 10,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto en mobile",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "height_d",
+      "min": 10,
+      "max": 240,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto en desktop",
+      "default": 80
+    },
+    {
+      "type": "checkbox",
+      "id": "flip",
+      "label": "Espejar",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "invert",
+      "label": "Dar vuelta (la forma baja desde arriba)",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "paragraph",
+      "content": "Elegí las mismas combinaciones que la sección de arriba y la de abajo para que la unión no se note."
+    },
+    {
+      "type": "color_scheme",
+      "id": "scheme_top",
+      "label": "Combinación de la sección de arriba",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "scheme_bottom",
+      "label": "Combinación de la sección de abajo",
+      "default": "scheme-2"
+    },
+    {
+      "type": "color",
+      "id": "color_top",
+      "label": "Color propio de arriba",
+      "info": "Pisa a la combinación. Útil si esa sección usa colores propios."
+    },
+    {
+      "type": "color",
+      "id": "color_bottom",
+      "label": "Color propio de abajo"
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Separador de secciones"
+    }
+  ]
+}
+{% endschema %}

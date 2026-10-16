@@ -601,6 +601,12 @@
     },
     "bundle": {
       "empty": "Elegí los productos del combo en el editor."
+    },
+    "merge": {
+      "missing": "Unión: escribí el ancla de dos secciones de esta página. Todavía no están puestas o no se encontraron."
+    },
+    "shoppable": {
+      "pick": "Elegí un producto para este punto."
     }
   }
 }

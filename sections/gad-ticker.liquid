@@ -30,9 +30,9 @@
 {%- else -%}
   {%- render 'gad-colors', s: s, key: section.id -%}
   <gad-ticker
-    class="gad-ticker {% render 'gad-scheme', s: s, key: section.id %}{% if s.pause_hover %} gad-ticker--pause{% endif %}{% if s.direction == 'reverse' %} gad-ticker--reverse{% endif %}"
+    class="gad-ticker {% render 'gad-scheme', s: s, key: section.id %}{% if s.pause_hover %} gad-ticker--pause{% endif %}{% if s.direction == 'reverse' or s.direction == 'down' %} gad-ticker--reverse{% endif %}{% if s.direction == 'up' or s.direction == 'down' %} gad-ticker--vertical{% endif %}"
     data-speed="{{ s.speed }}"
-    style="--gap-m: {{ s.gap_m }}px; --gap-d: {{ s.gap_d }}px; --size-m: {{ s.text_size_m }}px; --size-d: {{ s.text_size_d }}px; --img-m: {{ s.image_height_m }}px; --img-d: {{ s.image_height_d }}px; --rv-m: {{ s.review_width_m }}px; --rv-d: {{ s.review_width_d }}px; --pt-m: {{ s.padding_top_m }}px; --pb-m: {{ s.padding_bottom_m }}px; --pt-d: {{ s.padding_top_d }}px; --pb-d: {{ s.padding_bottom_d }}px;"
+    style="--h-m: {{ s.height_m }}px; --h-d: {{ s.height_d }}px; --gap-m: {{ s.gap_m }}px; --gap-d: {{ s.gap_d }}px; --size-m: {{ s.text_size_m }}px; --size-d: {{ s.text_size_d }}px; --img-m: {{ s.image_height_m }}px; --img-d: {{ s.image_height_d }}px; --rv-m: {{ s.review_width_m }}px; --rv-d: {{ s.review_width_d }}px; --pt-m: {{ s.padding_top_m }}px; --pb-m: {{ s.padding_bottom_m }}px; --pt-d: {{ s.padding_top_d }}px; --pb-d: {{ s.padding_bottom_d }}px;"
     {% render 'gad-section-attrs', s: s %}
   >
     <div class="gad-ticker__track">
@@ -170,6 +170,38 @@
     scrollbar-width: none;
   }
 
+  gad-ticker.gad-ticker--vertical {
+    height: var(--h-m);
+  }
+
+  .gad-ticker--vertical .gad-ticker__track,
+  .gad-ticker--vertical .gad-ticker__group {
+    flex-direction: column;
+    width: auto;
+  }
+
+  .gad-ticker--vertical .gad-ticker__group {
+    padding-right: 0;
+    padding-bottom: var(--gap);
+  }
+
+  gad-ticker.gad-ticker--vertical.is-running .gad-ticker__track {
+    animation-name: gadTickerY;
+  }
+
+  html.gad-reduce gad-ticker.gad-ticker--vertical {
+    overflow: hidden auto;
+  }
+
+  @keyframes gadTickerY {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, -50%, 0);
+    }
+  }
+
   @keyframes gadTicker {
     from {
       transform: translate3d(0, 0, 0);
@@ -284,6 +316,10 @@
       --rv-w: var(--rv-d);
     }
 
+    gad-ticker.gad-ticker--vertical {
+      height: var(--h-d);
+    }
+
     .gad-ticker__ti--fixed,
     .gad-ticker__ic--fixed {
       width: var(--w-d);
@@ -328,7 +364,8 @@
     }
 
     build() {
-      const width = this.clientWidth;
+      const vertical = this.classList.contains('gad-ticker--vertical');
+      const width = vertical ? this.clientHeight : this.clientWidth;
       if (!width) return;
       if (this._lastWidth === width && this._built) return;
       this._lastWidth = width;
@@ -339,11 +376,12 @@
         this._built = true;
         return;
       }
-      let unitWidth = this.group.scrollWidth;
+      const measure = () => (vertical ? this.group.scrollHeight : this.group.scrollWidth);
+      let unitWidth = measure();
       let guard = 0;
       while (unitWidth > 0 && unitWidth < width && guard < 30) {
         this.base.forEach((el) => this.group.appendChild(this.cloneItem(el)));
-        unitWidth = this.group.scrollWidth;
+        unitWidth = measure();
         guard++;
       }
       const copy = this.group.cloneNode(true);
@@ -402,9 +440,37 @@
         {
           "value": "reverse",
           "label": "Hacia la derecha"
+        },
+        {
+          "value": "up",
+          "label": "Hacia arriba (cinta vertical)"
+        },
+        {
+          "value": "down",
+          "label": "Hacia abajo (cinta vertical)"
         }
       ],
       "default": "normal"
+    },
+    {
+      "type": "range",
+      "id": "height_m",
+      "min": 100,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Alto de la cinta vertical en mobile",
+      "default": 260
+    },
+    {
+      "type": "range",
+      "id": "height_d",
+      "min": 100,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Alto de la cinta vertical en desktop",
+      "default": 360
     },
     {
       "type": "checkbox",
@@ -1300,6 +1366,40 @@
           "type": "text",
           "settings": {
             "text": "Cambios sin vueltas"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cinta vertical",
+      "settings": {
+        "direction": "up",
+        "uppercase": false,
+        "text_size_d": 24
+      },
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "Envíos a todo el país"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Pagá en cuotas"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Cambios sin vueltas"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Atención por WhatsApp"
           }
         }
       ]

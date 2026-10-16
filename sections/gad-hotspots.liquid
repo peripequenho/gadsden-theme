@@ -1,0 +1,462 @@
+{%- comment -%}
+  Características con puntos sobre imagen (S25): puntos numerados sobre una foto y, al lado, la lista
+  con la explicación de cada uno. Tocar un punto resalta su ítem de la lista y al revés.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-hs gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;{% if s.point_color != blank %} --hs-c: {{ s.point_color }};{% endif %}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    <gad-hotspots class="gad-hs__wrap gad-hs__wrap--{{ s.layout }}">
+      <div class="gad-hs__media">
+        {%- if s.image != blank -%}
+          {{ s.image | image_url: width: 1600 | image_tag: loading: 'lazy', alt: s.image.alt, sizes: '(min-width: 990px) 55vw, 100vw', widths: '600, 900, 1200, 1600' }}
+        {%- else -%}
+          {{ 'product-apparel-1' | placeholder_svg_tag: 'gad-hs__ph' }}
+        {%- endif -%}
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="gad-hs__point"
+            style="left: {{ block.settings.x }}%; top: {{ block.settings.y }}%;"
+            data-gad-hs="{{ forloop.index }}"
+            aria-controls="GadHs-{{ block.id }}"
+            aria-label="{{ forloop.index }}. {{ block.settings.title | strip_html | escape }}"
+          >
+            {%- if s.numbered -%}{{ forloop.index }}{%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+      <ol class="gad-hs__list list-unstyled" role="list">
+        {%- for block in section.blocks -%}
+          <li class="gad-hs__item" id="GadHs-{{ block.id }}" data-gad-hs="{{ forloop.index }}" {{ block.shopify_attributes }}>
+            <span class="gad-hs__num" aria-hidden="true">{% if s.numbered %}{{ forloop.index }}{% endif %}</span>
+            <div>
+              {%- if block.settings.title != blank -%}<h3 class="gad-hs__title h4">{{ block.settings.title }}</h3>{%- endif -%}
+              {%- if block.settings.text != blank -%}<div class="gad-hs__text rte">{{ block.settings.text }}</div>{%- endif -%}
+            </div>
+          </li>
+        {%- endfor -%}
+      </ol>
+    </gad-hotspots>
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-hs__wrap {
+    display: grid;
+    gap: 3.2rem;
+    align-items: center;
+    --hs: var(--hs-c, rgb(var(--color-button)));
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-hs__wrap {
+      grid-template-columns: 1.2fr 1fr;
+    }
+
+    .gad-hs__wrap--image_right .gad-hs__media {
+      order: 2;
+    }
+  }
+
+  .gad-hs__media {
+    position: relative;
+  }
+
+  .gad-hs__media img,
+  .gad-hs__ph {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 1.2rem;
+  }
+
+  .gad-hs__ph {
+    aspect-ratio: 4 / 3;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-hs__point {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    padding: 0;
+    translate: -50% -50%;
+    border: 0.3rem solid #fff;
+    border-radius: 50%;
+    background: var(--hs);
+    color: #fff;
+    font: inherit;
+    font-size: 1.3rem;
+    font-weight: 700;
+    box-shadow: 0 0 0 0 var(--hs);
+    cursor: pointer;
+    animation: gadHsPulse 2s infinite;
+  }
+
+  .gad-hs__point.is-active {
+    scale: 1.2;
+    animation: none;
+  }
+
+  html.gad-reduce .gad-hs__point {
+    animation: none;
+  }
+
+  @keyframes gadHsPulse {
+    70% {
+      box-shadow: 0 0 0 1.2rem transparent;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+
+  .gad-hs__list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+  }
+
+  .gad-hs__item {
+    display: flex;
+    gap: 1.4rem;
+    padding: 1.4rem 1.6rem;
+    border-radius: 1rem;
+    transition: background-color 0.2s;
+    cursor: pointer;
+  }
+
+  .gad-hs__item.is-active {
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-hs__num {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 50%;
+    background: var(--hs);
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .gad-hs__title {
+    margin: 0 0 0.4rem;
+  }
+
+  .gad-hs__text p {
+    margin: 0;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadHotspots extends HTMLElement {
+    connectedCallback() {
+      this.addEventListener('click', (e) => {
+        const el = e.target.closest('[data-gad-hs]');
+        if (el) this.select(el.dataset.gadHs, el.classList.contains('gad-hs__point'));
+      });
+      this.addEventListener('shopify:block:select', (e) => {
+        const li = e.target.closest('[data-gad-hs]');
+        if (li) this.select(li.dataset.gadHs, false);
+      });
+    }
+
+    select(n, fromPoint) {
+      this.querySelectorAll('[data-gad-hs]').forEach((el) => el.classList.toggle('is-active', el.dataset.gadHs === n));
+      const li = this.querySelector(`.gad-hs__item[data-gad-hs="${n}"]`);
+      if (fromPoint && li && li.getBoundingClientRect().top > window.innerHeight) li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  if (!customElements.get('gad-hotspots')) customElements.define('gad-hotspots', GadHotspots);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Puntos sobre imagen",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Cada detalle <strong>pensado</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Imagen",
+      "options": [
+        {
+          "value": "image_left",
+          "label": "A la izquierda"
+        },
+        {
+          "value": "image_right",
+          "label": "A la derecha"
+        }
+      ],
+      "default": "image_left"
+    },
+    {
+      "type": "checkbox",
+      "id": "numbered",
+      "label": "Numerar los puntos",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "point_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color de los botones."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "point",
+      "name": "Punto",
+      "limit": 12,
+      "settings": [
+        {
+          "type": "range",
+          "id": "x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Posición horizontal",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Posición vertical",
+          "default": 50
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Característica"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Explicá en una línea qué hace esta parte.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Puntos sobre imagen",
+      "blocks": [
+        {
+          "type": "point",
+          "settings": {
+            "x": 30,
+            "y": 35
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "x": 62,
+            "y": 50
+          }
+        },
+        {
+          "type": "point",
+          "settings": {
+            "x": 45,
+            "y": 75
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

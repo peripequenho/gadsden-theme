@@ -91,6 +91,29 @@
     margin-top: 1.6rem;
   }
 
+  .gad-cols__col > .gad-cols__item:first-child {
+    margin-top: 0;
+  }
+
+  .gad-cols__item.accordion + .gad-cols__item.accordion {
+    margin-top: 0;
+    border-top: none;
+  }
+
+  .gad-cols .list-payment {
+    justify-content: flex-start;
+    margin: -0.5rem;
+    padding-top: 0;
+  }
+
+  .gad-cols__col--center .list-payment {
+    justify-content: center;
+  }
+
+  .gad-cols__col--right .list-payment {
+    justify-content: flex-end;
+  }
+
   .gad-cols__buttons {
     display: flex;
     flex-wrap: wrap;

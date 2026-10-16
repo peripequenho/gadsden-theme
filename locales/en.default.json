@@ -589,6 +589,12 @@
     },
     "bundle": {
       "empty": "Pick products for this bundle in the editor."
+    },
+    "merge": {
+      "missing": "Merge: type the anchor names of two sections on this page. They are not set yet or were not found."
+    },
+    "shoppable": {
+      "pick": "Pick a product for this point."
     }
   }
 }
