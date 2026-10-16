@@ -1063,3 +1063,42 @@ if (!customElements.get('gad-track-order'))
       }
     }
   );
+
+/* ---------- T13: ventana para cambiar al idioma del navegador ---------- */
+if (!customElements.get('gad-language-popup'))
+  customElements.define(
+    'gad-language-popup',
+    class GadLanguagePopup extends HTMLElement {
+      connectedCallback() {
+        const key = 'gad-language-popup';
+        const dialog = this.querySelector('dialog');
+        if (!dialog || Gadsden.designMode) return;
+        let seen = null;
+        try {
+          seen = localStorage.getItem(key);
+        } catch (e) {}
+        if (seen) return;
+        const available = (this.dataset.languages || '').split(',').filter(Boolean);
+        const current = (this.dataset.current || '').toLowerCase();
+        const wanted = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])
+          .map((l) => l.toLowerCase())
+          .map((l) => available.find((a) => a.toLowerCase() === l) || available.find((a) => a.toLowerCase().split('-')[0] === l.split('-')[0]))
+          .find(Boolean);
+        if (!wanted || wanted.toLowerCase() === current || wanted.toLowerCase().split('-')[0] === current.split('-')[0]) return;
+        const select = dialog.querySelector('select');
+        if (select) select.value = wanted;
+        const remember = () => {
+          try {
+            localStorage.setItem(key, '1');
+          } catch (e) {}
+        };
+        dialog.querySelector('[data-gad-lang-stay]').addEventListener('click', () => {
+          remember();
+          dialog.close();
+        });
+        dialog.addEventListener('cancel', remember);
+        dialog.querySelector('form').addEventListener('submit', remember);
+        setTimeout(() => dialog.showModal(), 600);
+      }
+    }
+  );

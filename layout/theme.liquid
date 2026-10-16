@@ -1,6 +1,38 @@
 <!doctype html>
 {%- liquid
   assign gad_html_classes = 'js'
+
+  comment
+    T14: derecha a izquierda, siempre o según el idioma.
+  endcomment
+  assign gad_dir = 'ltr'
+  assign gad_lang = request.locale.iso_code | split: '-' | first
+  if settings.rtl_mode == 'always'
+    assign gad_dir = 'rtl'
+  elsif settings.rtl_mode == 'auto'
+    assign gad_rtl_langs = 'ar,he,fa,ur,ps,yi,ku,dv,sd,ug' | split: ','
+    if gad_rtl_langs contains gad_lang
+      assign gad_dir = 'rtl'
+    endif
+  endif
+
+  comment
+    T12: bloqueo por país con el país que detecta Shopify. Nunca en el editor.
+  endcomment
+  assign gad_geo_blocked = false
+  if settings.geo_mode != blank and settings.geo_mode != 'off' and request.design_mode == false
+    assign gad_geo_country = localization.country.iso_code | upcase
+    assign gad_geo_list = settings.geo_countries | upcase | replace: ' ', '' | split: ','
+    assign gad_geo_listed = false
+    if gad_geo_list contains gad_geo_country
+      assign gad_geo_listed = true
+    endif
+    if settings.geo_mode == 'block' and gad_geo_listed
+      assign gad_geo_blocked = true
+    elsif settings.geo_mode == 'allow' and gad_geo_listed == false and settings.geo_countries != blank
+      assign gad_geo_blocked = true
+    endif
+  endif
   if settings.protect_content
     assign gad_html_classes = gad_html_classes | append: ' gad-protect'
   endif
@@ -23,6 +55,7 @@
 <html
   class="{{ gad_html_classes }}"
   lang="{{ request.locale.iso_code }}"
+  dir="{{ gad_dir }}"
   data-gad-primary-host="{{ request.host }}"
   data-gad-permanent-host="{{ shop.permanent_domain }}"
 >
@@ -348,6 +381,7 @@
     {{ 'gadsden.css' | asset_url | stylesheet_tag }}
     {%- render 'gad-form-styles' -%}
     {%- render 'gad-typography' -%}
+    {%- render 'gad-appearance' -%}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -395,6 +429,9 @@
       {{ 'accessibility.skip_to_text' | t }}
     </a>
 
+    {%- if gad_geo_blocked -%}
+      {%- render 'gad-geo-block' -%}
+    {%- else -%}
     {%- if settings.cart_type == 'drawer' -%}
       {%- section 'cart-drawer' -%}
     {%- endif -%}
@@ -414,6 +451,8 @@
     {% sections 'footer-group' %}
 
     {%- render 'gad-back-to-top' -%}
+    {%- render 'gad-language-popup' -%}
+    {%- endif -%}
 
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>

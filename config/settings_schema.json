@@ -2551,5 +2551,251 @@
         "info": "Desactiva el clic derecho, la selección de texto, el arrastre de imágenes y los atajos de las herramientas del navegador. No es una protección real: sólo le pone trabas a quien copia. Los campos de formulario siguen funcionando."
       }
     ]
+  },
+  {
+    "name": "Gadsden · Idioma y país",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Ventana de idioma"
+      },
+      {
+        "type": "checkbox",
+        "id": "language_popup",
+        "label": "Ofrecer el idioma del navegador al entrar",
+        "default": false,
+        "info": "Sólo con más de un idioma publicado, y si el del navegador es uno de ellos. Si la cierran, no vuelve a aparecer."
+      },
+      {
+        "type": "text",
+        "id": "language_popup_title",
+        "label": "Título",
+        "default": "¿Preferís otro idioma?"
+      },
+      {
+        "type": "richtext",
+        "id": "language_popup_text",
+        "label": "Texto"
+      },
+      {
+        "type": "text",
+        "id": "language_popup_button",
+        "label": "Botón para cambiar",
+        "default": "Cambiar"
+      },
+      {
+        "type": "text",
+        "id": "language_popup_stay",
+        "label": "Botón para seguir",
+        "default": "Seguir así"
+      },
+      {
+        "type": "color_scheme",
+        "id": "language_popup_scheme",
+        "label": "Combinación de colores",
+        "default": "scheme-1"
+      },
+      {
+        "type": "header",
+        "content": "Derecha a izquierda"
+      },
+      {
+        "type": "select",
+        "id": "rtl_mode",
+        "label": "Sentido de lectura",
+        "options": [
+          {
+            "value": "off",
+            "label": "Izquierda a derecha"
+          },
+          {
+            "value": "auto",
+            "label": "Según el idioma (árabe, hebreo, persa, urdu…)"
+          },
+          {
+            "value": "always",
+            "label": "Siempre de derecha a izquierda"
+          }
+        ],
+        "default": "off"
+      },
+      {
+        "type": "header",
+        "content": "Bloqueo por país"
+      },
+      {
+        "type": "select",
+        "id": "geo_mode",
+        "label": "Bloqueo",
+        "options": [
+          {
+            "value": "off",
+            "label": "Desactivado"
+          },
+          {
+            "value": "block",
+            "label": "Bloquear los países de la lista"
+          },
+          {
+            "value": "allow",
+            "label": "Permitir sólo los países de la lista"
+          }
+        ],
+        "default": "off",
+        "info": "Usa el país que detecta Shopify. No es una barrera de seguridad: con una VPN se puede entrar. En el editor nunca se bloquea."
+      },
+      {
+        "type": "text",
+        "id": "geo_countries",
+        "label": "Países",
+        "info": "Códigos de dos letras separados por coma, ej. AR, UY, CL."
+      },
+      {
+        "type": "richtext",
+        "id": "geo_message",
+        "label": "Mensaje",
+        "default": "<p>Por el momento no vendemos en tu país.</p>"
+      },
+      {
+        "type": "color_scheme",
+        "id": "geo_scheme",
+        "label": "Combinación de colores",
+        "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Gadsden · Apariencia avanzada",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Fuentes por enlace"
+      },
+      {
+        "type": "paragraph",
+        "content": "Para usar fuentes que no están en la biblioteca de Shopify. Lo que no cargues acá sigue con las fuentes de Tipografía."
+      },
+      {
+        "type": "text",
+        "id": "custom_font_url",
+        "label": "Enlace de la hoja de estilos",
+        "info": "Empieza con https://. Por ejemplo, el enlace \"css2\" de Google Fonts."
+      },
+      {
+        "type": "text",
+        "id": "custom_heading_font",
+        "label": "Nombre de la fuente de los títulos",
+        "info": "Tal como figura en la hoja de estilos, ej. Playfair Display."
+      },
+      {
+        "type": "range",
+        "id": "custom_heading_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "label": "Grosor de los títulos",
+        "default": 400
+      },
+      {
+        "type": "text",
+        "id": "custom_body_font",
+        "label": "Nombre de la fuente de los textos"
+      },
+      {
+        "type": "range",
+        "id": "custom_body_weight",
+        "min": 100,
+        "max": 900,
+        "step": 100,
+        "label": "Grosor de los textos",
+        "default": 400
+      },
+      {
+        "type": "header",
+        "content": "Cursor propio"
+      },
+      {
+        "type": "image_picker",
+        "id": "cursor_image",
+        "label": "Imagen del cursor",
+        "info": "Mejor un PNG cuadrado con fondo transparente. En pantallas táctiles no se ve."
+      },
+      {
+        "type": "range",
+        "id": "cursor_size",
+        "min": 16,
+        "max": 64,
+        "step": 4,
+        "unit": "px",
+        "label": "Tamaño",
+        "default": 32
+      },
+      {
+        "type": "select",
+        "id": "cursor_hotspot",
+        "label": "Punta del cursor",
+        "options": [
+          {
+            "value": "center",
+            "label": "En el centro de la imagen"
+          },
+          {
+            "value": "top-left",
+            "label": "Arriba a la izquierda"
+          }
+        ],
+        "default": "center"
+      },
+      {
+        "type": "checkbox",
+        "id": "cursor_on_links",
+        "label": "Usarlo también sobre enlaces y botones",
+        "default": false,
+        "info": "Si no, sobre enlaces y botones va la manito de siempre."
+      },
+      {
+        "type": "header",
+        "content": "Barra de scroll"
+      },
+      {
+        "type": "checkbox",
+        "id": "custom_scrollbar",
+        "label": "Barra de scroll propia",
+        "default": false
+      },
+      {
+        "type": "color",
+        "id": "scrollbar_thumb",
+        "label": "Color de la barra",
+        "default": "#121212"
+      },
+      {
+        "type": "color",
+        "id": "scrollbar_track",
+        "label": "Color del fondo",
+        "default": "#F3F3F3"
+      },
+      {
+        "type": "range",
+        "id": "scrollbar_width",
+        "min": 4,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Ancho",
+        "default": 10,
+        "info": "En Chrome y Firefox recientes el ancho sólo admite fino (menos de 10) o normal."
+      },
+      {
+        "type": "range",
+        "id": "scrollbar_radius",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "px",
+        "label": "Redondeo",
+        "default": 5
+      }
+    ]
   }
 ]

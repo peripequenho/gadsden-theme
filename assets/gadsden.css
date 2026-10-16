@@ -1978,3 +1978,46 @@ html.gad-badge-flush .card--media .card__inner .card__content {
   height: 0;
   overflow: hidden;
 }
+
+/* ---------- T13 ventana de idioma ---------- */
+.gad-lang {
+  width: min(42rem, calc(100vw - 3rem));
+  padding: 2.4rem;
+  border: 0;
+  border-radius: var(--popup-corner-radius, 0);
+  box-shadow: 0 1rem 4rem rgba(0, 0, 0, 0.2);
+}
+
+.gad-lang::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.gad-lang__title {
+  margin: 0 0 1rem;
+}
+
+.gad-lang__text {
+  margin-bottom: 1.6rem;
+}
+
+.gad-lang__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.gad-lang__actions .button {
+  flex: 1 1 14rem;
+}
+
+/* T14: en derecha a izquierda el carrusel calcula sus desplazamientos de izquierda a derecha;
+   el riel se queda en ltr y cada ítem vuelve al sentido de lectura de la página */
+[dir='rtl'] .gad-carousel__viewport,
+[dir='rtl'] .gad-carousel__track {
+  direction: ltr;
+}
+
+[dir='rtl'] .gad-carousel__track > * {
+  direction: rtl;
+}
