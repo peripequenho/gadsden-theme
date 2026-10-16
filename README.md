@@ -2,7 +2,7 @@
 
 Theme de Shopify basado en [Dawn](https://github.com/Shopify/dawn) 16.0.0, pensado para tiendas de un producto o de pocos productos que venden con landings: ficha de producto con bloques de conversión, carrito lateral armable por bloques y más de 30 secciones para armar páginas de venta sin tocar código.
 
-Es *white-label*: no trae marca, colores ni textos de ninguna tienda. Todos los ajustes del editor están en castellano.
+Es *white-label*: no trae marca ni textos de ninguna tienda. Arranca con un estilo de tienda de conversión (Poppins, botón de compra lleno en verde con el precio, bordes redondeados, etiquetas en píldora) que se cambia entero desde *Configuración del tema*. Todos los ajustes del editor están en castellano.
 
 ## Qué agrega a Dawn
 
