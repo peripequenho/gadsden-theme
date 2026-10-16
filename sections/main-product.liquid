@@ -89,6 +89,12 @@
             {%- assign product_form_id = 'product-form-' | append: section.id -%}
 
             {%- for block in section.blocks -%}
+              {%- liquid
+                assign gad_ms = ''
+                if block.settings.margin_top != nil
+                  assign gad_ms = 'style="--mt: ' | append: block.settings.margin_top | append: 'px; --mb: ' | append: block.settings.margin_bottom | append: 'px;"'
+                endif
+              -%}
               {%- case block.type -%}
                 {%- when '@app' -%}
                   {% render block %}
@@ -102,7 +108,7 @@
                 {%- when 'title' -%}
                   <div
                     class="product__title gad-pm gad-title gad-title--{{ block.settings.size | default: 'md' }} gad-title--{{ block.settings.align | default: 'left' }}{% if block.settings.uppercase %} gad-title--upper{% endif %}"
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     {{ block.shopify_attributes }}
                   >
                     <h1>{{ product.title | escape }}</h1>
@@ -117,7 +123,7 @@
                     id="price-{{ section.id }}"
                     role="status"
                     class="gad-pm gad-price gad-price--{{ block.settings.order | default: 'price_first' }} gad-price--c-{{ block.settings.price_color | default: 'foreground' }} gad-price--cc-{{ block.settings.compare_color | default: 'foreground' }} gad-price--badge-{{ block.settings.badge | default: 'sale' }}"
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     {{ block.shopify_attributes }}
                   >
                     {%- render 'price',
@@ -156,7 +162,7 @@
                   </div>
                 {%- when 'inventory' -%}
                   <p
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     class="gad-pm product__inventory{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} visibility-hidden{% endif %}"
                     {{ block.shopify_attributes }}
                     id="Inventory-{{ section.id }}"
@@ -208,7 +214,7 @@
                   </p>
                 {%- when 'description' -%}
                   {%- if product.description != blank -%}
-                    <div class="product__description rte quick-add-hidden gad-pm" {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %} {{ block.shopify_attributes }}>
+                    <div class="product__description rte quick-add-hidden gad-pm" {{ gad_ms }} {{ block.shopify_attributes }}>
                       {{ product.description }}
                     </div>
                   {%- endif -%}
@@ -228,7 +234,7 @@
                   {%- assign gad_acc_icon = block.settings.icon_name | default: block.settings.icon -%}
                   <div
                     class="product__accordion accordion quick-add-hidden gad-pm gad-acc gad-acc--{{ block.settings.title_size | default: 'md' }} gad-acc--{{ block.settings.toggle_icon | default: 'caret' }}{% if block.settings.top_border == false %} gad-acc--no-border{% endif %}"
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     {{ block.shopify_attributes }}
                   >
                     <details id="Details-{{ block.id }}-{{ section.id }}"{% if block.settings.open %} open{% endif %}>
@@ -255,7 +261,7 @@
                   <div
                     id="Quantity-Form-{{ section.id }}"
                     class="product-form__input product-form__quantity gad-pm gad-qty{% if block.settings.full_width %} gad-qty--full{% endif %}{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     {{ block.shopify_attributes }}
                   >
                     {% comment %} TODO: enable theme-check once `item_count_for_variant` is accepted as valid filter {% endcomment %}
@@ -483,7 +489,7 @@
                   <modal-opener
                     class="product-popup-modal__opener quick-add-hidden gad-pm"
                     data-modal="#PopupModal-{{ block.id }}"
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     {{ block.shopify_attributes }}
                   >
                     <button
@@ -496,7 +502,7 @@
                     </button>
                   </modal-opener>
                 {%- when 'share' -%}
-                  <div class="gad-pm"{% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}>
+                  <div class="gad-pm"{{ gad_ms }}>
                     {% liquid
                       assign share_url = product.selected_variant.url | default: product.url | prepend: request.origin
                       render 'share-button', block: block, share_link: share_url
@@ -528,7 +534,7 @@
                   -%}
                 {%- when 'rating' -%}
                   {%- if product.metafields.reviews.rating.value != blank -%}
-                    <div class="rating-wrapper gad-pm"{% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}>
+                    <div class="rating-wrapper gad-pm"{{ gad_ms }}>
                       {% liquid
                         assign rating_decimal = 0
                         assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
@@ -566,7 +572,7 @@
                   {%- endif -%}
                 {%- when 'complementary' -%}
                   <product-recommendations
-                    {% if block.settings.margin_top != nil %} style="--mt: {{ block.settings.margin_top }}px; --mb: {{ block.settings.margin_bottom }}px;"{% endif %}
+                    {{ gad_ms }}
                     class="gad-pm complementary-products quick-add-hidden{% if block.settings.make_collapsible_row %} is-accordion{% endif %}{% if block.settings.enable_quick_add %} complementary-products-contains-quick-add{% endif %}"
                     data-url="{{ routes.product_recommendations_url }}?limit={{ block.settings.product_list_limit }}&intent=complementary"
                     data-section-id="{{ section.id }}"

@@ -115,14 +115,11 @@ class CartItems extends window.StandardEvents.createViewEventElement(HTMLElement
         .then((response) => response.text())
         .then((responseText) => {
           const html = new DOMParser().parseFromString(responseText, 'text/html');
-          const selectors = ['cart-drawer-items', '.cart-drawer__footer'];
-          for (const selector of selectors) {
-            const targetElement = document.querySelector(selector);
-            const sourceElement = html.querySelector(selector);
-            if (targetElement && sourceElement) {
-              targetElement.replaceWith(sourceElement);
-            }
-          }
+          const targetElement = document.querySelector('cart-drawer .drawer__inner');
+          const sourceElement = html.querySelector('.drawer__inner');
+          if (targetElement && sourceElement) targetElement.innerHTML = sourceElement.innerHTML;
+          const sourceDrawer = html.querySelector('cart-drawer');
+          if (sourceDrawer) document.querySelector('cart-drawer')?.classList.toggle('is-empty', sourceDrawer.classList.contains('is-empty'));
         })
         .catch((e) => {
           console.error(e);

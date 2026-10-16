@@ -10,7 +10,7 @@
 {%- endcomment -%}
 {%- liquid
   assign b = block.settings
-  assign rows = b.rows | default: 1
+  assign rows = b.rows | default: 1 | plus: 0
   assign started = false
   assign done = false
   assign items = ''
@@ -57,46 +57,44 @@
     {%- endif -%}
   {%- else -%}
     {%- capture slides -%}
-      <div class="gad-features__col">
-      {%- for blk in section.blocks -%}
-        {%- assign blk_key = blk.id | append: '' -%}
-        {%- unless item_ids contains blk_key -%}{%- continue -%}{%- endunless -%}
-        {%- liquid
-          assign f = blk.settings
-          assign pos = 0
-          for id in item_ids
-            if id == blk_key
-              assign pos = forloop.index0
-            endif
-          endfor
-          assign row_pos = pos | modulo: rows
-        -%}
-        {%- if row_pos == 0 and pos > 0 -%}</div><div class="gad-features__col">{%- endif -%}
-        <button
-          type="button"
-          class="gad-features__card"
-          data-gad-feature-open="GadFeature-{{ blk.id }}"
-          {{ blk.shopify_attributes }}
-        >
-          {%- if f.card_image != blank -%}
-            <span class="gad-features__media">
-              {{ f.card_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 15vw, 45vw', widths: '200, 300, 450, 600' }}
-              {%- if b.card_style == 'title_over' -%}
-                <span class="gad-features__overlay-text">{{ f.card_text | default: f.title }}</span>
+      {%- assign cols = count | plus: rows | minus: 1 | divided_by: rows -%}
+      {%- for c in (1..cols) -%}
+        <div class="gad-features__col">
+          {%- for r in (1..rows) -%}
+            {%- liquid
+              assign pos = c | minus: 1 | times: rows | plus: r | minus: 1
+              if pos >= count
+                break
+              endif
+              assign blk = section.blocks | where: 'id', item_ids[pos] | first
+              assign f = blk.settings
+            -%}
+            <button
+              type="button"
+              class="gad-features__card"
+              data-gad-feature-open="GadFeature-{{ blk.id }}"
+              {{ blk.shopify_attributes }}
+            >
+              {%- if f.card_image != blank -%}
+                <span class="gad-features__media">
+                  {{ f.card_image | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 15vw, 45vw', widths: '200, 300, 450, 600' }}
+                  {%- if b.card_style == 'title_over' -%}
+                    <span class="gad-features__overlay-text">{{ f.card_text | default: f.title }}</span>
+                  {%- endif -%}
+                </span>
               {%- endif -%}
-            </span>
-          {%- endif -%}
-          {%- unless b.card_style == 'title_over' and f.card_image != blank -%}
-            <span class="gad-features__label">
-              {%- if f.icon != blank or f.icon_image != blank -%}
-                {%- render 'gad-icon', name: f.icon, filled: f.icon_filled, image: f.icon_image, class: 'gad-features__icon' -%}
-              {%- endif -%}
-              <span>{{ f.card_text | default: f.title }}</span>
-            </span>
-          {%- endunless -%}
-        </button>
+              {%- unless b.card_style == 'title_over' and f.card_image != blank -%}
+                <span class="gad-features__label">
+                  {%- if f.icon != blank or f.icon_image != blank -%}
+                    {%- render 'gad-icon', name: f.icon, filled: f.icon_filled, image: f.icon_image, class: 'gad-features__icon' -%}
+                  {%- endif -%}
+                  <span>{{ f.card_text | default: f.title }}</span>
+                </span>
+              {%- endunless -%}
+            </button>
+          {%- endfor -%}
+        </div>
       {%- endfor -%}
-      </div>
     {%- endcapture -%}
 
     {%- liquid

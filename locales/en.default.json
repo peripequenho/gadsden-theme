@@ -572,6 +572,10 @@
     "sticky": {
       "label": "Quick purchase",
       "variant": "Variant"
+    },
+    "cart": {
+      "gift_badge": "Gift",
+      "upsell_add": "Add {{ product }} to the cart"
     }
   }
 }

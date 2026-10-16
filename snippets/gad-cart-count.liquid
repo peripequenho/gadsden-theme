@@ -1,0 +1,16 @@
+{%- comment -%}
+  Cantidad de productos del carrito sin contar los sumados como extra (C10) ni los regalos (C11):
+  las líneas con la propiedad oculta _gad_extra no suman. Imprime sólo el número.
+
+  Usage:
+  {%- capture count -%}{% render 'gad-cart-count' %}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign n = 0
+  for item in cart.items
+    if item.properties._gad_extra == blank
+      assign n = n | plus: item.quantity
+    endif
+  endfor
+  echo n
+-%}

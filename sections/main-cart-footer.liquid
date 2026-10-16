@@ -2,6 +2,8 @@
 {{ 'component-totals.css' | asset_url | stylesheet_tag }}
 {{ 'component-price.css' | asset_url | stylesheet_tag }}
 {{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+{{ 'gad-cart.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'gad-cart.js' | asset_url }}" defer="defer"></script>
 
 {%- style -%}
   .section-{{ section.id }}-padding {
@@ -103,6 +105,11 @@
                   {%- endif -%}
                 </small>
               </div>
+            {%- when 'coupon' -%}
+              {%- liquid
+                assign mg = '--gad-mt: ' | append: block.settings.margin_top | append: 'px; --gad-mb: ' | append: block.settings.margin_bottom | append: 'px;'
+              -%}
+              {%- render 'gad-coupon', b: block.settings, key: block.id, attrs: block.shopify_attributes, mg: mg -%}
             {%- else -%}
               <div class="cart__ctas" {{ block.shopify_attributes }}>
                 <button
@@ -147,7 +154,7 @@
     {
       "type": "header",
       "content": "t:sections.all.padding.section_padding_heading"
-    },    
+    },
     {
       "type": "range",
       "id": "padding_top",
@@ -179,6 +186,65 @@
       "type": "buttons",
       "name": "t:sections.main-cart-footer.blocks.buttons.name",
       "limit": 1
+    },
+    {
+      "type": "coupon",
+      "name": "Campo de cupón",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "No valida el código: lleva al pago con el código aplicado. Si no es válido, se avisa en el pago."
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Texto de ejemplo",
+          "default": "Código de descuento"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Texto del botón",
+          "default": "Aplicar"
+        },
+        {
+          "type": "text",
+          "id": "error",
+          "label": "Mensaje con el campo vacío",
+          "default": "Ingresá un código"
+        },
+        {
+          "type": "checkbox",
+          "id": "separator",
+          "label": "Línea separadora debajo",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
     },
     {
       "type": "@app"

@@ -1041,3 +1041,70 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
   opacity: 0.55;
   transform: scale(0.92);
 }
+
+/* ---------- color de los íconos por nombre (barra de íconos, cinta, íconos con texto) ---------- */
+.gad-accent-accent {
+  --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
+}
+
+.gad-accent-text {
+  --gad-icon-color: rgb(var(--color-foreground));
+}
+
+.gad-accent-button {
+  --gad-icon-color: rgb(var(--color-button));
+}
+
+/* ---------- íconos con texto (P06 en la ficha, C14 en el carrito) ---------- */
+.gad-p-icons {
+  display: flex;
+  gap: 1.6rem;
+}
+
+.gad-p-icons--row {
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+}
+
+.gad-p-icons--column {
+  flex-direction: column;
+}
+
+.gad-p-icons__item {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-m, 6px);
+  min-width: 0;
+}
+
+.gad-p-icons--column .gad-p-icons__item {
+  flex-direction: row;
+}
+
+.gad-p-icons__icon {
+  font-size: var(--ic-m, 28px);
+}
+
+.gad-p-icons__title {
+  font-size: var(--tx-m, 12px);
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-p-icons__item {
+    gap: var(--gap-d, 8px);
+  }
+
+  .gad-p-icons__icon {
+    font-size: var(--ic-d, 32px);
+  }
+
+  .gad-p-icons__title {
+    font-size: var(--tx-d, 13px);
+  }
+}

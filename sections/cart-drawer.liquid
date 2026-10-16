@@ -1,1 +1,2421 @@
-{%- render 'cart-drawer' -%}
+{%- render 'cart-drawer', section: section -%}
+
+{% schema %}
+{
+  "name": "Carrito lateral",
+  "class": "gad-cart-drawer-section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Para que el carrito sea lateral, en Configuración del tema > Carrito elegí el tipo \"Cajón\". La combinación de colores del cajón también está ahí."
+    },
+    {
+      "type": "checkbox",
+      "id": "test_mode",
+      "label": "Modo prueba",
+      "default": false,
+      "info": "Deja el cajón abierto en el editor para personalizarlo. No cambia nada en la tienda."
+    },
+    {
+      "type": "header",
+      "content": "Encabezado"
+    },
+    {
+      "type": "text",
+      "id": "heading_text",
+      "label": "Título",
+      "default": "Tu carrito ({cantidad})",
+      "info": "{cantidad}: los productos del carrito, sin contar los sumados como extra ni los regalos. Vacío: \"Tu carrito\"."
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Alineación del título",
+      "options": [
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Ancho"
+    },
+    {
+      "type": "select",
+      "id": "width_d",
+      "label": "Ancho en desktop",
+      "options": [
+        {
+          "value": "normal",
+          "label": "Normal"
+        },
+        {
+          "value": "wide",
+          "label": "Ancho"
+        }
+      ],
+      "default": "normal"
+    },
+    {
+      "type": "select",
+      "id": "width_m",
+      "label": "Ancho en mobile",
+      "options": [
+        {
+          "value": "partial",
+          "label": "Parcial"
+        },
+        {
+          "value": "full",
+          "label": "Pantalla completa"
+        }
+      ],
+      "default": "partial"
+    },
+    {
+      "type": "header",
+      "content": "Fondos"
+    },
+    {
+      "type": "checkbox",
+      "id": "header_bg",
+      "label": "Fondo propio en el encabezado",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "header_bg_color",
+      "label": "Color del encabezado",
+      "default": "#F3F3F3"
+    },
+    {
+      "type": "checkbox",
+      "id": "body_bg",
+      "label": "Fondo propio en el cuerpo",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "body_bg_color",
+      "label": "Color del cuerpo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "footer_bg",
+      "label": "Fondo propio en el pie",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "footer_bg_color",
+      "label": "Color del pie",
+      "default": "#F3F3F3"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "items",
+      "name": "Lista de productos",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Siempre va en el cuerpo. Dentro del cuerpo, respeta el orden de los bloques."
+        },
+        {
+          "type": "header",
+          "content": "Imagen y título"
+        },
+        {
+          "type": "select",
+          "id": "image_size",
+          "label": "Tamaño de la imagen",
+          "options": [
+            {
+              "value": "small",
+              "label": "Chica"
+            },
+            {
+              "value": "medium",
+              "label": "Mediana"
+            },
+            {
+              "value": "large",
+              "label": "Grande"
+            }
+          ],
+          "default": "medium"
+        },
+        {
+          "type": "checkbox",
+          "id": "image_link",
+          "label": "La imagen lleva al producto",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "title_size",
+          "label": "Tamaño del título",
+          "options": [
+            {
+              "value": "small",
+              "label": "Chico"
+            },
+            {
+              "value": "medium",
+              "label": "Mediano"
+            },
+            {
+              "value": "large",
+              "label": "Grande"
+            }
+          ],
+          "default": "medium"
+        },
+        {
+          "type": "checkbox",
+          "id": "title_link",
+          "label": "El título lleva al producto",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "variant_style",
+          "label": "Variante",
+          "options": [
+            {
+              "value": "classic",
+              "label": "Clásica (Color: Negro, Talle: S)"
+            },
+            {
+              "value": "compact",
+              "label": "Compacta (Negro / S)"
+            }
+          ],
+          "default": "classic"
+        },
+        {
+          "type": "header",
+          "content": "Precio"
+        },
+        {
+          "type": "select",
+          "id": "price_position",
+          "label": "Ubicación del precio",
+          "options": [
+            {
+              "value": "right",
+              "label": "A la derecha"
+            },
+            {
+              "value": "left",
+              "label": "A la izquierda"
+            }
+          ],
+          "default": "right",
+          "info": "A la izquierda: el precio va debajo del título y la cantidad a la derecha."
+        },
+        {
+          "type": "select",
+          "id": "compare_source",
+          "label": "Precio tachado",
+          "options": [
+            {
+              "value": "auto",
+              "label": "Automático (el mayor)"
+            },
+            {
+              "value": "cart",
+              "label": "Según los descuentos del carrito"
+            },
+            {
+              "value": "compare",
+              "label": "Según el precio de comparación"
+            }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "select",
+          "id": "price_color",
+          "label": "Color del precio",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "select",
+          "id": "compare_color",
+          "label": "Color del precio tachado",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "muted"
+        },
+        {
+          "type": "checkbox",
+          "id": "unit_price",
+          "label": "Mostrar el precio unitario con descuento",
+          "default": true,
+          "info": "Debajo del título, cuando el producto tiene un descuento."
+        },
+        {
+          "type": "text",
+          "id": "unit_label",
+          "label": "Etiqueta del precio unitario",
+          "info": "Opcional, ej. \"Por unidad:\"."
+        },
+        {
+          "type": "checkbox",
+          "id": "savings",
+          "label": "Mostrar el ahorro de la línea",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "savings_text",
+          "label": "Texto del ahorro",
+          "default": "Ahorrás {monto}",
+          "info": "{monto}: lo que se ahorra en esa línea."
+        },
+        {
+          "type": "select",
+          "id": "savings_color",
+          "label": "Color del ahorro",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "header",
+          "content": "Selector de cantidad"
+        },
+        {
+          "type": "checkbox",
+          "id": "qty_custom",
+          "label": "Estilo propio",
+          "default": false,
+          "info": "Si no, usa el estilo de los campos del tema."
+        },
+        {
+          "type": "range",
+          "id": "qty_font",
+          "min": 10,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño de la letra",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "qty_icon",
+          "min": 8,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño de los íconos",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "qty_padding",
+          "min": 0,
+          "max": 12,
+          "step": 1,
+          "unit": "px",
+          "label": "Relleno",
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "qty_radius",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Redondeo",
+          "default": 6
+        },
+        {
+          "type": "range",
+          "id": "qty_border",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "label": "Grosor del borde",
+          "default": 1
+        },
+        {
+          "type": "color",
+          "id": "qty_border_color",
+          "label": "Color del borde",
+          "default": "#CCCCCC"
+        },
+        {
+          "type": "color_scheme",
+          "id": "qty_scheme",
+          "label": "Combinación del contenedor",
+          "default": "scheme-1"
+        },
+        {
+          "type": "color_scheme",
+          "id": "qty_btn_scheme",
+          "label": "Combinación de los botones",
+          "default": "scheme-1"
+        },
+        {
+          "type": "range",
+          "id": "qty_divider",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Opacidad de los separadores",
+          "default": 0
+        },
+        {
+          "type": "select",
+          "id": "qty_btn_shape",
+          "label": "Botones",
+          "options": [
+            {
+              "value": "square",
+              "label": "Comunes"
+            },
+            {
+              "value": "rounded",
+              "label": "Redondeados"
+            },
+            {
+              "value": "outline",
+              "label": "En contorno"
+            }
+          ],
+          "default": "square"
+        },
+        {
+          "type": "header",
+          "content": "Quitar"
+        },
+        {
+          "type": "select",
+          "id": "remove_position",
+          "label": "Botón para quitar",
+          "options": [
+            {
+              "value": "beside",
+              "label": "Al lado de la cantidad"
+            },
+            {
+              "value": "top",
+              "label": "Arriba a la derecha de la línea"
+            }
+          ],
+          "default": "beside"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "progress",
+      "name": "Barra de progreso",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Siempre va en el cuerpo. La barra sólo avisa: el beneficio (por ejemplo, el envío gratis) se configura aparte en Shopify."
+        },
+        {
+          "type": "select",
+          "id": "goal_type",
+          "label": "Base de la meta",
+          "options": [
+            {
+              "value": "subtotal",
+              "label": "Subtotal"
+            },
+            {
+              "value": "quantity",
+              "label": "Cantidad de productos"
+            }
+          ],
+          "default": "subtotal"
+        },
+        {
+          "type": "number",
+          "id": "goal",
+          "label": "Meta",
+          "default": 50000,
+          "info": "En la moneda de la tienda, sin centavos, o en cantidad de productos según la base."
+        },
+        {
+          "type": "text",
+          "id": "message",
+          "label": "Mensaje mientras falta",
+          "default": "Te faltan {monto} para el envío gratis",
+          "info": "{monto}: lo que falta para la meta."
+        },
+        {
+          "type": "text",
+          "id": "success_message",
+          "label": "Mensaje al llegar",
+          "default": "¡Tenés envío gratis!"
+        },
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "default": "local_shipping",
+          "info": "Nombre en inglés de Material Symbols. Vacío: sin ícono."
+        },
+        {
+          "type": "checkbox",
+          "id": "icon_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "select",
+          "id": "accent",
+          "label": "Color de la barra",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "milestones",
+      "name": "Barra de hitos",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Como la barra de progreso, con hasta 3 metas en el mismo recorrido. Siempre va en el cuerpo."
+        },
+        {
+          "type": "select",
+          "id": "goal_type",
+          "label": "Base de la meta",
+          "options": [
+            {
+              "value": "subtotal",
+              "label": "Subtotal"
+            },
+            {
+              "value": "quantity",
+              "label": "Cantidad de productos"
+            }
+          ],
+          "default": "subtotal"
+        },
+        {
+          "type": "text",
+          "id": "message",
+          "label": "Mensaje mientras falta",
+          "default": "Te faltan {monto} para {premio}",
+          "info": "{monto}: lo que falta para la próxima meta. {premio}: el premio de esa meta."
+        },
+        {
+          "type": "text",
+          "id": "success_message",
+          "label": "Mensaje final",
+          "default": "¡Desbloqueaste todos los premios!"
+        },
+        {
+          "type": "select",
+          "id": "accent",
+          "label": "Color de la barra",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "range",
+          "id": "label_size_d",
+          "min": 8,
+          "max": 18,
+          "step": 1,
+          "unit": "px",
+          "label": "Etiquetas en desktop",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "label_size_m",
+          "min": 8,
+          "max": 16,
+          "step": 1,
+          "unit": "px",
+          "label": "Etiquetas en mobile",
+          "default": 10
+        },
+        {
+          "type": "header",
+          "content": "Meta 1"
+        },
+        {
+          "type": "checkbox",
+          "id": "g1_on",
+          "label": "Activar",
+          "default": true
+        },
+        {
+          "type": "number",
+          "id": "g1_amount",
+          "label": "Meta",
+          "default": 20000,
+          "info": "En la moneda de la tienda, sin centavos, o en cantidad de productos según la base."
+        },
+        {
+          "type": "text",
+          "id": "g1_icon",
+          "label": "Ícono",
+          "default": "local_shipping"
+        },
+        {
+          "type": "checkbox",
+          "id": "g1_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "g1_label",
+          "label": "Etiqueta bajo el ícono",
+          "default": "Envío gratis"
+        },
+        {
+          "type": "text",
+          "id": "g1_prize",
+          "label": "Premio para el mensaje",
+          "default": "el envío gratis",
+          "info": "Reemplaza a {premio}."
+        },
+        {
+          "type": "header",
+          "content": "Meta 2"
+        },
+        {
+          "type": "checkbox",
+          "id": "g2_on",
+          "label": "Activar",
+          "default": true
+        },
+        {
+          "type": "number",
+          "id": "g2_amount",
+          "label": "Meta",
+          "default": 40000
+        },
+        {
+          "type": "text",
+          "id": "g2_icon",
+          "label": "Ícono",
+          "default": "percent"
+        },
+        {
+          "type": "checkbox",
+          "id": "g2_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "g2_label",
+          "label": "Etiqueta bajo el ícono",
+          "default": "Descuento"
+        },
+        {
+          "type": "text",
+          "id": "g2_prize",
+          "label": "Premio para el mensaje",
+          "default": "tu descuento"
+        },
+        {
+          "type": "header",
+          "content": "Meta 3"
+        },
+        {
+          "type": "checkbox",
+          "id": "g3_on",
+          "label": "Activar",
+          "default": false
+        },
+        {
+          "type": "number",
+          "id": "g3_amount",
+          "label": "Meta",
+          "default": 60000
+        },
+        {
+          "type": "text",
+          "id": "g3_icon",
+          "label": "Ícono",
+          "default": "redeem"
+        },
+        {
+          "type": "checkbox",
+          "id": "g3_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "g3_label",
+          "label": "Etiqueta bajo el ícono",
+          "default": "Regalo"
+        },
+        {
+          "type": "text",
+          "id": "g3_prize",
+          "label": "Premio para el mensaje",
+          "default": "tu regalo"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "countdown",
+      "name": "Cuenta regresiva",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Completá tu compra en {tiempo}",
+          "info": "{tiempo}: minutos y segundos que bajan. Arranca la primera vez que se abre el cajón, vuelve a empezar al recargar la página y, al llegar a cero, sigue desde 1:30. No vence nada: es sólo un aviso."
+        },
+        {
+          "type": "number",
+          "id": "duration",
+          "label": "Duración en segundos",
+          "default": 300
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "label": "Tamaño del texto",
+          "options": [
+            {
+              "value": "xs",
+              "label": "Muy chico"
+            },
+            {
+              "value": "s",
+              "label": "Chico"
+            },
+            {
+              "value": "m",
+              "label": "Mediano"
+            },
+            {
+              "value": "l",
+              "label": "Grande"
+            },
+            {
+              "value": "xl",
+              "label": "Muy grande"
+            }
+          ],
+          "default": "m"
+        },
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Combinación de colores",
+          "default": "scheme-3"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "name": "Nota del pedido",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Siempre va en el pie. Lo escrito se guarda solo y llega al pedido."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "coupon",
+      "name": "Campo de cupón",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Siempre va en el pie. No valida el código: lleva al pago con el código aplicado. Si no es válido, se avisa en el pago."
+        },
+        {
+          "type": "text",
+          "id": "placeholder",
+          "label": "Texto de ejemplo",
+          "default": "Código de descuento"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Texto del botón",
+          "default": "Aplicar"
+        },
+        {
+          "type": "text",
+          "id": "error",
+          "label": "Mensaje con el campo vacío",
+          "default": "Ingresá un código"
+        },
+        {
+          "type": "checkbox",
+          "id": "separator",
+          "label": "Línea separadora debajo",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "subtotals",
+      "name": "Subtotales",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "header",
+          "content": "Ahorro total"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_savings",
+          "label": "Mostrar el ahorro total",
+          "default": true,
+          "info": "Sólo aparece si hay ahorro."
+        },
+        {
+          "type": "text",
+          "id": "savings_left",
+          "label": "Texto de la izquierda",
+          "default": "Ahorro"
+        },
+        {
+          "type": "text",
+          "id": "savings_right",
+          "label": "Texto de la derecha",
+          "default": "-{ahorro}",
+          "info": "{ahorro}: la diferencia entre los precios de comparación y lo que se paga, con los descuentos."
+        },
+        {
+          "type": "select",
+          "id": "savings_layout",
+          "label": "Disposición",
+          "options": [
+            {
+              "value": "spaced",
+              "label": "A los costados"
+            },
+            {
+              "value": "center",
+              "label": "Centrada"
+            }
+          ],
+          "default": "spaced"
+        },
+        {
+          "type": "select",
+          "id": "savings_color",
+          "label": "Color",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "range",
+          "id": "savings_size",
+          "min": 10,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 14
+        },
+        {
+          "type": "select",
+          "id": "savings_position",
+          "label": "Ubicación",
+          "options": [
+            {
+              "value": "above",
+              "label": "Arriba del subtotal"
+            },
+            {
+              "value": "below",
+              "label": "Abajo del subtotal"
+            }
+          ],
+          "default": "above"
+        },
+        {
+          "type": "range",
+          "id": "savings_gap",
+          "min": 0,
+          "max": 30,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación con el subtotal",
+          "default": 8
+        },
+        {
+          "type": "header",
+          "content": "Subtotal"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_subtotal",
+          "label": "Mostrar el subtotal",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "subtotal_left",
+          "label": "Texto de la izquierda",
+          "default": "Subtotal"
+        },
+        {
+          "type": "text",
+          "id": "subtotal_right",
+          "label": "Texto de la derecha",
+          "default": "{subtotal}",
+          "info": "{subtotal}: el total del carrito con los descuentos."
+        },
+        {
+          "type": "select",
+          "id": "subtotal_layout",
+          "label": "Disposición",
+          "options": [
+            {
+              "value": "spaced",
+              "label": "A los costados"
+            },
+            {
+              "value": "center",
+              "label": "Centrada"
+            }
+          ],
+          "default": "spaced"
+        },
+        {
+          "type": "select",
+          "id": "subtotal_color",
+          "label": "Color",
+          "options": [
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "muted",
+              "label": "Texto suave"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "text"
+        },
+        {
+          "type": "range",
+          "id": "subtotal_size",
+          "min": 12,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño",
+          "default": 18
+        },
+        {
+          "type": "checkbox",
+          "id": "subtotal_bold",
+          "label": "En negrita",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Descuentos aplicados"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_discounts",
+          "label": "Mostrar las etiquetas de los descuentos",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "discounts_title",
+          "label": "Título",
+          "default": "Descuentos"
+        },
+        {
+          "type": "select",
+          "id": "discounts_align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "right"
+        },
+        {
+          "type": "header",
+          "content": "Nota"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tax_note",
+          "label": "Mostrar la nota de impuestos y envío",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "checkout",
+      "name": "Botón de pago",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Texto del botón",
+          "info": "Vacío: \"Finalizar compra\"."
+        },
+        {
+          "type": "checkbox",
+          "id": "show_total",
+          "label": "Mostrar el subtotal en el botón",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "express",
+          "label": "Mostrar los botones de pago acelerado",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Color"
+        },
+        {
+          "type": "checkbox",
+          "id": "custom_color",
+          "label": "Color propio",
+          "default": false,
+          "info": "Si no, el de la combinación del cajón."
+        },
+        {
+          "type": "color",
+          "id": "btn_bg",
+          "label": "Fondo del botón",
+          "default": "#121212"
+        },
+        {
+          "type": "color",
+          "id": "btn_fg",
+          "label": "Texto del botón",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "header",
+          "content": "Íconos"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_before",
+          "label": "Ícono antes del texto"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_after",
+          "label": "Ícono después del texto"
+        },
+        {
+          "type": "range",
+          "id": "icon_scale",
+          "min": 80,
+          "max": 180,
+          "step": 10,
+          "unit": "%",
+          "label": "Escala de los íconos",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "icon_gap",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación de los íconos",
+          "default": 10
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "payment_icons",
+      "name": "Sellos de medios de pago",
+      "settings": [
+        {
+          "type": "text",
+          "id": "custom_list",
+          "label": "Medios a mostrar",
+          "info": "Vacío: los habilitados en la tienda. Para elegir, escribí los nombres separados por coma, ej. visa, master, american_express, paypal."
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "terms",
+      "name": "Casilla de términos",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Siempre va en el pie. Sin marcar, frena el botón de pago y el cupón. Los botones de pago acelerado no se pueden frenar."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "Acepto los <a href=\"/policies/terms-of-service\">términos y condiciones</a>"
+        },
+        {
+          "type": "text",
+          "id": "warning",
+          "label": "Aviso sin marcar",
+          "default": "Tenés que aceptar los términos para seguir."
+        },
+        {
+          "type": "color",
+          "id": "warning_color",
+          "label": "Color del aviso",
+          "default": "#D72C0D"
+        },
+        {
+          "type": "checkbox",
+          "id": "dim_checkout",
+          "label": "Atenuar el botón de pago hasta que se acepte",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "min": 10,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto",
+          "default": 14
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "upsells",
+      "name": "Productos para sumar",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Sumá a tu pedido"
+        },
+        {
+          "type": "product",
+          "id": "product_1",
+          "label": "Producto 1"
+        },
+        {
+          "type": "product",
+          "id": "product_2",
+          "label": "Producto 2"
+        },
+        {
+          "type": "product",
+          "id": "product_3",
+          "label": "Producto 3"
+        },
+        {
+          "type": "select",
+          "id": "control",
+          "label": "Control para sumar",
+          "options": [
+            {
+              "value": "toggle",
+              "label": "Interruptor"
+            },
+            {
+              "value": "checkbox",
+              "label": "Casilla"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "toggle",
+          "info": "Con interruptor o casilla, se puede volver a quitar desde acá."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Texto del botón",
+          "default": "Sumar"
+        },
+        {
+          "type": "range",
+          "id": "discount",
+          "min": 0,
+          "max": 90,
+          "step": 5,
+          "unit": "%",
+          "label": "Descuento a mostrar",
+          "default": 0,
+          "info": "Sólo cambia el precio que se ve. Para cobrarlo así, creá el descuento en Shopify (Descuentos)."
+        },
+        {
+          "type": "product_list",
+          "id": "trigger_products",
+          "label": "Mostrar sólo con estos productos en el carrito",
+          "limit": 20,
+          "info": "Vacío: se muestra siempre."
+        },
+        {
+          "type": "paragraph",
+          "content": "No se muestra un producto que ya está en el carrito. Los sumados desde acá no cuentan en el título ni en la burbuja del carrito."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "gift",
+      "name": "Regalo",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Producto de regalo"
+        },
+        {
+          "type": "select",
+          "id": "mode",
+          "label": "Cuándo se desbloquea",
+          "options": [
+            {
+              "value": "always",
+              "label": "Siempre (con algo en el carrito)"
+            },
+            {
+              "value": "amount",
+              "label": "Al llegar a un monto"
+            },
+            {
+              "value": "quantity",
+              "label": "Al llegar a una cantidad"
+            }
+          ],
+          "default": "amount"
+        },
+        {
+          "type": "number",
+          "id": "goal",
+          "label": "Meta",
+          "default": 50000,
+          "info": "En la moneda de la tienda, sin centavos, o en cantidad de productos. El regalo no cuenta para la meta."
+        },
+        {
+          "type": "text",
+          "id": "locked_text",
+          "label": "Texto bloqueado",
+          "default": "Te faltan {monto} para llevarte {producto} de regalo",
+          "info": "{monto}: lo que falta. {producto}: el nombre del regalo."
+        },
+        {
+          "type": "text",
+          "id": "unlocked_text",
+          "label": "Texto desbloqueado",
+          "default": "¡Te llevás {producto} de regalo!"
+        },
+        {
+          "type": "checkbox",
+          "id": "auto_add",
+          "label": "Sumarlo solo al desbloquearse",
+          "default": true,
+          "info": "Y sacarlo si el carrito deja de cumplir. Si el comprador lo quita, no se vuelve a sumar solo: aparece el botón."
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Texto del botón",
+          "default": "Sumar mi regalo"
+        },
+        {
+          "type": "paragraph",
+          "content": "Para que salga gratis, creá en Shopify un descuento automático del 100 % sobre este producto."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 12
+        }
+      ]
+    },
+    {
+      "type": "text_icons",
+      "name": "Texto con ícono",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "header",
+          "content": "Renglón 1"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_1",
+          "label": "Texto",
+          "default": "Texto del renglón",
+          "info": "Acepta metacampos. Sin texto, el renglón no aparece."
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_1",
+          "label": "Ícono",
+          "default": "check_circle",
+          "info": "Nombre en inglés de Material Symbols, ej. local_shipping. Acepta metacampos."
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_1",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_1",
+          "label": "Ícono propio (imagen)",
+          "info": "Si cargás una imagen, reemplaza al ícono por nombre."
+        },
+        {
+          "type": "header",
+          "content": "Renglón 2"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_2",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_2",
+          "label": "Ícono"
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_2",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_2",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "header",
+          "content": "Renglón 3"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "ti_text_3",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "ti_icon_3",
+          "label": "Ícono"
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_filled_3",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "ti_image_3",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "header",
+          "content": "Estilo de los renglones"
+        },
+        {
+          "type": "range",
+          "id": "ti_size_m",
+          "min": 8,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto en mobile",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "ti_size_d",
+          "min": 10,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto en desktop",
+          "default": 16
+        },
+        {
+          "type": "select",
+          "id": "ti_align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "color",
+          "id": "ti_color",
+          "label": "Color del texto",
+          "info": "Vacío: el de la combinación."
+        },
+        {
+          "type": "range",
+          "id": "ti_icon_scale",
+          "min": 100,
+          "max": 200,
+          "step": 5,
+          "unit": "%",
+          "label": "Escala de los íconos",
+          "default": 120
+        },
+        {
+          "type": "color",
+          "id": "ti_icon_color",
+          "label": "Color de los íconos",
+          "info": "Vacío: el del texto."
+        },
+        {
+          "type": "select",
+          "id": "ti_width",
+          "label": "Ancho",
+          "options": [
+            {
+              "value": "fit",
+              "label": "Ajustado al texto"
+            },
+            {
+              "value": "full",
+              "label": "Completo"
+            }
+          ],
+          "default": "fit"
+        },
+        {
+          "type": "select",
+          "id": "ti_stack",
+          "label": "Apilado",
+          "options": [
+            {
+              "value": "vertical",
+              "label": "En columna"
+            },
+            {
+              "value": "horizontal",
+              "label": "En fila"
+            }
+          ],
+          "default": "vertical"
+        },
+        {
+          "type": "range",
+          "id": "ti_gap",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación",
+          "default": 8
+        },
+        {
+          "type": "checkbox",
+          "id": "ti_bg",
+          "label": "Fondo tipo pastilla",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "ti_bg_color",
+          "label": "Color del fondo",
+          "default": "#F3F3F3"
+        },
+        {
+          "type": "range",
+          "id": "ti_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Redondeo del fondo",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "ti_padding",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Relleno del fondo",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "ti_border",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "unit": "px",
+          "label": "Borde",
+          "default": 0
+        },
+        {
+          "type": "color",
+          "id": "ti_border_color",
+          "label": "Color del borde",
+          "default": "#121212"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Imagen",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 10,
+          "max": 100,
+          "step": 10,
+          "unit": "%",
+          "label": "Ancho",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "align",
+          "label": "Alineación",
+          "options": [
+            {
+              "value": "left",
+              "label": "Izquierda"
+            },
+            {
+              "value": "center",
+              "label": "Centro"
+            },
+            {
+              "value": "right",
+              "label": "Derecha"
+            }
+          ],
+          "default": "center"
+        },
+        {
+          "type": "range",
+          "id": "radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Redondeo",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "icons",
+      "name": "Íconos con texto",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "Disposición",
+          "options": [
+            {
+              "value": "row",
+              "label": "En fila"
+            },
+            {
+              "value": "column",
+              "label": "En columna"
+            }
+          ],
+          "default": "row"
+        },
+        {
+          "type": "select",
+          "id": "icon_color",
+          "label": "Color de los íconos",
+          "options": [
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "text",
+              "label": "Texto"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            }
+          ],
+          "default": "accent"
+        },
+        {
+          "type": "header",
+          "content": "Desktop"
+        },
+        {
+          "type": "range",
+          "id": "icon_size_d",
+          "min": 16,
+          "max": 72,
+          "step": 4,
+          "unit": "px",
+          "label": "Tamaño del ícono",
+          "default": 32
+        },
+        {
+          "type": "range",
+          "id": "gap_d",
+          "min": 2,
+          "max": 24,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación entre ícono y texto",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "text_size_d",
+          "min": 12,
+          "max": 34,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto",
+          "default": 13
+        },
+        {
+          "type": "header",
+          "content": "Mobile"
+        },
+        {
+          "type": "range",
+          "id": "icon_size_m",
+          "min": 16,
+          "max": 64,
+          "step": 4,
+          "unit": "px",
+          "label": "Tamaño del ícono",
+          "default": 28
+        },
+        {
+          "type": "range",
+          "id": "gap_m",
+          "min": 2,
+          "max": 24,
+          "step": 2,
+          "unit": "px",
+          "label": "Separación entre ícono y texto",
+          "default": 6
+        },
+        {
+          "type": "range",
+          "id": "text_size_m",
+          "min": 10,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "label": "Tamaño del texto",
+          "default": 12
+        },
+        {
+          "type": "header",
+          "content": "Ítem 1"
+        },
+        {
+          "type": "text",
+          "id": "icon_1",
+          "label": "Ícono",
+          "default": "local_shipping"
+        },
+        {
+          "type": "checkbox",
+          "id": "filled_1",
+          "label": "Relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title_1",
+          "label": "Título",
+          "default": "Envío a todo el país",
+          "info": "Sin título, el ítem no se muestra."
+        },
+        {
+          "type": "header",
+          "content": "Ítem 2"
+        },
+        {
+          "type": "text",
+          "id": "icon_2",
+          "label": "Ícono",
+          "default": "verified"
+        },
+        {
+          "type": "checkbox",
+          "id": "filled_2",
+          "label": "Relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title_2",
+          "label": "Título",
+          "default": "Garantía"
+        },
+        {
+          "type": "header",
+          "content": "Ítem 3"
+        },
+        {
+          "type": "text",
+          "id": "icon_3",
+          "label": "Ícono",
+          "default": "support_agent"
+        },
+        {
+          "type": "checkbox",
+          "id": "filled_3",
+          "label": "Relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title_3",
+          "label": "Título",
+          "default": "Atención personalizada"
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 8
+        }
+      ]
+    },
+    {
+      "type": "custom",
+      "name": "Código propio",
+      "settings": [
+        {
+          "type": "select",
+          "id": "zone",
+          "label": "Zona del cajón",
+          "options": [
+            {
+              "value": "body",
+              "label": "Cuerpo (con scroll)"
+            },
+            {
+              "value": "footer",
+              "label": "Pie (fijo abajo)"
+            }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Código",
+          "info": "HTML o Liquid. Se dibuja tal cual."
+        },
+        {
+          "type": "header",
+          "content": "Márgenes"
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Arriba",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "label": "Abajo",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "progress"
+      },
+      {
+        "type": "countdown"
+      },
+      {
+        "type": "items"
+      },
+      {
+        "type": "note"
+      },
+      {
+        "type": "coupon"
+      },
+      {
+        "type": "subtotals"
+      },
+      {
+        "type": "checkout"
+      },
+      {
+        "type": "payment_icons"
+      }
+    ]
+  }
+}
+{% endschema %}

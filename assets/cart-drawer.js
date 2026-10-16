@@ -48,6 +48,7 @@ class CartDrawer extends HTMLElement {
     );
 
     document.body.classList.add('overflow-hidden');
+    document.dispatchEvent(new CustomEvent('gad:cart-open'));
 
     // cart-drawer-items is a CartItems subclass that extends createViewEventElement.
     // Its `view-event-trigger="manual"` skips auto-dispatch on connect; we fire

@@ -1,0 +1,34 @@
+{%- comment -%}
+  Campo de cupón (C07 en el carrito lateral, C17 en la página de carrito).
+  No valida el código: lleva al checkout con el código aplicado (/discount/CODIGO?redirect=/checkout).
+  Con el campo vacío muestra el mensaje de error, que se oculta al volver a escribir.
+
+  Accepts:
+  - b: {Object} settings del bloque. Ids: placeholder, button_text, error, separator
+  - key: {String} identificador único (block.id)
+  - attrs: {String} atributos extra del contenedor (block.shopify_attributes)
+  - mg: {String} estilos de margen (opcional)
+
+  Usage:
+  {% render 'gad-coupon', b: block.settings, key: block.id, attrs: block.shopify_attributes %}
+{%- endcomment -%}
+<gad-coupon class="gad-cb gad-coupon{% if b.separator %} gad-coupon--sep{% endif %}" style="{{ mg }}" {{ attrs }}>
+  <form class="gad-coupon__form" novalidate>
+    <div class="field">
+      <input
+        class="field__input"
+        type="text"
+        name="discount"
+        id="GadCoupon-{{ key }}"
+        placeholder="{{ b.placeholder | escape }}"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        aria-describedby="GadCouponError-{{ key }}"
+      >
+      <label class="field__label" for="GadCoupon-{{ key }}">{{ b.placeholder | escape }}</label>
+    </div>
+    <button type="submit" class="button gad-coupon__btn">{{ b.button_text | escape }}</button>
+  </form>
+  <p id="GadCouponError-{{ key }}" class="gad-coupon__error" role="alert" hidden>{{ b.error | escape }}</p>
+</gad-coupon>
