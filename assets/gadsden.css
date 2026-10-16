@@ -2138,3 +2138,47 @@ html.gad-badge-flush .card--media .card__inner .card__content {
 html.gad-modal-open {
   overflow: hidden;
 }
+
+/* ---------- A12 logo secundario y cabecera transparente (S01) ---------- */
+.gad-logo-2 {
+  display: none;
+}
+
+body:has(.gad-th-flag) .section-header {
+  margin-bottom: calc(-1 * var(--header-height, 0px));
+}
+
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) .header-wrapper {
+  background: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) :is(.header__menu-item, .header__icon, .header__heading-link, .header__heading-link .h2) {
+  color: var(--gad-th-link, #fff);
+}
+
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) .header__active-menu-item {
+  color: var(--gad-th-active, #fff);
+}
+
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) :is(.header__menu-item, .header__icon):hover,
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) .header__menu-item:hover .header__active-menu-item {
+  color: var(--gad-th-hover, #ddd);
+}
+
+body:has(.gad-th-flag) .section-header:not(.scrolled-past-header) .header__menu-item span {
+  text-decoration-color: currentColor;
+}
+
+body:has(.gad-th-flag--logo2) .section-header:not(.scrolled-past-header) .header__heading-logo-wrapper:has(.gad-logo-2) .header__heading-logo:not(.gad-logo-2) {
+  display: none;
+}
+
+body:has(.gad-th-flag--logo2) .section-header:not(.scrolled-past-header) .gad-logo-2 {
+  display: block;
+}
+
+body:has(.gad-th-flag--hide-bars) .shopify-section-group-header-group:not(.section-header) {
+  display: none;
+}

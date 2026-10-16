@@ -610,6 +610,9 @@
     },
     "product": {
       "pick_products": "Elegí productos en este bloque."
+    },
+    "menu": {
+      "view_all": "Ver todo"
     }
   }
 }

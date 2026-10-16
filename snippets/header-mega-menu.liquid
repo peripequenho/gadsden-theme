@@ -5,11 +5,23 @@
   {% render 'header-mega-menu' %}
 {% endcomment %}
 
+{%- assign mega_list = section.settings.mega_links | downcase | split: ',' -%}
 <nav class="header__inline-menu">
   <ul class="list-menu list-menu--inline" role="list">
     {%- for link in section.settings.menu.links -%}
       <li>
-        {%- if link.links != blank -%}
+        {%- liquid
+          assign is_mega = false
+          assign lt = link.title | downcase | strip
+          for t in mega_list
+            assign tt = t | strip
+            if tt != blank and tt == lt
+              assign is_mega = true
+            endif
+          endfor
+        -%}
+        {%- capture mega_html -%}{%- if is_mega -%}{%- render 'gad-mega-panel', link: link, images: section.settings.mega_images_d, context: 'desktop' -%}{%- endif -%}{%- endcapture -%}
+        {%- if link.links != blank or mega_html != blank -%}
           <header-menu>
             <details id="Details-HeaderMenu-{{ forloop.index }}" class="mega-menu">
               <summary
@@ -30,6 +42,9 @@
                 class="mega-menu__content color-{{ section.settings.menu_color_scheme }} gradient motion-reduce global-settings-popup"
                 tabindex="-1"
               >
+                {%- if mega_html != blank -%}
+                  <div class="page-width">{{ mega_html }}</div>
+                {%- else -%}
                 <ul
                   class="mega-menu__list page-width{% if link.levels == 1 %} mega-menu__list--condensed{% endif %}"
                   role="list"
@@ -67,6 +82,7 @@
                     </li>
                   {%- endfor -%}
                 </ul>
+                {%- endif -%}
               </div>
             </details>
           </header-menu>

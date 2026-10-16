@@ -16,6 +16,12 @@
         "label": "t:settings_schema.logo.settings.logo_image.label"
       },
       {
+        "type": "image_picker",
+        "id": "logo_secondary",
+        "label": "Logo secundario",
+        "info": "Para la cabecera transparente (por ejemplo, el logo en blanco). Se usa con el mismo ancho que el principal."
+      },
+      {
         "type": "range",
         "id": "logo_width",
         "min": 50,

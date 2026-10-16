@@ -28,6 +28,24 @@
     {%- endcase -%}
   }
 {%- endstyle -%}
+{%- if s.transparent_header -%}
+  <span class="gad-th-flag{% if s.th_logo == 'secondary' %} gad-th-flag--logo2{% endif %}{% if s.th_hide_bars %} gad-th-flag--hide-bars{% endif %}" hidden></span>
+  {%- style -%}
+    :root {
+      --gad-th-link: {{ s.th_link }};
+      --gad-th-active: {{ s.th_active }};
+      --gad-th-hover: {{ s.th_hover }};
+    }
+    #GadHero-{{ section.id }} .gad-hero__content {
+      padding-top: calc(var(--pt, 0px) * 0.75 + var(--header-height, 0px));
+    }
+    @media screen and (min-width: 750px) {
+      #GadHero-{{ section.id }} .gad-hero__content {
+        padding-top: calc(var(--pt, 0px) + var(--header-height, 0px));
+      }
+    }
+  {%- endstyle -%}
+{%- endif -%}
 
 {%- capture slides -%}
   {%- for block in section.blocks -%}
@@ -515,6 +533,58 @@
       "label": "Píxeles en mobile",
       "default": 450,
       "info": "Es un mínimo: si el contenido no entra, la diapositiva crece."
+    },
+    {
+      "type": "header",
+      "content": "Cabecera transparente"
+    },
+    {
+      "type": "checkbox",
+      "id": "transparent_header",
+      "label": "Cabecera transparente sobre esta sección",
+      "default": false,
+      "info": "Conviene con esta sección arriba de todo. Al bajar, la cabecera fija se ve normal."
+    },
+    {
+      "type": "color",
+      "id": "th_link",
+      "label": "Links e íconos",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "th_active",
+      "label": "Link de la página actual",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "th_hover",
+      "label": "Link al pasar el mouse",
+      "default": "#DDDDDD"
+    },
+    {
+      "type": "select",
+      "id": "th_logo",
+      "label": "Logo",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Principal"
+        },
+        {
+          "value": "secondary",
+          "label": "Secundario"
+        }
+      ],
+      "default": "secondary",
+      "info": "El secundario se carga en Configuración del tema > Logo. Sin secundario, usa el principal."
+    },
+    {
+      "type": "checkbox",
+      "id": "th_hide_bars",
+      "label": "Ocultar las barras de anuncios y cintas de la cabecera en esta página",
+      "default": false
     },
     {
       "type": "header",

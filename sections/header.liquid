@@ -209,6 +209,21 @@
                 sizes: sizes,
                 preload: true
             }}
+            {%- if settings.logo_secondary != blank -%}
+              {%- assign logo2_height = settings.logo_width | divided_by: settings.logo_secondary.aspect_ratio -%}
+              {{
+                settings.logo_secondary
+                | image_url: width: 600
+                | image_tag:
+                  class: 'header__heading-logo gad-logo-2',
+                  widths: widths,
+                  height: logo2_height,
+                  width: settings.logo_width,
+                  alt: logo_alt,
+                  sizes: sizes,
+                  loading: 'lazy'
+              }}
+            {%- endif -%}
           </div>
         {%- else -%}
           <span class="h2">{{ shop.name }}</span>
@@ -252,6 +267,21 @@
                 sizes: sizes,
                 preload: true
             }}
+            {%- if settings.logo_secondary != blank -%}
+              {%- assign logo2_height = settings.logo_width | divided_by: settings.logo_secondary.aspect_ratio -%}
+              {{
+                settings.logo_secondary
+                | image_url: width: 600
+                | image_tag:
+                  class: 'header__heading-logo gad-logo-2',
+                  widths: widths,
+                  height: logo2_height,
+                  width: settings.logo_width,
+                  alt: logo_alt,
+                  sizes: sizes,
+                  loading: 'lazy'
+              }}
+            {%- endif -%}
           </div>
         {%- else -%}
           <span class="h2">{{ shop.name }}</span>
@@ -581,6 +611,24 @@
       ],
       "default": "dropdown",
       "label": "t:sections.header.settings.menu_type_desktop.label"
+    },
+    {
+      "type": "text",
+      "id": "mega_links",
+      "label": "Mega menú de productos",
+      "info": "Nombres de los links del menú, separados por coma (ej. Productos, Ofertas). Sus sublinks se ven como tarjetas con imagen; un link a una colección sin sublinks muestra sus productos. Necesita el menú tipo \"Mega menú\" en desktop."
+    },
+    {
+      "type": "checkbox",
+      "id": "mega_images_d",
+      "label": "Imágenes del mega menú en desktop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "mega_images_m",
+      "label": "Imágenes del mega menú en mobile",
+      "default": false
     },
     {
       "type": "select",

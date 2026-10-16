@@ -598,6 +598,9 @@
     },
     "product": {
       "pick_products": "Pick products in this block."
+    },
+    "menu": {
+      "view_all": "View all"
     }
   }
 }

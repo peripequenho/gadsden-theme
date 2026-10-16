@@ -9,6 +9,7 @@
   {% render 'header-drawer', show_language_selector: true %}
 {% enddoc %}
 
+{%- assign mega_list = section.settings.mega_links | downcase | split: ',' -%}
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
   <details id="Details-menu-drawer-container" class="menu-drawer-container">
     <summary
@@ -30,7 +31,18 @@
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
               {%- for link in section.settings.menu.links -%}
                 <li>
-                  {%- if link.links != blank -%}
+                  {%- liquid
+                    assign is_mega = false
+                    assign lt = link.title | downcase | strip
+                    for t in mega_list
+                      assign tt = t | strip
+                      if tt != blank and tt == lt
+                        assign is_mega = true
+                      endif
+                    endfor
+                  -%}
+                  {%- capture mega_html -%}{%- if is_mega -%}{%- render 'gad-mega-panel', link: link, images: section.settings.mega_images_m, context: 'mobile' -%}{%- endif -%}{%- endcapture -%}
+                  {%- if link.links != blank or mega_html != blank -%}
                     <details id="Details-menu-drawer-menu-item-{{ forloop.index }}">
                       <summary
                         id="HeaderDrawer-{{ link.handle }}"
@@ -56,6 +68,9 @@
                             </span>
                             {{ link.title | escape }}
                           </button>
+                          {%- if mega_html != blank -%}
+                            {{ mega_html }}
+                          {%- else -%}
                           <ul class="menu-drawer__menu list-menu" role="list" tabindex="-1">
                             {%- for childlink in link.links -%}
                               <li>
@@ -123,6 +138,7 @@
                               </li>
                             {%- endfor -%}
                           </ul>
+                          {%- endif -%}
                         </div>
                       </div>
                     </details>
