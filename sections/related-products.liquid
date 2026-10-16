@@ -21,6 +21,8 @@
   }
 {%- endstyle -%}
 
+{%- comment -%} Sin producto (sección puesta en una página) no hay a qué recomendarle: no se dibuja. {%- endcomment -%}
+{%- if product != blank -%}
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <product-recommendations
     class="related-products page-width section-{{ section.id }}-padding isolate{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
@@ -59,6 +61,7 @@
     {{ 'mask-arch.svg' | inline_asset_content }}
   {%- endif -%}
 </div>
+{%- endif -%}
 
 {% schema %}
 {

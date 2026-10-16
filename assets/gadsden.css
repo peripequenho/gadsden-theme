@@ -1929,6 +1929,11 @@ summary .gad-acc__plus {
   margin-top: auto;
 }
 
+/* con la columna flexible la etiqueta "arriba" perdía su fila de la grilla de Dawn y caía debajo del botón */
+.gad-cards--equal .card > .card__content .card__badge.top {
+  order: -1;
+}
+
 /* ---------- A09 color de los íconos decorativos ---------- */
 html.gad-icons-accent .gad-icon {
   color: var(--gad-icon-color, rgb(var(--color-accent, var(--color-button))));
@@ -2334,4 +2339,25 @@ h5,
     padding: 0.6rem 1rem;
     font-size: 1.4rem;
   }
+}
+
+/* ---------- Campos, filtros y nombre de la tienda: interletrado justo ---------- */
+.field__label,
+.customer .field label,
+.field__input,
+.customer .field input,
+.select__select,
+.mobile-facets__open-label,
+.facet-filters__label,
+.facets__summary,
+.product-count__text {
+  letter-spacing: 0.01rem;
+}
+
+.header__heading-link .h2 {
+  color: rgb(var(--color-foreground));
+}
+
+.card__heading {
+  hyphens: auto;
 }
