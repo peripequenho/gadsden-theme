@@ -1,11 +1,11 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Dawn",
-    "theme_version": "16.0.0",
-    "theme_author": "Shopify",
-    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
-    "theme_support_url": "https://support.shopify.com/"
+    "theme_name": "Gadsden",
+    "theme_version": "1.0.0",
+    "theme_author": "Gero",
+    "theme_documentation_url": "https://github.com/peripequenho/gadsden-theme",
+    "theme_support_url": "https://github.com/peripequenho/gadsden-theme/issues"
   },
   {
     "name": "t:settings_schema.logo.name",

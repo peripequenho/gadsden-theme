@@ -1,0 +1,9 @@
+# Plantillas de laboratorio (sólo para probar en el theme de desarrollo)
+templates/*.lab*.json
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/
