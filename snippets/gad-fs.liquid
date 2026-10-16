@@ -1,0 +1,11 @@
+{%- comment -%}
+  Tamaño de la letra de un bloque: escribe data-gad-fs (el CSS hace el zoom de sus textos).
+  Va dentro de la etiqueta de apertura, después de block.shopify_attributes.
+
+  Accepts:
+  - b: {Object} el bloque
+
+  Usage:
+  <div {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
+{%- endcomment -%}
+{%- if b.settings.fs_scale != blank and b.settings.fs_scale != '100' %} data-gad-fs="{{ b.settings.fs_scale }}"{% endif -%}

@@ -26,7 +26,7 @@
   {% if bs.margin_top != nil %}
     style="--mt: {{ bs.margin_top }}px; --mb: {{ bs.margin_bottom }}px; --icon-scale: {{ bs.icon_scale | default: 120 | divided_by: 100.0 }}; --icon-gap: {{ bs.icon_gap | default: 10 }}px;"
   {% endif %}
-  {{ block.shopify_attributes }}
+  {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
 >
   {%- if product != blank -%}
     {%- liquid

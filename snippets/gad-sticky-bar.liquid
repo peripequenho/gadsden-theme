@@ -38,7 +38,7 @@
   data-form="{{ product_form_id }}"
   aria-label="{{ 'gadsden.sticky.label' | t }}"
   role="region"
-  {{ block.shopify_attributes }}
+  {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
 >
   <div class="gad-sticky__inner page-width" id="GadStickyInner-{{ section.id }}" data-gad-sync>
     {%- liquid

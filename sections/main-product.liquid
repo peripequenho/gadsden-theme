@@ -77,7 +77,7 @@
   {% assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src' %}
   <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'page' | escape }}">
     <div class="page-width">
-      <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
+      <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }}{% if section.settings.gad_sticky_media %} product--gad-sticky-media{% endif %} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
         <div class="grid__item product__media-wrapper">
           {% render 'product-media-gallery', variant_images: variant_images %}
         </div>
@@ -101,7 +101,7 @@
                 {%- when 'text' -%}
                   <p
                     class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     {{- block.settings.text -}}
                   </p>
@@ -109,7 +109,7 @@
                   <div
                     class="product__title gad-pm gad-title gad-title--{{ block.settings.size | default: 'md' }} gad-title--{{ block.settings.align | default: 'left' }}{% if block.settings.uppercase %} gad-title--upper{% endif %}"
                     {{ gad_ms }}
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     <h1>{{ product.title | escape }}</h1>
                     <a href="{{ product.url }}" class="product__title">
@@ -124,7 +124,7 @@
                     role="status"
                     class="gad-pm gad-price gad-price--{{ block.settings.order | default: 'price_first' }} gad-price--c-{{ block.settings.price_color | default: 'foreground' }} gad-price--cc-{{ block.settings.compare_color | default: 'foreground' }} gad-price--badge-{{ block.settings.badge | default: 'sale' }}"
                     {{ gad_ms }}
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     {%- render 'price',
                       product: product,
@@ -139,7 +139,7 @@
                       <span>{{ 'products.product.volume_pricing.note' | t }}</span>
                     </div>
                   {%- endif -%}
-                  {%- if cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
+                  {%- if block.settings.show_tax_note != false and cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
                     <div class="product__tax caption rte">
                       {%- if cart.duties_included and cart.taxes_included -%}
                         {{ 'products.product.duties_and_taxes_included' | t }}
@@ -153,7 +153,7 @@
                       {%- endif -%}
                     </div>
                   {%- endif -%}
-                  <div {{ block.shopify_attributes }}>
+                  <div {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
                     {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                     {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
                       <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
@@ -164,7 +164,7 @@
                   <p
                     {{ gad_ms }}
                     class="gad-pm product__inventory{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} visibility-hidden{% endif %}"
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                     id="Inventory-{{ section.id }}"
                     role="status"
                   >
@@ -214,7 +214,7 @@
                   </p>
                 {%- when 'description' -%}
                   {%- if product.description != blank -%}
-                    <div class="product__description rte quick-add-hidden gad-pm" {{ gad_ms }} {{ block.shopify_attributes }}>
+                    <div class="product__description rte quick-add-hidden gad-pm" {{ gad_ms }} {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
                       {{ product.description }}
                     </div>
                   {%- endif -%}
@@ -223,7 +223,7 @@
                     class="product__sku{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{% endif %}"
                     id="Sku-{{ section.id }}"
                     role="status"
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     <span class="visually-hidden">{{ 'products.product.sku' | t }}:</span>
                     {{- product.selected_or_first_available_variant.sku -}}
@@ -235,7 +235,7 @@
                   <div
                     class="product__accordion accordion quick-add-hidden gad-pm gad-acc gad-acc--{{ block.settings.title_size | default: 'md' }} gad-acc--{{ block.settings.toggle_icon | default: 'caret' }}{% if block.settings.top_border == false %} gad-acc--no-border{% endif %}"
                     {{ gad_ms }}
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     <details id="Details-{{ block.id }}-{{ section.id }}"{% if block.settings.open %} open{% endif %}>
                       <summary>
@@ -262,7 +262,7 @@
                     id="Quantity-Form-{{ section.id }}"
                     class="product-form__input product-form__quantity gad-pm gad-qty{% if block.settings.full_width %} gad-qty--full{% endif %}{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
                     {{ gad_ms }}
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     {% comment %} TODO: enable theme-check once `item_count_for_variant` is accepted as valid filter {% endcomment %}
                     {% # theme-check-disable %}
@@ -490,7 +490,7 @@
                     class="product-popup-modal__opener quick-add-hidden gad-pm"
                     data-modal="#PopupModal-{{ block.id }}"
                     {{ gad_ms }}
-                    {{ block.shopify_attributes }}
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     <button
                       id="ProductPopup-{{ block.id }}"
@@ -744,7 +744,7 @@
 
       {% assign popups = section.blocks | where: 'type', 'popup' %}
       {%- for block in popups -%}
-        <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal" {{ block.shopify_attributes }}>
+        <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
           <div
             role="dialog"
             aria-label="{{ block.settings.text }}"
@@ -1032,6 +1032,50 @@
           "id": "m_transparent",
           "label": "Estilo transparente",
           "default": false
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1278,6 +1322,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1315,6 +1403,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1471,6 +1603,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1687,6 +1863,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1916,6 +2136,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -1986,6 +2250,50 @@
             "vimeo"
           ],
           "info": "Si cargás un video, se muestra en lugar de la imagen."
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2096,6 +2404,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2189,6 +2541,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2455,6 +2851,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2736,6 +3176,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2801,6 +3285,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2854,6 +3382,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2915,6 +3487,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -2971,6 +3587,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3056,6 +3716,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3172,6 +3876,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3276,6 +4024,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3388,6 +4180,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3504,6 +4340,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3602,6 +4482,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3701,6 +4625,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3800,6 +4768,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3832,6 +4844,50 @@
           ],
           "default": "body",
           "label": "t:sections.main-product.blocks.text.settings.text_style.label"
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -3905,6 +4961,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4077,6 +5177,57 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tax_note",
+          "label": "Mostrar el aviso de impuestos y envío",
+          "default": true,
+          "info": "Por ejemplo \"Los gastos de envío se calculan en la pantalla de pago\". Sale si la tienda tiene política de envío o precios con impuestos."
         }
       ]
     },
@@ -4104,6 +5255,50 @@
           ],
           "default": "body",
           "label": "t:sections.main-product.blocks.sku.settings.text_style.label"
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4170,6 +5365,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4211,6 +5450,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4345,6 +5628,50 @@
           "label": "Lista de colores de este bloque",
           "placeholder": "Negro: #000000\nRojo: #D62828",
           "info": "Un color por renglón: nombre del valor, dos puntos y el color."
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4511,6 +5838,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4542,6 +5913,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4579,6 +5994,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4634,6 +6093,50 @@
           "id": "open_by_default",
           "label": "t:sections.disclosures.settings.open_by_default.label",
           "default": false
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4933,6 +6436,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 0
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -4996,6 +6543,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -5031,6 +6622,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -5327,6 +6962,50 @@
           "unit": "px",
           "label": "Abajo",
           "default": 15
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },
@@ -5950,6 +7629,50 @@
           "default": "t:sections.main-product.blocks.icon_with_text.settings.heading_3.default",
           "label": "t:sections.main-product.blocks.icon_with_text.settings.heading_3.label",
           "info": "t:sections.main-product.blocks.icon_with_text.settings.heading.info"
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     }
@@ -5960,6 +7683,13 @@
       "id": "enable_sticky_info",
       "default": true,
       "label": "t:sections.main-product.settings.enable_sticky_info.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "gad_sticky_media",
+      "label": "Imagen fija al bajar",
+      "default": false,
+      "info": "En desktop la galería queda quieta mientras se baja por la información del producto, hasta que termina la sección."
     },
     {
       "type": "color_scheme",

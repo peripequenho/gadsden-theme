@@ -26,7 +26,7 @@
   style="--mt: {{ b.margin_top }}px; --mb: {{ b.margin_bottom }}px;"
   data-section="{{ section.id }}"
   data-gad-qty-offers
-  {{ block.shopify_attributes }}
+  {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
 >
   <div id="GadOffersInner-{{ section.id }}" data-gad-sync>
     {%- if b.title != blank -%}

@@ -107,6 +107,7 @@
   <div
     class="utility-bar gad-ann-bar {% render 'gad-scheme', s: s, key: section.id %}{% if s.show_line_separator %} utility-bar--bottom-border{% endif %}{% if s.separator %} gad-ann-bar--sep{% endif %}{% if language_country_selector %} header-localization{% endif %}{% if bar_visible != 'true' %} gad-ann-bar--hidden-here{% endif %}"
     style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+   {% if s.title_scale != blank and s.title_scale != '100' %} data-gad-hs="{{ s.title_scale }}"{% endif %}{% if s.text_scale != blank and s.text_scale != '100' %} data-gad-ts="{{ s.text_scale }}"{% endif %}
   >
     <div class="page-width utility-bar__grid{% if count > 0 and language_country_selector or s.show_social and social_icons %} utility-bar__grid--3-col{% elsif language_country_selector or s.show_social and social_icons %} utility-bar__grid--2-col{% endif %}">
       {%- if s.show_social and social_icons -%}
@@ -523,6 +524,99 @@
       "label": "t:sections.announcement-bar.settings.enable_language_selector.label",
       "default": false,
       "info": "t:sections.announcement-bar.settings.enable_language_selector.info"
+    },
+    {
+      "type": "header",
+      "content": "Tamaño de la letra"
+    },
+    {
+      "type": "select",
+      "id": "title_scale",
+      "label": "Tamaño de los títulos",
+      "options": [
+        {
+          "value": "70",
+          "label": "70 %"
+        },
+        {
+          "value": "80",
+          "label": "80 %"
+        },
+        {
+          "value": "90",
+          "label": "90 %"
+        },
+        {
+          "value": "100",
+          "label": "Normal"
+        },
+        {
+          "value": "110",
+          "label": "110 %"
+        },
+        {
+          "value": "125",
+          "label": "125 %"
+        },
+        {
+          "value": "150",
+          "label": "150 %"
+        },
+        {
+          "value": "175",
+          "label": "175 %"
+        },
+        {
+          "value": "200",
+          "label": "200 %"
+        }
+      ],
+      "default": "100"
+    },
+    {
+      "type": "select",
+      "id": "text_scale",
+      "label": "Tamaño de los textos",
+      "options": [
+        {
+          "value": "70",
+          "label": "70 %"
+        },
+        {
+          "value": "80",
+          "label": "80 %"
+        },
+        {
+          "value": "90",
+          "label": "90 %"
+        },
+        {
+          "value": "100",
+          "label": "Normal"
+        },
+        {
+          "value": "110",
+          "label": "110 %"
+        },
+        {
+          "value": "125",
+          "label": "125 %"
+        },
+        {
+          "value": "150",
+          "label": "150 %"
+        },
+        {
+          "value": "175",
+          "label": "175 %"
+        },
+        {
+          "value": "200",
+          "label": "200 %"
+        }
+      ],
+      "default": "100",
+      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
     }
   ],
   "blocks": [

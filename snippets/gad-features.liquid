@@ -37,7 +37,7 @@
 <div
   class="gad-pblock gad-features gad-features--{{ b.card_style }}"
   style="--mt: {{ b.margin_top }}px; --mb: {{ b.margin_bottom }}px; --card-bg: {{ b.card_bg }}; --card-text: {{ b.card_text }}; --pill-bg: {{ b.pill_bg }}; --pill-text: {{ b.pill_text }};"
-  {{ block.shopify_attributes }}
+  {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
 >
   {%- if b.custom_css != blank -%}
     <style>

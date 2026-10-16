@@ -2361,3 +2361,70 @@ h5,
 .card__heading {
   hyphens: auto;
 }
+
+/* ---------- Tamaño de la letra (títulos y textos por sección, letra por bloque de la ficha) ----------
+   zoom sólo en el elemento de texto más externo, para que no se multiplique en los anidados. */
+:is([data-gad-hs='70'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='70'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='70'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='70'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='70']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='70'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 0.7;
+}
+
+:is([data-gad-hs='80'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='80'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='80'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='80'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='80']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='80'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 0.8;
+}
+
+:is([data-gad-hs='90'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='90'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='90'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='90'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='90']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='90'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 0.9;
+}
+
+:is([data-gad-hs='110'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='110'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='110'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='110'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='110']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='110'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 1.1;
+}
+
+:is([data-gad-hs='125'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='125'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='125'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='125'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='125']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='125'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 1.25;
+}
+
+:is([data-gad-hs='150'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='150'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='150'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='150'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='150']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='150'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 1.5;
+}
+
+:is([data-gad-hs='175'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='175'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='175'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='175'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='175']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='175'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 1.75;
+}
+
+:is([data-gad-hs='200'], .shopify-section:has(> .gad-sec-marker[data-gad-hs='200'])) :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+:is([data-gad-ts='200'], .shopify-section:has(> .gad-sec-marker[data-gad-ts='200'])) :is(p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle) *),
+[data-gad-fs='200']:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button),
+[data-gad-fs='200'] :is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button):not(:is(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .hxl, .hxxl, p, .rte, blockquote, figcaption, dd, dt, small, .caption, .caption-large, .caption-with-letter-spacing, .subtitle, .price, label, legend, .button, .shopify-payment-button__button) *) {
+  zoom: 2;
+}
+
+/* imagen fija en la ficha: la galería acompaña mientras dura la sección */
+@media screen and (min-width: 750px) {
+  .product--gad-sticky-media > .product__media-wrapper {
+    position: sticky;
+    top: 3rem;
+    align-self: flex-start;
+  }
+}

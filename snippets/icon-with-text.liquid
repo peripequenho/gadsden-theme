@@ -38,7 +38,7 @@
 -%}
 <ul
   class="icon-with-text icon-with-text--{{ block.settings.layout }} list-unstyled{% if text_only_all_items %} icon-with-text--text-only{% endif %}"
-  {{ block.shopify_attributes }}
+  {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
 >
   {%- unless heading_1_empty -%}
     <li class="icon-with-text__item">

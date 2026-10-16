@@ -76,7 +76,7 @@
   <div
     class="disclosures spacing-style"
     {% if block != blank %}
-      {{ block.shopify_attributes }}
+      {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
     {% endif %}
   >
     {%- if heading != blank -%}

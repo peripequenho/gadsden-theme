@@ -13,7 +13,7 @@
 {%- assign b = block.settings -%}
 {%- case block.type -%}
   {%- when 'text' -%}
-    <div class="gad-cols__item" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       {%- if b.heading != blank -%}
         <h3 class="{{ b.heading_size }} gad-hl" style="margin: 0 0 1rem;{% if b.heading_accent != blank %} --gad-hl: {{ b.heading_accent }};{% endif %}">{{ b.heading }}</h3>
       {%- endif -%}
@@ -21,7 +21,7 @@
     </div>
 
   {%- when 'buttons' -%}
-    <div class="gad-cols__item gad-cols__buttons" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item gad-cols__buttons" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       {%- if b.label_1 != blank -%}
         <a href="{{ b.link_1 | default: '#' }}" class="button{% if b.outline_1 %} button--secondary{% endif %}">{{ b.label_1 | escape }}</a>
       {%- endif -%}
@@ -31,7 +31,7 @@
     </div>
 
   {%- when 'video' -%}
-    <div class="gad-cols__item" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       {%- if b.video != blank -%}
         {%- render 'gad-video', video: b.video, poster: b.poster, autoplay: b.autoplay, loop: true, tap: true, sound: true -%}
       {%- elsif b.video_url != blank -%}
@@ -52,7 +52,7 @@
 
   {%- when 'collapsible' -%}
     {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
-    <div class="gad-cols__item accordion gad-acc gad-acc--md{% if b.plus %} gad-acc--plus{% endif %}" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item accordion gad-acc gad-acc--md{% if b.plus %} gad-acc--plus{% endif %}" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       <details{% if b.open %} open{% endif %}>
         <summary>
           <div class="summary__title">
@@ -77,7 +77,7 @@
         assign types = b.custom_list | replace: ' ', '' | downcase | split: ','
       endif
     -%}
-    <div class="gad-cols__item" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       <span class="visually-hidden">{{ 'sections.footer.payment' | t }}</span>
       <ul class="list list-payment" role="list">
         {%- for type in types -%}
@@ -88,13 +88,13 @@
 
   {%- when 'newsletter' -%}
     {{ 'component-newsletter.css' | asset_url | stylesheet_tag }}
-    <div class="gad-cols__item gad-cols__news" {{ block.shopify_attributes }}>
+    <div class="gad-cols__item gad-cols__news" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
       {%- if b.heading != blank -%}<h3 class="h3" style="margin: 0 0 1rem;">{{ b.heading }}</h3>{%- endif -%}
       {%- render 'gad-footer-block', block: block -%}
     </div>
 
   {%- when 'custom' -%}
-    <div class="gad-cols__item" {{ block.shopify_attributes }}>{{ b.custom_liquid }}</div>
+    <div class="gad-cols__item" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>{{ b.custom_liquid }}</div>
 
   {%- else -%}
     <div class="gad-cols__item">

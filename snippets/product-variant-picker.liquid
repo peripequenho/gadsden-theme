@@ -20,7 +20,7 @@
     {% # theme-check-disable %}
     data-selected-price-amount="{{ product.selected_or_first_available_variant.price | default: 0 | money_amount | escape }}"
     {% # theme-check-enable %}
-    {{ block.shopify_attributes }}
+    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
   >
     {%- liquid
       assign gad_types = block.settings.option_types | downcase | split: ','

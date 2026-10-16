@@ -69,6 +69,7 @@
     <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
     <div
       class="drawer__inner gradient color-{{ settings.cart_color_scheme }}"
+     {% if section.settings.title_scale != blank and section.settings.title_scale != '100' %} data-gad-hs="{{ section.settings.title_scale }}"{% endif %}{% if section.settings.text_scale != blank and section.settings.text_scale != '100' %} data-gad-ts="{{ section.settings.text_scale }}"{% endif %}
       role="dialog"
       aria-modal="true"
       aria-label="{{ 'sections.cart.title' | t }}"
