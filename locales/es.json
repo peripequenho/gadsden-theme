@@ -570,6 +570,19 @@
     },
     "before_after": {
       "label": "Arrastrá para comparar el antes y el después"
+    },
+    "features": {
+      "empty": "Agregá bloques \"Característica\" justo debajo de este bloque para llenar el slider."
+    },
+    "offers": {
+      "label": "Opciones de cantidad"
+    },
+    "buy": {
+      "buy_now": "Comprar ahora"
+    },
+    "sticky": {
+      "label": "Compra rápida",
+      "variant": "Variante"
     }
   }
 }

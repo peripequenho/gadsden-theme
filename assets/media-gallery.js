@@ -29,6 +29,8 @@ if (!customElements.get('media-gallery')) {
       }
 
       setActiveMedia(mediaId, prepend) {
+        // Gadsden: con "no mover la imagen de la variante" la galería conserva su orden.
+        if (this.dataset.gadKeepOrder === 'true') prepend = false;
         const activeMedia =
           this.elements.viewer.querySelector(`[data-media-id="${mediaId}"]`) ||
           this.elements.viewer.querySelector('[data-media-id]');

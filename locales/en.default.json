@@ -559,6 +559,19 @@
     },
     "before_after": {
       "label": "Drag to compare before and after"
+    },
+    "features": {
+      "empty": "Add \"Feature\" blocks right below this block to fill the slider."
+    },
+    "offers": {
+      "label": "Quantity options"
+    },
+    "buy": {
+      "buy_now": "Buy now"
+    },
+    "sticky": {
+      "label": "Quick purchase",
+      "variant": "Variant"
     }
   }
 }

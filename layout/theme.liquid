@@ -337,6 +337,7 @@
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'gadsden.css' | asset_url | stylesheet_tag }}
+    {%- render 'gad-form-styles' -%}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}

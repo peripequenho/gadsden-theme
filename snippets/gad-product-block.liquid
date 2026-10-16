@@ -1,0 +1,184 @@
+{%- comment -%}
+  Bloques Gadsden de la ficha de producto (main-product): los dibuja según block.type.
+  sticky_bar (P01), reviews (P02), benefits (P03), divider (P04), urgency (P05), icons (P06),
+  image (P07), features + feature (P08/P09), stars (P10), text_icons (PX8), quantity_offers (PX10).
+
+  Accepts:
+  - block: {Object} bloque
+  - product: {Object} producto
+  - section: {Object} sección main-product
+  - product_form_id: {String} id del formulario de compra
+
+  Usage:
+  {% render 'gad-product-block', block: block, product: product, section: section, product_form_id: product_form_id %}
+{%- endcomment -%}
+{%- liquid
+  assign b = block.settings
+  assign margins = '--mt: ' | append: b.margin_top | append: 'px; --mb: ' | append: b.margin_bottom | append: 'px;'
+-%}
+{%- case block.type -%}
+  {%- when 'sticky_bar' -%}
+    {%- render 'gad-sticky-bar', block: block, product: product, section: section, product_form_id: product_form_id -%}
+
+  {%- when 'reviews' -%}
+    {%- capture slides -%}
+      {%- for i in (1..3) -%}
+        {%- liquid
+          assign k_author = 'author_' | append: i
+          assign k_text = 'text_' | append: i
+          assign k_photo = 'photo_' | append: i
+        -%}
+        {%- if b[k_text] != blank -%}
+          <div class="gad-p-reviews__slide">
+            {%- render 'gad-review-card', b: b, author: b[k_author], text: b[k_text], image: b[k_photo] -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if slides != blank -%}
+      {%- liquid
+        assign dots = 'hidden'
+        if b.show_dots
+          assign dots = 'under'
+        endif
+        assign arrows = 'hidden'
+        if b.show_arrows
+          assign arrows = 'under'
+        endif
+        assign rv_key = section.id | append: '-' | append: block.id
+      -%}
+      <div class="gad-pblock gad-p-reviews" style="{{ margins }}" {{ block.shopify_attributes }}>
+        {%- render 'gad-carousel',
+          s: b,
+          key: rv_key,
+          slides: slides,
+          d_per_view: 1,
+          m_per_view: 1,
+          force_d_on: true,
+          force_m_on: true,
+          dots_d: dots,
+          dots_m: dots,
+          arrows_d: arrows,
+          arrows_m: arrows,
+          gap_d: 12,
+          gap_m: 12
+        -%}
+      </div>
+    {%- endif -%}
+
+  {%- when 'benefits' -%}
+    {%- if b.benefits != blank -%}
+      <div class="gad-pblock gad-p-benefits rte" style="{{ margins }}" {{ block.shopify_attributes }}>
+        {{ b.benefits }}
+      </div>
+    {%- endif -%}
+
+  {%- when 'divider' -%}
+    <div
+      class="gad-pblock gad-p-divider gad-p-align--{{ b.align }}{% if b.full_mobile and b.width == 100 %} gad-p-bleed{% endif %}"
+      style="{{ margins }} --div-color: {{ b.color }}; --div-h: {{ b.thickness }}px; --div-w: {{ b.width }}%; --div-r: {{ b.radius }}px;"
+      {{ block.shopify_attributes }}
+    >
+      <hr class="gad-p-divider__line">
+    </div>
+
+  {%- when 'urgency' -%}
+    {%- if b.text != blank -%}
+      <div class="gad-pblock gad-p-urgency-wrap gad-p-align--{{ b.align }}" style="{{ margins }}" {{ block.shopify_attributes }}>
+        <p class="gad-p-urgency color-{{ b.color_scheme }}">{{ b.text }}</p>
+      </div>
+    {%- endif -%}
+
+  {%- when 'icons' -%}
+    {%- liquid
+      assign has_item = false
+      for i in (1..3)
+        assign k_title = 'title_' | append: i
+        if b[k_title] != blank
+          assign has_item = true
+        endif
+      endfor
+    -%}
+    {%- if has_item -%}
+      <div
+        class="gad-pblock gad-p-icons gad-p-icons--{{ b.layout }} gad-accent-{{ b.icon_color }}"
+        style="{{ margins }} --ic-d: {{ b.icon_size_d }}px; --ic-m: {{ b.icon_size_m }}px; --gap-d: {{ b.gap_d }}px; --gap-m: {{ b.gap_m }}px; --tx-d: {{ b.text_size_d }}px; --tx-m: {{ b.text_size_m }}px;"
+        {{ block.shopify_attributes }}
+      >
+        {%- for i in (1..3) -%}
+          {%- liquid
+            assign k_title = 'title_' | append: i
+            assign k_icon = 'icon_' | append: i
+            assign k_filled = 'filled_' | append: i
+            assign k_image = 'image_' | append: i
+          -%}
+          {%- if b[k_title] != blank -%}
+            <div class="gad-p-icons__item">
+              {%- render 'gad-icon', name: b[k_icon], filled: b[k_filled], image: b[k_image], class: 'gad-p-icons__icon' -%}
+              <span class="gad-p-icons__title">{{ b[k_title] }}</span>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  {%- when 'image' -%}
+    {%- if b.image != blank -%}
+      <div
+        class="gad-pblock gad-p-image gad-p-align--{{ b.align }}{% if b.full_mobile and b.width == 100 %} gad-p-bleed{% endif %}"
+        style="{{ margins }} --img-w: {{ b.width }}%; --img-r: {{ b.radius }}px;"
+        {{ block.shopify_attributes }}
+      >
+        {%- assign img_alt = b.image.alt | default: '' -%}
+        {{ b.image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 45vw, 100vw', widths: '375, 550, 750, 1100, 1500' }}
+      </div>
+    {%- elsif request.design_mode -%}
+      <div class="gad-pblock gad-p-image" style="{{ margins }} --img-w: 100%;" {{ block.shopify_attributes }}>
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+
+  {%- when 'features' -%}
+    {%- render 'gad-features', block: block, section: section -%}
+
+  {%- when 'feature' -%}
+    {%- comment -%} Los ítems los dibuja el slider de características que los precede. {%- endcomment -%}
+
+  {%- when 'stars' -%}
+    {%- liquid
+      assign rating = b.rating | at_least: 0 | at_most: 5
+      assign fill_pct = rating | times: 20
+      assign star_class = ''
+      if b.empty_style == 'outline'
+        assign star_class = ' gad-p-stars--outline'
+      endif
+      assign target = b.scroll_target | remove: '#' | strip
+    -%}
+    <div
+      class="gad-pblock gad-p-stars-wrap gad-p-align--{{ b.align }}"
+      style="{{ margins }} --star: {{ b.star_color }}; --star-off: {{ b.empty_color }}; --star-size: {{ b.size }}px;"
+      {{ block.shopify_attributes }}
+    >
+      {%- if target != blank -%}<a href="#{{ target }}" class="gad-p-stars-link" data-gad-scroll>{%- endif -%}
+      <span class="gad-p-stars{{ star_class }}" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: rating }}">
+        <span class="gad-p-stars__base" aria-hidden="true">
+          {%- for i in (1..5) -%}{%- render 'gad-icon', name: 'star', filled: true -%}{%- endfor -%}
+        </span>
+        <span class="gad-p-stars__fill" style="width: {{ fill_pct }}%;" aria-hidden="true">
+          {%- for i in (1..5) -%}{%- render 'gad-icon', name: 'star', filled: true -%}{%- endfor -%}
+        </span>
+      </span>
+      {%- if b.text != blank -%}
+        <span class="gad-p-stars__text">{{ b.text }}</span>
+      {%- endif -%}
+      {%- if target != blank -%}</a>{%- endif -%}
+    </div>
+
+  {%- when 'text_icons' -%}
+    <div class="gad-pblock" style="{{ margins }}" {{ block.shopify_attributes }}>
+      {%- render 'gad-text-icons', b: b, key: block.id -%}
+    </div>
+
+  {%- when 'quantity_offers' -%}
+    {%- render 'gad-quantity-offers', block: block, product: product, section: section, product_form_id: product_form_id -%}
+{%- endcase -%}

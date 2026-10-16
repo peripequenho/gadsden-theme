@@ -1690,6 +1690,535 @@
     ]
   },
   {
+    "name": "Gadsden · Formularios de compra",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Estilo de los desplegables de variantes, del selector de cantidad, de las pastillas y de las muestras de color de la ficha. Los colores son de la combinación de cada sección."
+      },
+      {
+        "type": "header",
+        "content": "Desplegables de variantes"
+      },
+      {
+        "type": "select",
+        "id": "dd_bg",
+        "label": "Fondo",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "background"
+      },
+      {
+        "type": "select",
+        "id": "dd_border",
+        "label": "Borde",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "select",
+        "id": "dd_text",
+        "label": "Texto",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "select",
+        "id": "dd_veil",
+        "label": "Velo",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "range",
+        "id": "dd_veil_opacity",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "%",
+        "label": "Opacidad del velo",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "dd_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "Grosor del borde",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "dd_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Opacidad del borde",
+        "default": 55
+      },
+      {
+        "type": "range",
+        "id": "dd_radius",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "label": "Redondeo",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "dd_shadow",
+        "label": "Sombra",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "dd_hover_veil",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "%",
+        "label": "Velo al pasar el mouse",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "dd_hover_border",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Borde al pasar el mouse",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Selector de cantidad"
+      },
+      {
+        "type": "select",
+        "id": "q_bg",
+        "label": "Fondo",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "background"
+      },
+      {
+        "type": "select",
+        "id": "q_border",
+        "label": "Borde",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "select",
+        "id": "q_text",
+        "label": "Texto",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "select",
+        "id": "q_veil",
+        "label": "Velo",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "range",
+        "id": "q_veil_opacity",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "%",
+        "label": "Opacidad del velo",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "q_border_width",
+        "min": 0,
+        "max": 4,
+        "step": 1,
+        "unit": "px",
+        "label": "Grosor del borde",
+        "default": 1
+      },
+      {
+        "type": "range",
+        "id": "q_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Opacidad del borde",
+        "default": 55
+      },
+      {
+        "type": "range",
+        "id": "q_radius",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "px",
+        "label": "Redondeo",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "q_shadow",
+        "label": "Sombra",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "q_hover_veil",
+        "min": 0,
+        "max": 30,
+        "step": 1,
+        "unit": "%",
+        "label": "Velo al pasar el mouse",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "q_hover_border",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Borde al pasar el mouse",
+        "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Pastillas de variantes"
+      },
+      {
+        "type": "select",
+        "id": "pill_accent",
+        "label": "Color de la elegida",
+        "options": [
+          {
+            "value": "background",
+            "label": "Fondo"
+          },
+          {
+            "value": "foreground",
+            "label": "Texto"
+          },
+          {
+            "value": "button",
+            "label": "Botón"
+          },
+          {
+            "value": "button_text",
+            "label": "Texto del botón"
+          },
+          {
+            "value": "accent",
+            "label": "Acento"
+          },
+          {
+            "value": "outline",
+            "label": "Contorno y enlaces"
+          }
+        ],
+        "default": "foreground"
+      },
+      {
+        "type": "range",
+        "id": "pill_veil",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "%",
+        "label": "Velo de fondo de las no elegidas",
+        "default": 0
+      },
+      {
+        "type": "checkbox",
+        "id": "pill_bold",
+        "label": "Negrita",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "pill_text_size",
+        "min": 10,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Tamaño del texto",
+        "default": 14
+      },
+      {
+        "type": "range",
+        "id": "pill_pad_y",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Relleno arriba y abajo",
+        "default": 10
+      },
+      {
+        "type": "range",
+        "id": "pill_pad_x",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "Relleno a los costados",
+        "default": 20
+      },
+      {
+        "type": "header",
+        "content": "Muestras de color"
+      },
+      {
+        "type": "range",
+        "id": "swatch_radius",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "%",
+        "label": "Redondeo",
+        "default": 50,
+        "info": "50 %: círculo."
+      },
+      {
+        "type": "range",
+        "id": "swatch_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Opacidad del borde",
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "swatch_selected_border_opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "%",
+        "label": "Opacidad del borde de la elegida",
+        "default": 100
+      },
+      {
+        "type": "textarea",
+        "id": "swatch_colors",
+        "label": "Lista global de colores",
+        "placeholder": "Negro: #000000\nBlanco: #FFFFFF",
+        "info": "Un color por renglón. La usan los selectores de variantes que eligen \"Lista global del tema\"."
+      }
+    ]
+  },
+  {
     "name": "Gadsden · Carruseles",
     "settings": [
       {

@@ -1,4 +1,22 @@
-{%- if icon != 'none' -%}
-  {%- assign file = icon | replace: '_', '-' | prepend: 'icon-' | append: '.svg' -%}
-  <span class="svg-wrapper">{{ file | inline_asset_content }}</span>
+{%- comment -%}
+  Ícono de las pestañas desplegables.
+  - icon: nombre de un ícono de Dawn (lista del editor) o, si no es uno de esos, de Material Symbols.
+    Acepta metacampos cuando viene de un ajuste de texto.
+  - filled: versión rellena (sólo Material Symbols).
+  - image: ícono propio (imagen), gana sobre el nombre.
+{%- endcomment -%}
+{%- liquid
+  assign dawn_icons = ',apple,banana,bottle,box,carrot,chat_bubble,check_mark,clipboard,dairy,dairy_free,dryer,eye,fire,gluten_free,heart,iron,leaf,leather,lightning_bolt,lipstick,lock,map_pin,nut_free,pants,paw_print,pepper,perfume,plane,plant,price_tag,question_mark,recycle,return,ruler,serving_dish,shirt,shoe,silhouette,snowflake,star,stopwatch,truck,washing,'
+  assign icon_name = icon | strip
+  assign key = ',' | append: icon_name | append: ','
+-%}
+{%- if image != blank -%}
+  <span class="svg-wrapper gad-acc-icon">{%- render 'gad-icon', image: image, class: 'gad-acc-icon__img' -%}</span>
+{%- elsif icon_name != 'none' and icon_name != blank -%}
+  {%- if dawn_icons contains key -%}
+    {%- assign file = icon_name | replace: '_', '-' | prepend: 'icon-' | append: '.svg' -%}
+    <span class="svg-wrapper">{{ file | inline_asset_content }}</span>
+  {%- else -%}
+    <span class="svg-wrapper gad-acc-icon">{%- render 'gad-icon', name: icon_name, filled: filled -%}</span>
+  {%- endif -%}
 {%- endif -%}

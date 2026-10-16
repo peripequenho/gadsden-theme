@@ -10,7 +10,24 @@
   Usage:
   {% render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id: section.id, show_pickup_availability: true %}
 {% endcomment %}
-<div {{ block.shopify_attributes }}>
+{%- liquid
+  assign bs = block.settings
+  assign gad_label = bs.button_label
+  if gad_label == blank
+    assign gad_label = 'products.product.add_to_cart' | t
+  endif
+  assign gad_price = product.selected_or_first_available_variant.price | money
+  if settings.currency_code_enabled
+    assign gad_price = product.selected_or_first_available_variant.price | money_with_currency
+  endif
+-%}
+<div
+  class="gad-buy"
+  {% if bs.margin_top != nil %}
+    style="--mt: {{ bs.margin_top }}px; --mb: {{ bs.margin_bottom }}px; --icon-scale: {{ bs.icon_scale | default: 120 | divided_by: 100.0 }}; --icon-gap: {{ bs.icon_gap | default: 10 }}px;"
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
   {%- if product != blank -%}
     {%- liquid
       assign gift_card_recipient_feature_active = false
@@ -60,7 +77,12 @@
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
         {%- endif -%}
 
-        <div class="product-form__buttons">
+        <div
+          class="product-form__buttons{% if bs.uppercase %} gad-buy--upper{% endif %}"
+          {% if bs.skip_cart %}
+            data-gad-skip-cart="true"
+          {% endif %}
+        >
           {%- liquid
             assign check_against_inventory = true
             if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
@@ -74,7 +96,10 @@
             id="ProductSubmitButton-{{ section_id }}"
             type="submit"
             name="add"
-            class="product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
+            class="product-form__submit button button--full-width button--primary"
+            {% if bs.custom_color %}
+              style="--color-button: {{ bs.color.red }},{{ bs.color.green }},{{ bs.color.blue }}; --color-button-text: {{ bs.text_color.red }},{{ bs.text_color.green }},{{ bs.text_color.blue }};"
+            {% endif %}
             {% if product.selected_or_first_available_variant.available == false
               or quantity_rule_soldout
               or product.selected_or_first_available_variant == null
@@ -82,19 +107,58 @@
               disabled
             {% endif %}
           >
-            <span>
+            <span id="GadBuyLabel-{{ section_id }}" class="gad-buy__label" data-gad-sync>
               {%- if product.selected_or_first_available_variant == null -%}
                 {{ 'products.product.unavailable' | t }}
               {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
                 {{ 'products.product.sold_out' | t }}
               {%- else -%}
-                {{ 'products.product.add_to_cart' | t }}
+                {%- if bs.icon_before != blank -%}
+                  {{ bs.icon_before | image_url: width: 96 | image_tag: class: 'gad-buy__icon', alt: '', loading: 'lazy' }}
+                {%- endif -%}
+                <span>{{ gad_label | escape }}</span>
+                {%- if bs.price_in_button -%}
+                  <span class="gad-buy__price">&bull; {{ gad_price }}</span>
+                {%- endif -%}
+                {%- if bs.icon_after != blank -%}
+                  {{ bs.icon_after | image_url: width: 96 | image_tag: class: 'gad-buy__icon', alt: '', loading: 'lazy' }}
+                {%- endif -%}
               {%- endif -%}
             </span>
             {%- render 'loading-spinner' -%}
           </button>
           {%- if show_dynamic_checkout -%}
             {{ form | payment_button }}
+          {%- endif -%}
+          {%- if bs.second_button -%}
+            <button
+              type="button"
+              class="button button--full-width button--secondary gad-buy__now"
+              data-gad-buy-now
+              {% if bs.second_custom_color %}
+                style="--color-button: {{ bs.second_color.red }},{{ bs.second_color.green }},{{ bs.second_color.blue }}; --color-button-text: {{ bs.second_text_color.red }},{{ bs.second_text_color.green }},{{ bs.second_text_color.blue }}; --color-secondary-button-text: {{ bs.second_color.red }},{{ bs.second_color.green }},{{ bs.second_color.blue }};"
+              {% endif %}
+              {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+                disabled
+              {% endif %}
+            >
+              <span class="gad-buy__label">
+                {%- if bs.second_icon_before != blank -%}
+                  {{ bs.second_icon_before | image_url: width: 96 | image_tag: class: 'gad-buy__icon', alt: '', loading: 'lazy' }}
+                {%- endif -%}
+                {%- liquid
+                  assign second_label = bs.second_label
+                  if second_label == blank
+                    assign second_label = 'gadsden.buy.buy_now' | t
+                  endif
+                -%}
+                <span>{{ second_label | escape }}</span>
+                {%- if bs.second_icon_after != blank -%}
+                  {{ bs.second_icon_after | image_url: width: 96 | image_tag: class: 'gad-buy__icon', alt: '', loading: 'lazy' }}
+                {%- endif -%}
+              </span>
+              {%- render 'loading-spinner' -%}
+            </button>
           {%- endif -%}
         </div>
       {%- endform -%}

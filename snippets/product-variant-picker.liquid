@@ -15,33 +15,69 @@
     data-product-handle="{{ product.handle }}"
     data-product-title="{{ product.title | escape }}"
     data-product-id="{{ product.id }}"
+    {% if block.settings.hide_sold_out %}data-gad-hide-sold-out{% endif %}
     data-currency-code="{{ cart.currency.iso_code }}"
     {% # theme-check-disable %}
     data-selected-price-amount="{{ product.selected_or_first_available_variant.price | default: 0 | money_amount | escape }}"
     {% # theme-check-enable %}
     {{ block.shopify_attributes }}
   >
+    {%- liquid
+      assign gad_types = block.settings.option_types | downcase | split: ','
+      assign gad_label_format = block.settings.label_format | default: '{nombre}'
+      case block.settings.swatch_size
+        when 'xs'
+          assign gad_swatch_size = '2.4rem'
+        when 's'
+          assign gad_swatch_size = '3.2rem'
+        when 'l'
+          assign gad_swatch_size = '5.6rem'
+        else
+          assign gad_swatch_size = '4.4rem'
+      endcase
+    -%}
     {%- for option in product.options_with_values -%}
       {%- liquid
         assign swatch_count = option.values | map: 'swatch' | compact | size
         assign picker_type = block.settings.picker_type
+        assign gad_type = gad_types[forloop.index0] | strip
 
-        if swatch_count > 0 and block.settings.swatch_shape != 'none'
-          if block.settings.picker_type == 'dropdown'
+        case gad_type
+          when 'pastillas', 'pastilla', 'pills', 'pill', 'botones', 'button'
+            assign picker_type = 'button'
+          when 'desplegable', 'lista', 'dropdown', 'select'
+            assign picker_type = 'dropdown'
+          when 'muestras', 'muestra', 'colores', 'swatches', 'swatch'
+            assign picker_type = 'gad_swatch'
+        endcase
+
+        assign gad_has_source = false
+        if block.settings.swatch_source != 'none' and block.settings.swatch_source != blank
+          assign gad_has_source = true
+        endif
+
+        if picker_type == 'gad_swatch'
+          if swatch_count > 0 or gad_has_source
+            assign picker_type = 'swatch'
+          else
+            assign picker_type = 'button'
+          endif
+        elsif swatch_count > 0 and block.settings.swatch_shape != 'none'
+          if picker_type == 'dropdown'
             assign picker_type = 'swatch_dropdown'
           else
             assign picker_type = 'swatch'
           endif
         endif
+
+        assign gad_label = gad_label_format | replace: '{numero}', forloop.index | replace: '{nombre}', option.name | escape
+        assign gad_value_esc = option.selected_value | escape
+        assign gad_value_html = '<span data-selected-value>' | append: gad_value_esc | append: '</span>'
+        assign gad_label = gad_label | replace: '{valor}', gad_value_html
       -%}
       {%- if picker_type == 'swatch' -%}
-        <fieldset class="js product-form__input product-form__input--swatch">
-          <legend class="form__label">
-            {{ option.name }}:
-            <span data-selected-value>
-              {{- option.selected_value -}}
-            </span>
-          </legend>
+        <fieldset class="js product-form__input product-form__input--swatch" style="--swatch-input--size: {{ gad_swatch_size }};">
+          <legend class="form__label">{{ gad_label }}</legend>
           {% render 'product-variant-options',
             product: product,
             option: option,
@@ -51,7 +87,7 @@
         </fieldset>
       {%- elsif picker_type == 'button' -%}
         <fieldset class="js product-form__input product-form__input--pill">
-          <legend class="form__label">{{ option.name }}</legend>
+          <legend class="form__label">{{ gad_label }}</legend>
           {% render 'product-variant-options',
             product: product,
             option: option,
@@ -60,9 +96,9 @@
           %}
         </fieldset>
       {%- else -%}
-        <div class="product-form__input product-form__input--dropdown">
+        <div class="product-form__input product-form__input--dropdown{% if block.settings.dropdown_full %} gad-dd-full{% endif %}">
           <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
-            {{ option.name }}
+            {{ gad_label }}
           </label>
           <div class="select">
             {%- if picker_type == 'swatch_dropdown' -%}

@@ -100,7 +100,29 @@
     </button>
   </modal-opener>
 
-  {%- if media.media_type != 'image' -%}
+  {%- liquid
+    assign gad_autoplay_video = false
+    if media.media_type == 'video' and section.settings.video_mode == 'autoplay'
+      assign gad_autoplay_video = true
+    endif
+  -%}
+  {%- if gad_autoplay_video -%}
+    <div class="gad-gallery-video media media--transparent">
+      {%- render 'gad-video',
+        video: media,
+        autoplay: true,
+        loop: true,
+        tap: section.settings.video_pause,
+        sound: section.settings.video_sound,
+        timeline: section.settings.video_timeline,
+        timeline_color: section.settings.video_timeline_color,
+        button_scheme: section.settings.video_button_scheme,
+        sound_scheme: section.settings.video_button_scheme,
+        cover: true,
+        width: 1100
+      -%}
+    </div>
+  {%- elsif media.media_type != 'image' -%}
     {%- if media.media_type == 'model' -%}
       <product-model class="deferred-media media media--transparent" data-media-id="{{ media.id }}">
     {%- else -%}
