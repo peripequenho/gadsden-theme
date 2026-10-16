@@ -1,0 +1,437 @@
+{%- comment -%}
+  Íconos con contenido (S21): cada ítem lleva un ícono grande (por nombre o imagen) con título, texto,
+  botones y una imagen o un video opcional, en columnas.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-ic gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ic-d: {{ s.columns_d }}; --ic-m: {{ s.columns_m }}; --ic-size: {{ s.icon_size }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    <div class="gad-ic__grid gad-ic__grid--{{ s.align }}">
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <div class="gad-ic__item" {{ block.shopify_attributes }}>
+          <span class="gad-ic__icon gad-accent-{{ s.icon_color }}">
+            {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: s.icon_size -%}
+          </span>
+          {%- if b.title != blank -%}<h3 class="gad-ic__title h4">{{ b.title }}</h3>{%- endif -%}
+          {%- if b.text != blank -%}<div class="gad-ic__text rte">{{ b.text }}</div>{%- endif -%}
+          {%- if b.video != blank -%}
+            <div class="gad-ic__media">{%- render 'gad-video', video: b.video, poster: b.image, autoplay: true, loop: true, tap: true -%}</div>
+          {%- elsif b.image != blank -%}
+            <div class="gad-ic__media">{{ b.image | image_url: width: 800 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 30vw, 90vw', widths: '300, 500, 800' }}</div>
+          {%- endif -%}
+          {%- if b.button_label != blank or b.button_label_2 != blank -%}
+            <div class="gad-ic__buttons">
+              {%- if b.button_label != blank -%}<a href="{{ b.button_link | default: '#' }}" class="button">{{ b.button_label | escape }}</a>{%- endif -%}
+              {%- if b.button_label_2 != blank -%}<a href="{{ b.button_link_2 | default: '#' }}" class="button button--secondary">{{ b.button_label_2 | escape }}</a>{%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-ic__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--ic-m, 1), minmax(0, 1fr));
+    gap: 3.2rem 2.4rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-ic__grid {
+      grid-template-columns: repeat(var(--ic-d, 3), minmax(0, 1fr));
+    }
+  }
+
+  .gad-ic__item {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .gad-ic__grid--center .gad-ic__item {
+    align-items: center;
+    text-align: center;
+  }
+
+  .gad-ic__icon {
+    display: grid;
+    place-items: center;
+    width: calc(var(--ic-size, 56px) * 1.6);
+    height: calc(var(--ic-size, 56px) * 1.6);
+    border-radius: 50%;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-ic__icon .gad-icon--image img {
+    width: var(--ic-size, 56px);
+    height: var(--ic-size, 56px);
+    object-fit: contain;
+  }
+
+  .gad-ic__title {
+    margin: 0;
+  }
+
+  .gad-ic__text p {
+    margin: 0;
+  }
+
+  .gad-ic__media img,
+  .gad-ic__media gad-video {
+    display: block;
+    width: 100%;
+    border-radius: 0.8rem;
+    overflow: hidden;
+  }
+
+  .gad-ic__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Íconos con contenido",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columnas en desktop",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_m",
+      "label": "Columnas en mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "select",
+      "id": "align",
+      "label": "Alineación",
+      "options": [
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 24,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "label": "Tamaño de los íconos",
+      "default": 56
+    },
+    {
+      "type": "select",
+      "id": "icon_color",
+      "label": "Color de los íconos",
+      "options": [
+        {
+          "value": "accent",
+          "label": "Acento"
+        },
+        {
+          "value": "text",
+          "label": "Texto"
+        },
+        {
+          "value": "button",
+          "label": "Botón"
+        }
+      ],
+      "default": "accent"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Ícono",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Ícono",
+          "default": "favorite",
+          "info": "Nombre en inglés de Material Symbols."
+        },
+        {
+          "type": "checkbox",
+          "id": "icon_filled",
+          "label": "Ícono relleno",
+          "default": true
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Título"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Un texto corto sobre este punto.</p>"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Reemplaza a la imagen."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Enlace del botón"
+        },
+        {
+          "type": "text",
+          "id": "button_label_2",
+          "label": "Texto del segundo botón"
+        },
+        {
+          "type": "url",
+          "id": "button_link_2",
+          "label": "Enlace del segundo botón"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Íconos con contenido",
+      "blocks": [
+        {
+          "type": "item"
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "local_shipping"
+          }
+        },
+        {
+          "type": "item",
+          "settings": {
+            "icon": "verified"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

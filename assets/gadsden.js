@@ -1246,3 +1246,225 @@ if (!customElements.get('gad-music'))
       }
     }
   );
+
+/* ---------- plata con el formato de la tienda ---------- */
+Gadsden.formatMoney = function (cents, format) {
+  const fmt = format || '${{amount}}';
+  const value = Number(cents) || 0;
+  const group = (n, dec, thousands, decimal) => {
+    const fixed = (n / 100).toFixed(dec);
+    const [int, frac] = fixed.split('.');
+    return int.replace(/\B(?=(\d{3})+(?!\d))/g, thousands) + (frac ? decimal + frac : '');
+  };
+  return fmt.replace(/\{\{\s*(\w+)\s*\}\}/, (m, key) => {
+    switch (key) {
+      case 'amount_no_decimals':
+        return group(value, 0, ',', '.');
+      case 'amount_with_comma_separator':
+        return group(value, 2, '.', ',');
+      case 'amount_no_decimals_with_comma_separator':
+        return group(value, 0, '.', ',');
+      case 'amount_with_apostrophe_separator':
+        return group(value, 2, "'", '.');
+      case 'amount_with_space_separator':
+        return group(value, 2, ' ', ',');
+      default:
+        return group(value, 2, ',', '.');
+    }
+  });
+};
+
+/* ---------- agregar varios al carrito y mostrar el cajón (S17, S28) ---------- */
+Gadsden.addItems = async function (items) {
+  const drawer = document.querySelector('cart-drawer');
+  const body = { items };
+  if (drawer && drawer.getSectionsToRender) {
+    body.sections = drawer.getSectionsToRender().map((s) => s.id);
+    body.sections_url = window.location.pathname;
+  }
+  const response = await fetch(window.routes.cart_add_url, { ...fetchConfig(), body: JSON.stringify(body) });
+  const data = await response.json();
+  if (!response.ok || data.status) throw new Error(data.description || data.message || 'error');
+  if (drawer && drawer.renderContents) {
+    drawer.classList.remove('is-empty');
+    drawer.renderContents(data);
+  } else {
+    window.location.href = window.routes.cart_url;
+  }
+  return data;
+};
+
+/* ---------- S17: ofertas combinadas ---------- */
+if (!customElements.get('gad-bundle'))
+  customElements.define(
+    'gad-bundle',
+    class GadBundle extends HTMLElement {
+      connectedCallback() {
+        if (this.dataset.ready) return;
+        this.dataset.ready = '1';
+        this.addEventListener('change', () => this.update());
+        const button = this.querySelector('[data-gad-bundle-add]');
+        button.addEventListener('click', async () => {
+          const items = this.selected().map((r) => ({ id: Number(r.id), quantity: 1 }));
+          const error = this.querySelector('.gad-bundle__error');
+          error.hidden = true;
+          if (!items.length) return;
+          button.setAttribute('aria-busy', 'true');
+          button.disabled = true;
+          try {
+            await Gadsden.addItems(items);
+          } catch (e) {
+            error.textContent = (window.cartStrings && window.cartStrings.error) || e.message;
+            error.hidden = false;
+          } finally {
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+          }
+        });
+        this.update();
+      }
+      selected() {
+        return [...this.querySelectorAll('.gad-bundle__item')]
+          .filter((row) => row.querySelector('[data-gad-bundle-check]').checked)
+          .map((row) => {
+            const v = row.querySelector('[data-gad-bundle-variant]');
+            const price = v.tagName === 'SELECT' ? v.selectedOptions[0].dataset.price : v.dataset.price;
+            return { id: v.value, price: Number(price) || 0 };
+          });
+      }
+      update() {
+        const list = this.selected();
+        const full = list.reduce((n, r) => n + r.price, 0);
+        const keep = Number(this.dataset.keep || 100);
+        const fmt = this.dataset.moneyFormat;
+        const total = this.querySelector('[data-gad-bundle-total]');
+        const strike = this.querySelector('[data-gad-bundle-full]');
+        if (total) total.textContent = Gadsden.formatMoney(Math.round((full * keep) / 100), fmt);
+        if (strike) strike.textContent = keep < 100 && full ? Gadsden.formatMoney(full, fmt) : '';
+        this.querySelector('[data-gad-bundle-add]').disabled = list.length === 0;
+      }
+    }
+  );
+
+/* ---------- S18: cambiador de colores (pisa la combinación 1, la principal) ---------- */
+(() => {
+  const key = 'gad-palette';
+  const apply = (data) => {
+    let style = document.getElementById('GadPalette');
+    if (!data) {
+      if (style) style.remove();
+      return;
+    }
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'GadPalette';
+      document.head.appendChild(style);
+    }
+    style.textContent =
+      ':root, body, .color-scheme-1 { --color-background: ' + data.bg + '; --gradient-background: rgb(' + data.bg + '); --color-foreground: ' + data.fg +
+      '; --color-button: ' + data.btn + '; --color-button-text: ' + data.btnText + '; --color-secondary-button-text: ' + data.btn + '; --color-link: ' + data.btn + '; } body { background-color: rgb(' + data.bg + '); }';
+  };
+  let saved = null;
+  try {
+    saved = JSON.parse(localStorage.getItem(key) || 'null');
+  } catch (e) {}
+  if (saved) apply(saved);
+  if (customElements.get('gad-color-switcher')) return;
+  customElements.define(
+    'gad-color-switcher',
+    class GadColorSwitcher extends HTMLElement {
+      connectedCallback() {
+        const items = [...this.querySelectorAll('[data-gad-palette]')];
+        const mark = (id) => items.forEach((b) => {
+          const on = b.dataset.gadPalette === (id || '');
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-checked', String(on));
+        });
+        mark(saved && saved.id);
+        items.forEach((b) =>
+          b.addEventListener('click', () => {
+            const data = b.dataset.gadPalette ? { id: b.dataset.gadPalette, bg: b.dataset.bg, fg: b.dataset.fg, btn: b.dataset.btn, btnText: b.dataset.btnText } : null;
+            apply(data);
+            saved = data;
+            mark(data && data.id);
+            try {
+              if (data) localStorage.setItem(key, JSON.stringify(data));
+              else localStorage.removeItem(key);
+            } catch (e) {}
+          })
+        );
+      }
+    }
+  );
+})();
+
+/* ---------- S22: historias ---------- */
+if (!customElements.get('gad-stories'))
+  customElements.define(
+    'gad-stories',
+    class GadStories extends HTMLElement {
+      connectedCallback() {
+        if (this.dataset.ready) return;
+        this.dataset.ready = '1';
+        this.dialog = this.querySelector('dialog');
+        this.slides = [...this.querySelectorAll('.gad-st__slide')];
+        this.bars = [...this.querySelectorAll('.gad-st__bar i')];
+        this.seconds = parseFloat(this.dataset.seconds || '5');
+        this.querySelectorAll('[data-gad-story]').forEach((b) => b.addEventListener('click', () => this.open(Number(b.dataset.gadStory))));
+        this.querySelector('[data-gad-story-next]').addEventListener('click', () => this.go(this.index + 1));
+        this.querySelector('[data-gad-story-prev]').addEventListener('click', () => this.go(this.index - 1));
+        this.querySelector('[data-gad-story-close]').addEventListener('click', () => this.dialog.close());
+        this.dialog.addEventListener('close', () => this.stop());
+        this.dialog.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') this.go(this.index + 1);
+          if (e.key === 'ArrowLeft') this.go(this.index - 1);
+        });
+      }
+      open(i) {
+        this.dialog.showModal();
+        document.documentElement.classList.add('gad-modal-open');
+        this.go(i);
+      }
+      stop() {
+        cancelAnimationFrame(this.raf);
+        this.slides.forEach((s) => {
+          const v = s.querySelector('video');
+          if (v) v.pause();
+        });
+        if (!document.querySelector('dialog[open]')) document.documentElement.classList.remove('gad-modal-open');
+      }
+      go(i) {
+        if (i < 0) i = 0;
+        if (i >= this.slides.length) {
+          this.dialog.close();
+          return;
+        }
+        cancelAnimationFrame(this.raf);
+        this.index = i;
+        this.slides.forEach((s, n) => {
+          s.hidden = n !== i;
+          const v = s.querySelector('video');
+          if (v && n !== i) v.pause();
+        });
+        this.bars.forEach((b, n) => (b.style.width = n < i ? '100%' : '0'));
+        const video = this.slides[i].querySelector('video');
+        const start = performance.now();
+        const step = () => {
+          let p;
+          if (video) {
+            p = video.duration ? video.currentTime / video.duration : 0;
+          } else {
+            p = (performance.now() - start) / (this.seconds * 1000);
+          }
+          this.bars[i].style.width = Math.min(100, p * 100) + '%';
+          if (p >= 1 || (video && video.ended)) return this.go(i + 1);
+          this.raf = requestAnimationFrame(step);
+        };
+        if (video) {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        }
+        this.raf = requestAnimationFrame(step);
+      }
+    }
+  );

@@ -1,0 +1,712 @@
+{%- comment -%}
+  Testimonios estilo red social (S20): tarjetas con forma de publicación (avatar, nombre, usuario,
+  tilde de verificado, foto, texto, reacciones y fecha), en grilla o carrusel (T04).
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-sr gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- capture slides -%}
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <article class="gad-sr__post color-{{ s.card_scheme }}" {{ block.shopify_attributes }}>
+          <header class="gad-sr__head">
+            <span class="gad-sr__avatar">
+              {%- if b.avatar != blank -%}
+                {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}
+              {%- else -%}
+                {{ b.name | slice: 0 | upcase }}
+              {%- endif -%}
+            </span>
+            <span class="gad-sr__who">
+              <span class="gad-sr__name">
+                {{- b.name | escape -}}
+                {%- if b.verified -%}
+                  <span class="gad-sr__verified" title="{{ 'gadsden.reviews.verified' | t }}">{%- render 'gad-icon', name: 'verified', filled: true -%}</span>
+                {%- endif -%}
+              </span>
+              {%- if b.handle != blank -%}<span class="gad-sr__handle">{{ b.handle | escape }}</span>{%- endif -%}
+            </span>
+            {%- if s.network_icon != blank -%}
+              <span class="gad-sr__net">{%- render 'gad-icon', name: s.network_icon -%}</span>
+            {%- endif -%}
+          </header>
+          {%- if b.image != blank -%}
+            <div class="gad-sr__photo">
+              {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 33vw, 90vw', widths: '400, 600, 900' }}
+            </div>
+          {%- endif -%}
+          <div class="gad-sr__text rte">{{ b.text }}</div>
+          <footer class="gad-sr__foot">
+            {%- if b.likes != blank -%}
+              <span class="gad-sr__stat">{%- render 'gad-icon', name: 'favorite', filled: true, class: 'gad-sr__heart' -%}{{ b.likes | escape }}</span>
+            {%- endif -%}
+            {%- if b.comments != blank -%}
+              <span class="gad-sr__stat">{%- render 'gad-icon', name: 'chat_bubble' -%}{{ b.comments | escape }}</span>
+            {%- endif -%}
+            {%- if b.date != blank -%}<span class="gad-sr__date">{{ b.date | escape }}</span>{%- endif -%}
+          </footer>
+        </article>
+      {%- endfor -%}
+    {%- endcapture -%}
+    {%- if section.blocks.size > 0 -%}
+      {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .gad-sr__post {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    height: 100%;
+    padding: 1.6rem;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.12);
+    border-radius: 1.2rem;
+    text-align: left;
+  }
+
+  .gad-sr__head {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .gad-sr__avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 4.8rem;
+    height: 4.8rem;
+    overflow: hidden;
+    border-radius: 50%;
+    background: rgba(var(--color-foreground), 0.1);
+    font-weight: var(--font-body-weight-bold, 700);
+  }
+
+  .gad-sr__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-sr__who {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+  }
+
+  .gad-sr__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: var(--font-body-weight-bold, 700);
+  }
+
+  .gad-sr__verified {
+    font-size: 1.6rem;
+    --gad-icon-color: #1d9bf0;
+  }
+
+  .gad-sr__handle,
+  .gad-sr__date {
+    opacity: 0.65;
+    font-size: 1.3rem;
+  }
+
+  .gad-sr__net {
+    font-size: 2rem;
+    opacity: 0.7;
+  }
+
+  .gad-sr__photo img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.8rem;
+  }
+
+  .gad-sr__text p {
+    margin: 0;
+  }
+
+  .gad-sr__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.4rem;
+    margin-top: auto;
+    font-size: 1.4rem;
+  }
+
+  .gad-sr__stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .gad-sr__heart {
+    --gad-icon-color: #e0245e;
+  }
+
+  .gad-sr__date {
+    margin-left: auto;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Testimonios sociales",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que dicen en <strong>redes</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "text",
+      "id": "network_icon",
+      "label": "Ícono de la red",
+      "default": "photo_camera",
+      "info": "Nombre en inglés de Material Symbols. Vacío: sin ícono."
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_scheme",
+      "label": "Combinación de las publicaciones",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "select",
+      "id": "car_type",
+      "label": "Tipo",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Clásico (se frena en los extremos)"
+        },
+        {
+          "value": "loop",
+          "label": "Infinito"
+        }
+      ],
+      "default": "loop"
+    },
+    {
+      "type": "select",
+      "id": "car_drag",
+      "label": "Arrastre con mouse o dedo",
+      "options": [
+        {
+          "value": "off",
+          "label": "Desactivado"
+        },
+        {
+          "value": "on",
+          "label": "Activado"
+        }
+      ],
+      "default": "on"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_autoplay",
+      "label": "Pase automático",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "car_speed",
+      "min": 1,
+      "max": 15,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Velocidad del pase",
+      "default": 5
+    },
+    {
+      "type": "color_scheme",
+      "id": "car_arrows_scheme",
+      "label": "Colores de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "car_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "d_carousel",
+      "label": "Mostrar como carrusel en desktop",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "d_per_view",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Ítems por pantalla",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "d_per_move",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "d_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "d_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "d_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "select",
+      "id": "d_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "sides"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_carousel",
+      "label": "Mostrar como carrusel en mobile",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "m_per_view",
+      "label": "Ítems por pantalla",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "m_per_move",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "m_gap",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "m_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "m_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "post",
+      "name": "Publicación",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Foto de perfil"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Cliente"
+        },
+        {
+          "type": "text",
+          "id": "handle",
+          "label": "Usuario",
+          "default": "@cliente"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Tilde de verificado",
+          "default": false
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto de la publicación"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Me encantó, llegó rapidísimo.</p>"
+        },
+        {
+          "type": "text",
+          "id": "likes",
+          "label": "Me gusta",
+          "default": "128"
+        },
+        {
+          "type": "text",
+          "id": "comments",
+          "label": "Comentarios",
+          "default": "12"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Fecha",
+          "default": "Hace 2 días"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonios sociales",
+      "blocks": [
+        {
+          "type": "post"
+        },
+        {
+          "type": "post"
+        },
+        {
+          "type": "post"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
