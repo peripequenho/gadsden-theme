@@ -30,6 +30,11 @@ Es *white-label*: no trae marca, colores ni textos de ninguna tienda. Todos los 
 **Secciones nuevas**
 Hero de diapositivas con video de fondo, barra de íconos, cinta deslizante (horizontal o vertical), slider de fotos y videos, antes y después, tabla comparativa, pestañas, testimonios, franja de logos, resultados en porcentaje, volver arriba, seguimiento de pedido, popup promocional con cupón, reproductor de música, ofertas combinadas, cambiador de colores, columnas armables, testimonios estilo red social, íconos con contenido, historias, hero con parallax 3D, tabla de planes, puntos sobre imagen, separador de secciones, unión de dos secciones, imagen comprable, reseñas estilo Trustpilot y grilla con ventanas.
 
+**Secciones para landings**
+Progreso de lectura, estilo propio de una página, oferta del producto, muro de reseñas, pósters con texto, pasos con cronómetro, pasos automáticos tipo historias, tarjetas desplegables con ventana, sellos animados, capítulos en video, reseñas en dos cintas con avatares, carrusel 3D de videos, garantía con anillo, cierre con resaltador, hero con palabra que rota, tarjetas con imagen recortada, aviso y datos legales, cuestionario con resultado por perfil y nota (advertorial) armada por bloques.
+
+Las animaciones respetan "reducir movimiento" del sistema.
+
 **Ajustes globales**
 Etiquetas de oferta con porcentaje, etiquetas propias por tag, estilos de tarjeta, tipografía extra (por enlace), cursor y barra de scroll propios, idiomas de derecha a izquierda, ventana para cambiar de idioma, bloqueo por país y protección de contenido.
 
