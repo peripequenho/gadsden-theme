@@ -1,0 +1,421 @@
+{%- comment -%}
+  Cierre con resaltador y escala (L15): imagen del producto, titular con una palabra resaltada cuyo
+  resaltador cambia de color al aparecer, una escala "de → a" opcional, tres ítems y un botón.
+  Con "reducir movimiento" el color cambia con un fundido.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign title = s.heading | escape
+  if s.mark != blank
+    assign mark_esc = s.mark | escape
+    assign mark_html = '<mark class="gad-cl__mark">' | append: mark_esc | append: '</mark>'
+    assign title = title | replace_first: mark_esc, mark_html
+  endif
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-closing
+  class="gad-cl gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --cl-from: {{ s.mark_from }}; --cl-to: {{ s.mark_to }};"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width gad-cl__grid">
+    <div class="gad-cl__media">
+      {%- if s.image != blank -%}
+        {{ s.image | image_url: width: 1200 | image_tag: loading: 'lazy', alt: s.image.alt, sizes: '(min-width: 990px) 45vw, 100vw', widths: '500, 800, 1200' }}
+      {%- else -%}
+        {{ 'product-2' | placeholder_svg_tag: 'gad-cl__ph' }}
+      {%- endif -%}
+      {%- if s.caption != blank -%}<p class="gad-cl__caption">{{ s.caption | escape }}</p>{%- endif -%}
+    </div>
+    <div class="gad-cl__info">
+      <h2 class="gad-cl__title {{ s.heading_size }}">{{ title }}</h2>
+      {%- if s.text != blank -%}<div class="rte">{{ s.text }}</div>{%- endif -%}
+      {%- if s.scale_from != blank and s.scale_to != blank -%}
+        <div class="gad-cl__scale" role="img" aria-label="{{ s.scale_from | escape }} → {{ s.scale_to | escape }}">
+          <span class="gad-cl__bar"></span>
+          <span class="gad-cl__ends"><span>{{ s.scale_from | escape }}</span><span>{{ s.scale_to | escape }}</span></span>
+        </div>
+      {%- endif -%}
+      <ul class="gad-cl__items list-unstyled" role="list">
+        {%- for i in (1..3) -%}
+          {%- assign k = 'item_' | append: i -%}
+          {%- if s[k] != blank -%}<li>{%- render 'gad-icon', name: 'check_circle', filled: true -%}<span>{{ s[k] }}</span></li>{%- endif -%}
+        {%- endfor -%}
+      </ul>
+      {%- if s.button_label != blank -%}
+        <a href="{{ s.button_link | default: '#oferta' }}" class="button gad-cl__btn">{{ s.button_label | escape }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</gad-closing>
+
+{% stylesheet %}
+  gad-closing {
+    display: block;
+  }
+
+  .gad-cl__grid {
+    display: grid;
+    gap: 2.8rem;
+    align-items: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-cl__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+    }
+  }
+
+  .gad-cl__media img,
+  .gad-cl__ph {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 1.2rem;
+  }
+
+  .gad-cl__ph {
+    aspect-ratio: 1;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-cl__caption {
+    margin: 0.8rem 0 0;
+    font-size: 1.3rem;
+    text-align: center;
+    opacity: 0.75;
+  }
+
+  .gad-cl__info {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .gad-cl__title {
+    margin: 0;
+  }
+
+  .gad-cl__mark {
+    padding: 0 0.2em;
+    background: linear-gradient(var(--cl-from), var(--cl-from)) left / 100% 100% no-repeat;
+    color: inherit;
+  }
+
+  gad-closing.is-in .gad-cl__mark {
+    background: linear-gradient(var(--cl-to), var(--cl-to)) left / 100% 100% no-repeat;
+    animation: gadClSweep 0.9s ease both;
+  }
+
+  @keyframes gadClSweep {
+    from {
+      background-size: 0% 100%;
+    }
+  }
+
+  html.gad-reduce gad-closing.is-in .gad-cl__mark {
+    animation: none;
+    transition: background 0.6s;
+  }
+
+  .gad-cl__scale {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .gad-cl__bar {
+    height: 1.2rem;
+    border-radius: 99rem;
+    background: linear-gradient(90deg, var(--cl-from), var(--cl-to));
+  }
+
+  .gad-cl__ends {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .gad-cl__items {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+  }
+
+  .gad-cl__items li {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .gad-cl__items .gad-icon {
+    font-size: 2.2rem;
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-cl__btn {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadClosing extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      const io = new IntersectionObserver((entries) => {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        this.classList.add('is-in');
+      }, { threshold: 0.5 });
+      io.observe(this.querySelector('.gad-cl__title'));
+    }
+  }
+
+  if (!customElements.get('gad-closing')) customElements.define('gad-closing', GadClosing);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Cierre con resaltador",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen del producto"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Pie de la imagen"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que buscabas, en una caja."
+    },
+    {
+      "type": "text",
+      "id": "mark",
+      "label": "Palabras resaltadas",
+      "default": "en una caja",
+      "info": "Tienen que estar escritas igual que en el título."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "mark_from",
+      "label": "Resaltador al principio",
+      "default": "#FFE066"
+    },
+    {
+      "type": "color",
+      "id": "mark_to",
+      "label": "Resaltador al aparecer",
+      "default": "#9BE7C4"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "text",
+      "id": "scale_from",
+      "label": "Escala: desde",
+      "info": "Con desde y hasta, se ve una barra con los dos colores del resaltador."
+    },
+    {
+      "type": "text",
+      "id": "scale_to",
+      "label": "Escala: hasta"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "item_1",
+      "label": "Ítem 1",
+      "default": "Envío a todo el país"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "item_2",
+      "label": "Ítem 2",
+      "default": "Hasta 3 cuotas sin interés"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "item_3",
+      "label": "Ítem 3",
+      "default": "Garantía de satisfacción"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón",
+      "default": "Lo quiero"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón",
+      "info": "Vacío: baja a la sección con el ancla \"oferta\"."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cierre con resaltador"
+    }
+  ]
+}
+{% endschema %}

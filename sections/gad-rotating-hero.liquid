@@ -1,0 +1,639 @@
+{%- comment -%}
+  Hero con palabra que rota (L16): arriba dos fotos con etiqueta (antes/después o dos productos), fondo
+  con imagen y parallax suave, texto chico, titular con una palabra que va cambiando, promesa con
+  resaltado, píldora con íconos y botón. Un chip flotante opcional sobre las fotos.
+  Con "reducir movimiento": sin parallax y la palabra queda fija en la primera.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign words = s.words | split: ','
+  assign promise = s.promise | escape
+  if s.promise_mark != blank
+    assign pm = s.promise_mark | escape
+    assign pm_html = '<mark>' | append: pm | append: '</mark>'
+    assign promise = promise | replace_first: pm, pm_html
+  endif
+-%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<gad-rotating-hero
+  class="gad-rh gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rh-word: {{ s.word_color | default: 'currentColor' }}; --rh-ph: {{ s.photo_height }}px;"
+  data-speed="{{ s.speed }}"
+  data-parallax="{{ s.parallax }}"
+  {% render 'gad-section-attrs', s: s %}
+>
+  {%- if s.bg_image != blank -%}
+    <div class="gad-rh__bg" aria-hidden="true">
+      {{ s.bg_image | image_url: width: 2000 | image_tag: loading: 'eager', alt: '', sizes: '100vw', widths: '750, 1200, 2000' }}
+    </div>
+  {%- endif -%}
+  <div class="page-width gad-rh__inner">
+    {%- if s.photo_1 != blank or s.photo_2 != blank or request.design_mode -%}
+      <div class="gad-rh__photos">
+        {%- for i in (1..2) -%}
+          {%- liquid
+            assign kp = 'photo_' | append: i
+            assign kl = 'label_' | append: i
+          -%}
+          <figure class="gad-rh__photo">
+            {%- if s[kp] != blank -%}
+              {{ s[kp] | image_url: width: 900 | image_tag: loading: 'eager', alt: s[kl], sizes: '(min-width: 990px) 30vw, 50vw', widths: '400, 600, 900' }}
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag: 'gad-rh__ph' }}
+            {%- endif -%}
+            {%- if s[kl] != blank -%}<figcaption>{{ s[kl] | escape }}</figcaption>{%- endif -%}
+          </figure>
+        {%- endfor -%}
+        {%- if s.chip_title != blank -%}
+          <div class="gad-rh__chip color-{{ s.chip_scheme }}">
+            {%- if s.chip_kicker != blank -%}<span>{{ s.chip_kicker | escape }}</span>{%- endif -%}
+            <b>{{ s.chip_title | escape }}</b>
+            {%- if s.chip_sub != blank -%}<small>{{ s.chip_sub | escape }}</small>{%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    <div class="gad-rh__copy">
+      {%- if s.caption != blank -%}<p class="gad-rh__caption">{{ s.caption | escape }}</p>{%- endif -%}
+      <h1 class="gad-rh__title {{ s.heading_size }}">
+        {{- s.heading_before | escape }}
+        <span class="gad-rh__words">
+          {%- for w in words -%}
+            <span class="gad-rh__word{% if forloop.first %} is-active{% endif %}"{% unless forloop.first %} aria-hidden="true"{% endunless %}>{{ w | strip | escape }}</span>
+          {%- endfor -%}
+        </span>
+        {{ s.heading_after | escape -}}
+      </h1>
+      {%- if s.promise != blank -%}<p class="gad-rh__promise">{{ promise }}</p>{%- endif -%}
+      {%- if s.pill_1 != blank or s.pill_2 != blank or s.pill_3 != blank -%}
+        <ul class="gad-rh__pill list-unstyled" role="list">
+          {%- for i in (1..3) -%}
+            {%- liquid
+              assign k = 'pill_' | append: i
+              assign ki = 'pill_' | append: i | append: '_icon'
+            -%}
+            {%- if s[k] != blank -%}<li>{%- render 'gad-icon', name: s[ki], filled: true -%}{{ s[k] | escape }}</li>{%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if s.button_label != blank -%}
+        <a href="{{ s.button_link | default: '#oferta' }}" class="button gad-rh__btn">{{ s.button_label | escape }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</gad-rotating-hero>
+
+{% stylesheet %}
+  gad-rotating-hero {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .gad-rh__bg {
+    position: absolute;
+    inset: -12% 0;
+    z-index: -1;
+    will-change: transform;
+  }
+
+  .gad-rh__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-rh__inner {
+    display: grid;
+    gap: 2.8rem;
+    text-align: center;
+  }
+
+  .gad-rh__photos {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    max-width: 64rem;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .gad-rh__photo {
+    position: relative;
+    height: var(--rh-ph, 280px);
+    margin: 0;
+    overflow: hidden;
+    border-radius: 1.2rem;
+    background: rgba(var(--color-foreground), 0.06);
+  }
+
+  .gad-rh__photo img,
+  .gad-rh__ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-rh__photo figcaption {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.3rem 1rem;
+    border-radius: 99rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .gad-rh__chip {
+    position: absolute;
+    top: -1.2rem;
+    right: -0.4rem;
+    display: grid;
+    padding: 0.8rem 1.2rem;
+    border-radius: 1rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    box-shadow: 0 0.6rem 2rem rgba(0, 0, 0, 0.18);
+    text-align: left;
+    line-height: 1.2;
+    transform: rotate(3deg);
+  }
+
+  .gad-rh__chip span {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+  }
+
+  .gad-rh__chip small {
+    font-size: 1.2rem;
+    opacity: 0.75;
+  }
+
+  .gad-rh__caption {
+    margin: 0;
+    font-size: 1.3rem;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
+  }
+
+  .gad-rh__title {
+    margin: 0.6rem 0 0;
+  }
+
+  .gad-rh__words {
+    position: relative;
+    display: inline-grid;
+    color: var(--rh-word);
+  }
+
+  .gad-rh__word {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(0.6em);
+    transition: opacity 0.35s, transform 0.35s;
+  }
+
+  .gad-rh__word.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  .gad-rh__word.is-out {
+    opacity: 0;
+    transform: translateY(-0.6em);
+  }
+
+  .gad-rh__promise {
+    margin: 1.2rem 0 0;
+    font-size: 1.7rem;
+  }
+
+  .gad-rh__promise mark {
+    padding: 0 0.2em;
+    background: rgba(var(--color-button), 0.25);
+    color: inherit;
+  }
+
+  .gad-rh__pill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.6rem;
+    margin: 1.6rem 0 0;
+    padding: 0.8rem 1.6rem;
+    border-radius: 99rem;
+    background: rgba(var(--color-foreground), 0.06);
+    font-size: 1.3rem;
+  }
+
+  .gad-rh__pill li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .gad-rh__btn {
+    margin-top: 2rem;
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-rh__photo {
+      height: calc(var(--rh-ph, 280px) * 0.7);
+    }
+
+    .gad-rh__btn {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadRotatingHero extends HTMLElement {
+    connectedCallback() {
+      if (this._ready || (window.Gadsden && Gadsden.reduceMotion())) return;
+      this._ready = true;
+      const words = [...this.querySelectorAll('.gad-rh__word')];
+      const ms = (parseFloat(this.dataset.speed) || 2.5) * 1000;
+      if (words.length > 1) {
+        let i = 0;
+        this.timer = setInterval(() => {
+          if (document.hidden) return;
+          const prev = words[i];
+          i = (i + 1) % words.length;
+          words.forEach((w) => w.classList.remove('is-out'));
+          prev.classList.remove('is-active');
+          prev.classList.add('is-out');
+          words[i].classList.add('is-active');
+        }, ms);
+      }
+      const bg = this.querySelector('.gad-rh__bg');
+      const k = parseFloat(this.dataset.parallax) || 0;
+      if (bg && k) {
+        this.onScroll = () => {
+          const r = this.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > window.innerHeight) return;
+          bg.style.transform = `translate3d(0, ${(-r.top * k) / 100}px, 0)`;
+        };
+        window.addEventListener('scroll', this.onScroll, { passive: true });
+        this.onScroll();
+      }
+    }
+
+    disconnectedCallback() {
+      clearInterval(this.timer);
+      if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
+      this._ready = false;
+    }
+  }
+
+  if (!customElements.get('gad-rotating-hero')) customElements.define('gad-rotating-hero', GadRotatingHero);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Hero con palabra que rota",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Fotos de arriba"
+    },
+    {
+      "type": "image_picker",
+      "id": "photo_1",
+      "label": "Foto 1"
+    },
+    {
+      "type": "text",
+      "id": "label_1",
+      "label": "Etiqueta 1",
+      "default": "Antes"
+    },
+    {
+      "type": "image_picker",
+      "id": "photo_2",
+      "label": "Foto 2"
+    },
+    {
+      "type": "text",
+      "id": "label_2",
+      "label": "Etiqueta 2",
+      "default": "Después"
+    },
+    {
+      "type": "range",
+      "id": "photo_height",
+      "min": 160,
+      "max": 480,
+      "step": 20,
+      "unit": "px",
+      "label": "Alto de las fotos",
+      "default": 280
+    },
+    {
+      "type": "text",
+      "id": "chip_kicker",
+      "label": "Chip: volanta",
+      "info": "El chip flota sobre las fotos. Sin título no se ve."
+    },
+    {
+      "type": "text",
+      "id": "chip_title",
+      "label": "Chip: título"
+    },
+    {
+      "type": "text",
+      "id": "chip_sub",
+      "label": "Chip: bajada"
+    },
+    {
+      "type": "color_scheme",
+      "id": "chip_scheme",
+      "label": "Chip: combinación",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Fondo"
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Imagen de fondo"
+    },
+    {
+      "type": "range",
+      "id": "parallax",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "unit": "%",
+      "label": "Parallax",
+      "default": 15,
+      "info": "0: quieto."
+    },
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Texto chico",
+      "default": "Nuevo"
+    },
+    {
+      "type": "text",
+      "id": "heading_before",
+      "label": "Título: antes de la palabra",
+      "default": "Hecho para"
+    },
+    {
+      "type": "text",
+      "id": "words",
+      "label": "Palabras que rotan",
+      "default": "vos, tu casa, tu día",
+      "info": "Separadas por coma."
+    },
+    {
+      "type": "text",
+      "id": "heading_after",
+      "label": "Título: después de la palabra"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h0"
+    },
+    {
+      "type": "color",
+      "id": "word_color",
+      "label": "Color de la palabra"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 1.5,
+      "max": 6,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Segundos por palabra",
+      "default": 2.5
+    },
+    {
+      "type": "text",
+      "id": "promise",
+      "label": "Promesa",
+      "default": "Resultados que se notan desde la primera semana."
+    },
+    {
+      "type": "text",
+      "id": "promise_mark",
+      "label": "Palabras resaltadas de la promesa",
+      "default": "desde la primera semana"
+    },
+    {
+      "type": "text",
+      "id": "pill_1",
+      "label": "Píldora: texto 1",
+      "default": "Envío gratis"
+    },
+    {
+      "type": "text",
+      "id": "pill_1_icon",
+      "label": "Píldora: ícono 1",
+      "default": "local_shipping",
+      "info": "Nombre en inglés de Material Symbols."
+    },
+    {
+      "type": "text",
+      "id": "pill_2",
+      "label": "Píldora: texto 2",
+      "default": "3 cuotas"
+    },
+    {
+      "type": "text",
+      "id": "pill_2_icon",
+      "label": "Píldora: ícono 2",
+      "default": "credit_card"
+    },
+    {
+      "type": "text",
+      "id": "pill_3",
+      "label": "Píldora: texto 3"
+    },
+    {
+      "type": "text",
+      "id": "pill_3_icon",
+      "label": "Píldora: ícono 3",
+      "default": "verified"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón",
+      "default": "Ver la oferta"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón",
+      "info": "Vacío: baja a la sección con el ancla \"oferta\"."
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 48,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero con palabra que rota"
+    }
+  ]
+}
+{% endschema %}

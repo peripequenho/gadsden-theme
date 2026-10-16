@@ -1,0 +1,541 @@
+{%- comment -%}
+  Carrusel 3D de videos (L10): la tarjeta del centro de frente y entera; las de los costados más
+  chicas, giradas hacia el centro y esfumadas. Se arrastra con impulso, encaja y es infinito.
+  Reproduce sin sonido el video del centro y los que estén dentro del rango elegido.
+  Con "reducir movimiento" queda plano, sin giro ni impulso.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- render 'gad-colors', s: s, key: section.id -%}
+<div
+  class="gad-cf gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --cf-w: {{ s.card_width }}px; --cf-star: {{ s.star_color }};"
+  {% render 'gad-section-attrs', s: s %}
+>
+  <div class="page-width">
+    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+  </div>
+  {%- if section.blocks.size > 0 -%}
+    <gad-coverflow class="gad-cf__stage" data-range="{{ s.play_range }}" tabindex="0" role="region" aria-roledescription="{{ 'gadsden.carousel.roledescription' | t }}" aria-label="{{ s.heading | strip_html | escape }}">
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        <figure class="gad-cf__card" {{ block.shopify_attributes }}>
+          <div class="gad-cf__media">
+            {%- if b.video != blank -%}
+              {{ b.video | video_tag: autoplay: false, loop: true, muted: true, playsinline: true, controls: false, preload: 'none' }}
+            {%- elsif b.poster != blank -%}
+              {{ b.poster | image_url: width: 600 | image_tag: loading: 'lazy', alt: '' }}
+            {%- else -%}
+              {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-cf__ph' }}
+            {%- endif -%}
+          </div>
+          <figcaption class="gad-cf__cap">
+            {%- if b.stars > 0 -%}
+              <span class="gad-cf__stars" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.stars }}">{%- for i in (1..b.stars) -%}★{%- endfor -%}</span>
+            {%- endif -%}
+            {%- if b.quote != blank -%}<span class="gad-cf__quote">{{ b.quote }}</span>{%- endif -%}
+            {%- if b.name != blank -%}<b>{{ b.name | escape }}</b>{%- endif -%}
+          </figcaption>
+        </figure>
+      {%- endfor -%}
+      <button type="button" class="gad-cf__arrow gad-cf__arrow--prev" aria-label="{{ 'gadsden.carousel.previous' | t }}">{%- render 'gad-icon', name: 'chevron_left' -%}</button>
+      <button type="button" class="gad-cf__arrow gad-cf__arrow--next" aria-label="{{ 'gadsden.carousel.next' | t }}">{%- render 'gad-icon', name: 'chevron_right' -%}</button>
+    </gad-coverflow>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .gad-cf {
+    overflow: hidden;
+  }
+
+  .gad-cf__stage {
+    position: relative;
+    display: block;
+    height: calc(var(--cf-w, 260px) * 16 / 9 + 2rem);
+    perspective: 500px;
+    touch-action: pan-y;
+    user-select: none;
+    cursor: grab;
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+
+  .gad-cf__stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  .gad-cf__card {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--cf-w, 260px);
+    margin: 0 0 0 calc(var(--cf-w, 260px) / -2);
+    overflow: hidden;
+    border-radius: 1.4rem;
+    background: #111;
+    color: #fff;
+    will-change: transform;
+  }
+
+  .gad-cf__media {
+    aspect-ratio: 9 / 16;
+  }
+
+  .gad-cf__media video,
+  .gad-cf__media img,
+  .gad-cf__ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  .gad-cf__ph {
+    opacity: 0.3;
+  }
+
+  .gad-cf__cap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    gap: 0.4rem;
+    padding: 4rem 1.4rem 1.4rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    font-size: 1.3rem;
+  }
+
+  .gad-cf__stars {
+    color: var(--cf-star, #f5b301);
+  }
+
+  .gad-cf__quote {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .gad-cf__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    width: 4.4rem;
+    height: 4.4rem;
+    margin-top: -2.2rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+    box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.2);
+    font-size: 2.4rem;
+    cursor: pointer;
+  }
+
+  .gad-cf__arrow--prev {
+    left: calc(50% - var(--cf-w, 260px) / 2 - 2.2rem);
+  }
+
+  .gad-cf__arrow--next {
+    right: calc(50% - var(--cf-w, 260px) / 2 - 2.2rem);
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-cf__arrow {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadCoverflow extends HTMLElement {
+    connectedCallback() {
+      if (this._ready) return;
+      this._ready = true;
+      this.cards = [...this.querySelectorAll('.gad-cf__card')];
+      this.n = this.cards.length;
+      this.pos = 0;
+      this.range = parseInt(this.dataset.range, 10) || 0;
+      this.flat = !!(window.Gadsden && Gadsden.reduceMotion());
+      this.querySelector('.gad-cf__arrow--prev').addEventListener('click', () => this.snapTo(Math.round(this.pos) - 1));
+      this.querySelector('.gad-cf__arrow--next').addEventListener('click', () => this.snapTo(Math.round(this.pos) + 1));
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') this.snapTo(Math.round(this.pos) - 1);
+        if (e.key === 'ArrowRight') this.snapTo(Math.round(this.pos) + 1);
+      });
+      this.addEventListener('pointerdown', (e) => this.down(e));
+      this.addEventListener('shopify:block:select', (e) => {
+        const i = this.cards.indexOf(e.target);
+        if (i >= 0) this.snapTo(i);
+      });
+      this.ro = new ResizeObserver(() => this.render());
+      this.ro.observe(this);
+      this.io = new IntersectionObserver((entries) => {
+        this.visible = entries[0].isIntersecting;
+        this.syncVideos();
+      });
+      this.io.observe(this);
+      this.render();
+    }
+
+    disconnectedCallback() {
+      if (this.ro) this.ro.disconnect();
+      if (this.io) this.io.disconnect();
+      this._ready = false;
+    }
+
+    offset(i) {
+      let d = i - this.pos;
+      d = ((((d + this.n / 2) % this.n) + this.n) % this.n) - this.n / 2;
+      return d;
+    }
+
+    render() {
+      const w = this.cards[0] ? this.cards[0].offsetWidth : 260;
+      this.cards.forEach((card, i) => {
+        const d = this.offset(i);
+        const a = Math.min(Math.abs(d), 3);
+        const x = d * w * (this.flat ? 1.05 : 0.62);
+        const scale = this.flat ? 1 : 1 - Math.min(a, 1) * 0.3;
+        const rot = this.flat ? 0 : Math.max(-1, Math.min(1, d)) * -20;
+        card.style.transform = `translateX(${x}px) rotateY(${rot}deg) scale(${scale})`;
+        card.style.zIndex = String(50 - Math.round(a * 10));
+        card.style.opacity = a > 2.6 ? '0' : '1';
+      });
+      this.syncVideos();
+    }
+
+    syncVideos() {
+      const center = Math.round(this.pos);
+      this.cards.forEach((card, i) => {
+        const v = card.querySelector('video');
+        if (!v) return;
+        const near = Math.abs(this.offset(i)) <= this.range + 0.5;
+        if (this.visible && near && !this.flat) {
+          if (v.preload === 'none') v.preload = 'auto';
+          v.play().catch(() => {});
+        } else if (!v.paused) v.pause();
+        if (this.flat && this.visible && ((i % this.n) + this.n) % this.n === ((center % this.n) + this.n) % this.n) v.play().catch(() => {});
+      });
+    }
+
+    down(e) {
+      if (e.target.closest('.gad-cf__arrow')) return;
+      cancelAnimationFrame(this.anim);
+      const w = this.cards[0].offsetWidth * (this.flat ? 1.05 : 0.62);
+      const startX = e.clientX;
+      const startPos = this.pos;
+      let lastX = e.clientX;
+      let lastT = performance.now();
+      let v = 0;
+      this.classList.add('is-dragging');
+      this.setPointerCapture(e.pointerId);
+      const move = (ev) => {
+        const now = performance.now();
+        v = (ev.clientX - lastX) / Math.max(1, now - lastT);
+        lastX = ev.clientX;
+        lastT = now;
+        this.pos = startPos - (ev.clientX - startX) / w;
+        this.render();
+      };
+      const up = () => {
+        this.removeEventListener('pointermove', move);
+        this.removeEventListener('pointerup', up);
+        this.removeEventListener('pointercancel', up);
+        this.classList.remove('is-dragging');
+        const fling = this.flat ? 0 : Math.max(-2, Math.min(2, (-v * 120) / w));
+        this.snapTo(Math.round(this.pos + fling));
+      };
+      this.addEventListener('pointermove', move);
+      this.addEventListener('pointerup', up);
+      this.addEventListener('pointercancel', up);
+    }
+
+    snapTo(target) {
+      cancelAnimationFrame(this.anim);
+      if (this.flat) {
+        this.pos = target;
+        return this.render();
+      }
+      const from = this.pos;
+      const start = performance.now();
+      const dur = 420;
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / dur);
+        const e = 1 - Math.pow(1 - t, 3);
+        this.pos = from + (target - from) * e;
+        this.render();
+        if (t < 1) this.anim = requestAnimationFrame(step);
+      };
+      this.anim = requestAnimationFrame(step);
+    }
+  }
+
+  if (!customElements.get('gad-coverflow')) customElements.define('gad-coverflow', GadCoverflow);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Carrusel 3D de videos",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que dicen <strong>en video</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "min": 180,
+      "max": 340,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho de las tarjetas",
+      "default": 240
+    },
+    {
+      "type": "range",
+      "id": "play_range",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "label": "Videos que se reproducen a cada lado",
+      "default": 1,
+      "info": "El del centro siempre. Más videos a la vez gastan más datos."
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Color de las estrellas",
+      "default": "#F5B301"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Vertical 9:16, corto y sin sonido."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Imagen",
+          "info": "Se ve si no hay video."
+        },
+        {
+          "type": "range",
+          "id": "stars",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "label": "Estrellas",
+          "default": 5,
+          "info": "0: sin estrellas."
+        },
+        {
+          "type": "inline_richtext",
+          "id": "quote",
+          "label": "Frase",
+          "default": "Una frase corta del cliente."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Cliente"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel 3D de videos",
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
