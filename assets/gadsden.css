@@ -1915,16 +1915,59 @@ summary .gad-acc__plus {
 }
 
 /* altura pareja: el contenido de la tarjeta crece y el agregado rápido queda abajo */
-.gad-cards--equal .card__content {
+.gad-cards--equal .card > .card__content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
 }
 
-.gad-cards--equal .card__content .card__information {
+.gad-cards--equal .card > .card__content .card__information {
   flex-grow: 1;
 }
 
-.gad-cards--equal .card__content .quick-add {
+.gad-cards--equal .card > .card__content .quick-add {
   margin-top: auto;
+}
+
+/* ---------- A09 color de los íconos decorativos ---------- */
+html.gad-icons-accent .gad-icon {
+  color: var(--gad-icon-color, rgb(var(--color-accent, var(--color-button))));
+}
+
+html.gad-icons-button .gad-icon {
+  color: var(--gad-icon-color, rgb(var(--color-button)));
+}
+
+/* ---------- tarjetas: etiqueta al centro, pegada al costado, renglones del título ---------- */
+.card__badge.center {
+  justify-self: center;
+}
+
+html.gad-badge-flush .card:not(.card--horizontal) > .card__content > .card__badge {
+  margin: 0;
+}
+
+html.gad-ct-1 .card__heading a,
+html.gad-ct-2 .card__heading a,
+html.gad-ct-3 .card__heading a {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+}
+
+html.gad-ct-1 .card__heading a {
+  -webkit-line-clamp: 1;
+}
+
+html.gad-ct-2 .card__heading a {
+  -webkit-line-clamp: 2;
+}
+
+html.gad-ct-3 .card__heading a {
+  -webkit-line-clamp: 3;
+}
+
+/* en tarjetas con foto, el contenido interno sólo lleva la etiqueta: sin relleno queda pegada al borde */
+html.gad-badge-flush .card--media .card__inner .card__content {
+  padding: var(--image-padding, 0);
 }

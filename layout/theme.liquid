@@ -10,6 +10,15 @@
   if settings.button_fx_action != 'none'
     assign gad_html_classes = gad_html_classes | append: ' gad-fx-action-' | append: settings.button_fx_action
   endif
+  if settings.accent_icons != blank and settings.accent_icons != 'text'
+    assign gad_html_classes = gad_html_classes | append: ' gad-icons-' | append: settings.accent_icons
+  endif
+  if settings.badge_flush
+    assign gad_html_classes = gad_html_classes | append: ' gad-badge-flush'
+  endif
+  if settings.card_title_lines != blank and settings.card_title_lines != 'none'
+    assign gad_html_classes = gad_html_classes | append: ' gad-ct-' | append: settings.card_title_lines
+  endif
 -%}
 <html
   class="{{ gad_html_classes }}"
@@ -338,6 +347,7 @@
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'gadsden.css' | asset_url | stylesheet_tag }}
     {%- render 'gad-form-styles' -%}
+    {%- render 'gad-typography' -%}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}

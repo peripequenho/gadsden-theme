@@ -306,7 +306,10 @@
       {%- endfor -%}
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
-        {% if cart == empty %}
+        {% if settings.cart_icon != blank and settings.cart_icon != 'bag-1' %}
+          {%- assign gad_cart_svg = 'icon-gad-' | append: settings.cart_icon | append: '.svg' -%}
+          <span class="svg-wrapper">{{ gad_cart_svg | inline_asset_content }}</span>
+        {% elsif cart == empty %}
           <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
         {% else %}
           <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>

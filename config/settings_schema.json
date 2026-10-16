@@ -49,6 +49,10 @@
     "settings": [
       {
         "type": "paragraph",
+        "content": "Gadsden usa cinco combinaciones con estos papeles: 1 Fondo 1 (el fondo principal), 2 Fondo 2 (un fondo alternativo), 3 Inversa (el texto como fondo), 4 Acento 1 (el color de los botones llenos) y 5 Acento 2. Cada una admite un degradé que reemplaza al fondo liso, y su propio acento para las palabras resaltadas y los íconos."
+      },
+      {
+        "type": "paragraph",
         "content": "Gadsden arranca con cinco combinaciones: 1 · Fondo, 2 · Fondo alternativo, 3 · Acento 2, 4 · Inversa y 5 · Acento. Cada sección elige una, o usa sus colores propios desde la casilla \"Usar colores propios\"."
       },
       {
@@ -120,6 +124,27 @@
           "on_secondary_button": "secondary_button_label",
           "secondary_button_border": "secondary_button_label"
         }
+      },
+      {
+        "type": "select",
+        "id": "accent_icons",
+        "label": "Color de los íconos decorativos",
+        "options": [
+          {
+            "value": "text",
+            "label": "Texto"
+          },
+          {
+            "value": "accent",
+            "label": "Acento de la combinación"
+          },
+          {
+            "value": "button",
+            "label": "Botón de la combinación"
+          }
+        ],
+        "default": "text",
+        "info": "Los íconos chicos por nombre (barras, cintas, renglones con ícono) cuando la sección no elige otro color."
       }
     ]
   },
@@ -165,6 +190,48 @@
         "unit": "%",
         "label": "t:settings_schema.typography.settings.body_scale.label",
         "default": 100
+      },
+      {
+        "type": "header",
+        "content": "Interlineado y espaciado"
+      },
+      {
+        "type": "range",
+        "id": "heading_line_height",
+        "min": 0.8,
+        "max": 2,
+        "step": 0.1,
+        "label": "Interlineado de los títulos",
+        "default": 1.3
+      },
+      {
+        "type": "range",
+        "id": "heading_letter_spacing",
+        "min": -1,
+        "max": 3,
+        "step": 0.1,
+        "unit": "px",
+        "label": "Espaciado de letras de los títulos",
+        "default": 0.6
+      },
+      {
+        "type": "range",
+        "id": "body_line_height",
+        "min": 1,
+        "max": 2.4,
+        "step": 0.1,
+        "label": "Interlineado de los textos",
+        "default": 1.8
+      },
+      {
+        "type": "range",
+        "id": "body_letter_spacing",
+        "min": -1,
+        "max": 3,
+        "step": 0.1,
+        "unit": "px",
+        "label": "Espaciado de letras de los textos",
+        "default": 0.6
       }
     ]
   },
@@ -792,6 +859,51 @@
         "unit": "px",
         "label": "t:settings_schema.global.settings.blur.label",
         "default": 0
+      },
+      {
+        "type": "header",
+        "content": "Gadsden · Tarjetas"
+      },
+      {
+        "type": "select",
+        "id": "card_title_lines",
+        "label": "Renglones del título",
+        "options": [
+          {
+            "value": "none",
+            "label": "Sin límite"
+          },
+          {
+            "value": "1",
+            "label": "1"
+          },
+          {
+            "value": "2",
+            "label": "2"
+          },
+          {
+            "value": "3",
+            "label": "3"
+          }
+        ],
+        "default": "none",
+        "info": "Lo que no entra termina en puntos suspensivos."
+      },
+      {
+        "type": "select",
+        "id": "quick_add_style",
+        "label": "Botón de agregado rápido",
+        "options": [
+          {
+            "value": "outline",
+            "label": "Con contorno"
+          },
+          {
+            "value": "filled",
+            "label": "Lleno"
+          }
+        ],
+        "default": "outline"
       }
     ]
   },
@@ -1413,10 +1525,21 @@
           {
             "value": "top right",
             "label": "t:settings_schema.badges.settings.position.options__4.label"
+          },
+          {
+            "value": "top center",
+            "label": "Arriba al centro"
           }
         ],
         "default": "bottom left",
         "label": "t:settings_schema.badges.settings.position.label"
+      },
+      {
+        "type": "checkbox",
+        "id": "badge_flush",
+        "label": "Pegada al costado de la tarjeta",
+        "default": false,
+        "info": "Sin el margen alrededor de la etiqueta."
       },
       {
         "type": "range",
@@ -1627,6 +1750,38 @@
         ],
         "default": "drawer",
         "label": "t:settings_schema.cart.settings.cart_type.label"
+      },
+      {
+        "type": "select",
+        "id": "cart_icon",
+        "label": "Ícono del carrito",
+        "options": [
+          {
+            "value": "bag-1",
+            "label": "Bolsa 1"
+          },
+          {
+            "value": "bag-2",
+            "label": "Bolsa 2"
+          },
+          {
+            "value": "cart-1",
+            "label": "Carrito 1"
+          },
+          {
+            "value": "cart-2",
+            "label": "Carrito 2"
+          },
+          {
+            "value": "basket-1",
+            "label": "Canasta 1"
+          },
+          {
+            "value": "basket-2",
+            "label": "Canasta 2"
+          }
+        ],
+        "default": "bag-1"
       },
       {
         "type": "checkbox",
