@@ -1,0 +1,18 @@
+{%- comment -%}
+  Visibilidad por dispositivo (T09) y ancla (T10) para las secciones de Dawn que no se rehicieron:
+  un marcador vacío como primer hijo de la sección. El CSS de T09 oculta la sección entera con
+  .shopify-section:has(> [data-gad-visibility]) y el ancla lleva hasta el principio de la sección.
+
+  Accepts:
+  - s: {Object} settings de la sección (lee visibility y anchor)
+
+  Usage:
+  {%- render 'gad-section-marker', s: section.settings -%}
+{%- endcomment -%}
+{%- liquid
+  assign vis = s.visibility | default: 'all'
+  assign anchor = s.anchor | handleize
+-%}
+{%- if vis != 'all' or anchor != blank -%}
+  <span class="gad-sec-marker"{% if vis != 'all' %} data-gad-visibility="{{ vis }}"{% endif %}{% if anchor != blank %} id="{{ anchor }}" data-gad-anchor{% endif %}></span>
+{%- endif -%}

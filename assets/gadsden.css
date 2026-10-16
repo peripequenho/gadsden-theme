@@ -1971,3 +1971,10 @@ html.gad-ct-3 .card__heading a {
 html.gad-badge-flush .card--media .card__inner .card__content {
   padding: var(--image-padding, 0);
 }
+
+/* marcador de visibilidad y ancla (T09, T10) en secciones de Dawn */
+.gad-sec-marker {
+  display: block;
+  height: 0;
+  overflow: hidden;
+}

@@ -1030,3 +1030,36 @@ if (!customElements.get('gad-contact-form'))
     if (link && !link.contains(event.relatedTarget)) swap(link, false);
   });
 })();
+
+/* ---------- S12: seguimiento de pedido, abre el rastreador con el código ---------- */
+if (!customElements.get('gad-track-order'))
+  customElements.define(
+    'gad-track-order',
+    class GadTrackOrder extends HTMLElement {
+      connectedCallback() {
+        const form = this.querySelector('form');
+        if (!form || form.dataset.gadReady) return;
+        form.dataset.gadReady = '1';
+        const input = form.querySelector('input');
+        const error = this.querySelector('.gad-track__error');
+        input.addEventListener('input', () => {
+          error.hidden = true;
+          input.removeAttribute('aria-invalid');
+        });
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const code = input.value.trim();
+          if (!code) {
+            error.hidden = false;
+            input.setAttribute('aria-invalid', 'true');
+            input.focus();
+            return;
+          }
+          const url = (this.dataset.url || '').split('{codigo}').join(encodeURIComponent(code));
+          if (!url) return;
+          if (this.dataset.newTab === 'true') window.open(url, '_blank', 'noopener');
+          else window.location.href = url;
+        });
+      }
+    }
+  );

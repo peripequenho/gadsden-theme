@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "track": {
+      "type": "gad-track-order",
+      "settings": {}
+    }
+  },
+  "order": [
+    "track"
+  ]
+}
