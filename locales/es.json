@@ -561,7 +561,8 @@
     },
     "reviews": {
       "stars": "{{ count }} de 5 estrellas",
-      "verified": "Comprador verificado"
+      "verified": "Comprador verificado",
+      "empty": "Agregá reseñas para que se vea el muro."
     },
     "compare": {
       "benefit": "Beneficio",
@@ -613,6 +614,12 @@
     },
     "menu": {
       "view_all": "Ver todo"
+    },
+    "page_style": {
+      "note": "Estilo de esta página: esta sección no se ve, sólo cambia el aspecto de esta página."
+    },
+    "offer": {
+      "pick": "Elegí un producto para esta oferta."
     }
   }
 }

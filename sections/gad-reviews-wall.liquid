@@ -1,0 +1,600 @@
+{%- comment -%}
+  Muro de reseñas (L08): reseñas en mampostería (columnas de CSS) con formatos mezclados: con foto,
+  sólo texto y destacadas. Arriba, opcional, el promedio y una cinta que usa las mismas reseñas.
+  Muestra de a tantas y un botón "Ver más". Sin reseñas cargadas no se muestra.
+{%- endcomment -%}
+{%- assign s = section.settings -%}
+{%- if section.blocks.size > 0 -%}
+  {%- render 'gad-colors', s: s, key: section.id -%}
+  <div
+    class="gad-rw gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+    style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rw-cols: {{ s.columns_d }}; --rw-star: {{ s.star_color }};"
+    {% render 'gad-section-attrs', s: s %}
+  >
+    <div class="page-width">
+      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      {%- if s.average != blank -%}
+        {%- assign avg = s.average | replace: ',', '.' | times: 1.0 | round -%}
+        <div class="gad-rw__summary">
+          <strong class="gad-rw__avg">{{ s.average | escape }}</strong>
+          <span class="gad-rw__stars" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: s.average }}">
+            {%- for i in (1..5) -%}<span{% if i > avg %} class="is-off"{% endif %}>★</span>{%- endfor -%}
+          </span>
+          {%- if s.count_text != blank -%}<span class="gad-rw__count">{{ s.count_text }}</span>{%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if s.marquee -%}
+      <div class="gad-rw__marquee" aria-hidden="true">
+        <div class="gad-rw__strip">
+          {%- for copy in (1..2) -%}
+            <div class="gad-rw__group">
+              {%- for block in section.blocks limit: 12 -%}
+                <span class="gad-rw__chip">
+                  <span class="gad-rw__stars">{%- for i in (1..5) -%}<span{% if i > block.settings.stars %} class="is-off"{% endif %}>★</span>{%- endfor -%}</span>
+                  <span>{{ block.settings.text | strip_html | truncate: 60 }}</span>
+                  <b>{{ block.settings.author | escape }}</b>
+                </span>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    <gad-reviews-wall class="page-width" data-batch="{{ s.batch }}">
+      <div class="gad-rw__wall">
+        {%- for block in section.blocks -%}
+          {%- assign b = block.settings -%}
+          <article
+            class="gad-rw__card color-{% if b.featured %}{{ s.featured_scheme }}{% else %}{{ s.card_scheme }}{% endif %}{% if b.featured %} gad-rw__card--featured{% endif %}"
+            {% if forloop.index > s.batch %}
+              hidden data-gad-rw-more
+            {% endif %}
+            {{ block.shopify_attributes }}
+          >
+            {%- if b.image != blank -%}
+              {{ b.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', class: 'gad-rw__photo', sizes: '(min-width: 990px) 25vw, 50vw', widths: '300, 450, 600' }}
+            {%- endif -%}
+            <div class="gad-rw__body">
+              <span class="gad-rw__stars" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.stars }}">
+                {%- for i in (1..5) -%}<span{% if i > b.stars %} class="is-off"{% endif %}>★</span>{%- endfor -%}
+              </span>
+              {%- if b.title != blank -%}<h3 class="gad-rw__title">{{ b.title | escape }}</h3>{%- endif -%}
+              <div class="gad-rw__text rte">{{ b.text }}</div>
+              <footer class="gad-rw__foot">
+                <span class="gad-rw__author">{{ b.author | escape }}</span>
+                {%- if b.verified -%}
+                  <span class="gad-rw__verified">{%- render 'gad-icon', name: 'verified', filled: true -%}{{ 'gadsden.reviews.verified' | t }}</span>
+                {%- endif -%}
+                {%- if b.date != blank -%}<span class="gad-rw__date">{{ b.date | escape }}</span>{%- endif -%}
+              </footer>
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+      {%- if section.blocks.size > s.batch -%}
+        <div class="gad-rw__more">
+          <button type="button" class="button button--secondary" data-gad-rw-btn>{{ s.more_label | escape }}</button>
+        </div>
+      {%- endif -%}
+    </gad-reviews-wall>
+  </div>
+{%- elsif request.design_mode -%}
+  <p class="gad-rw__empty page-width">{{ 'gadsden.reviews.empty' | t }}</p>
+{%- endif -%}
+
+{% stylesheet %}
+  .gad-rw__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem 1.2rem;
+    margin-bottom: 2.4rem;
+  }
+
+  .gad-rw__avg {
+    font-size: 3.2rem;
+    line-height: 1;
+  }
+
+  .gad-rw__summary .gad-rw__stars {
+    font-size: 2.2rem;
+  }
+
+  .gad-rw__count {
+    font-size: 1.4rem;
+    opacity: 0.8;
+  }
+
+  .gad-rw__stars {
+    color: var(--rw-star, #f5b301);
+    letter-spacing: 0.1rem;
+  }
+
+  .gad-rw__stars .is-off {
+    opacity: 0.25;
+  }
+
+  .gad-rw__marquee {
+    overflow: hidden;
+    margin-bottom: 2.4rem;
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .gad-rw__strip {
+    display: flex;
+    width: max-content;
+    animation: gadRwMarquee 60s linear infinite;
+  }
+
+  .gad-rw__marquee:hover .gad-rw__strip,
+  html.gad-reduce .gad-rw__strip {
+    animation-play-state: paused;
+  }
+
+  .gad-rw__group {
+    display: flex;
+    gap: 1rem;
+    padding-right: 1rem;
+  }
+
+  .gad-rw__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.4rem;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    border-radius: 99rem;
+    font-size: 1.3rem;
+    white-space: nowrap;
+  }
+
+  @keyframes gadRwMarquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .gad-rw__wall {
+    columns: 2;
+    column-gap: 1.2rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-rw__wall {
+      columns: var(--rw-cols, 3);
+      column-gap: 2rem;
+    }
+  }
+
+  .gad-rw__card {
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 1.2rem;
+    overflow: hidden;
+    break-inside: avoid;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+    border-radius: 1.2rem;
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-rw__card {
+      margin-bottom: 2rem;
+    }
+  }
+
+  .gad-rw__card[hidden] {
+    display: none;
+  }
+
+  .gad-rw__photo {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .gad-rw__body {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.4rem;
+  }
+
+  .gad-rw__card--featured .gad-rw__text {
+    font-size: 1.7rem;
+    font-weight: 600;
+  }
+
+  .gad-rw__title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .gad-rw__text {
+    font-size: 1.4rem;
+  }
+
+  .gad-rw__text p {
+    margin: 0;
+  }
+
+  .gad-rw__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.8rem;
+    font-size: 1.2rem;
+  }
+
+  .gad-rw__author {
+    font-weight: 700;
+  }
+
+  .gad-rw__verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    opacity: 0.8;
+  }
+
+  .gad-rw__date {
+    opacity: 0.6;
+  }
+
+  .gad-rw__more {
+    margin-top: 1.2rem;
+    text-align: center;
+  }
+
+  .gad-rw__empty {
+    padding: 1.2rem;
+    border: 0.1rem dashed rgba(var(--color-foreground), 0.3);
+    font-size: 1.3rem;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class GadReviewsWall extends HTMLElement {
+    connectedCallback() {
+      const btn = this.querySelector('[data-gad-rw-btn]');
+      if (!btn) return;
+      const batch = parseInt(this.dataset.batch, 10) || 8;
+      btn.addEventListener('click', () => {
+        const hidden = [...this.querySelectorAll('[data-gad-rw-more][hidden]')];
+        hidden.slice(0, batch).forEach((el) => (el.hidden = false));
+        if (hidden.length <= batch) btn.parentElement.remove();
+      });
+    }
+  }
+
+  if (!customElements.get('gad-reviews-wall')) customElements.define('gad-reviews-wall', GadReviewsWall);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Muro de reseñas",
+  "tag": "section",
+  "class": "section gad-section",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Lo que dicen <strong>los que lo usan</strong>",
+      "info": "Marcá en negrita las palabras que querés resaltar."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Tamaño del título",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Chico"
+        },
+        {
+          "value": "h1",
+          "label": "Mediano"
+        },
+        {
+          "value": "h0",
+          "label": "Grande"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "color",
+      "id": "heading_accent",
+      "label": "Color de las palabras resaltadas",
+      "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto"
+    },
+    {
+      "type": "header",
+      "content": "Resumen"
+    },
+    {
+      "type": "text",
+      "id": "average",
+      "label": "Promedio",
+      "info": "Ej. 4,8. Vacío: sin resumen. Poné el promedio real."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "count_text",
+      "label": "Cantidad",
+      "info": "Ej. 128 reseñas."
+    },
+    {
+      "type": "checkbox",
+      "id": "marquee",
+      "label": "Cinta corrida con las mismas reseñas",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Color de las estrellas",
+      "default": "#F5B301"
+    },
+    {
+      "type": "header",
+      "content": "Muro"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "label": "Columnas en desktop",
+      "default": 3,
+      "info": "En mobile, 2."
+    },
+    {
+      "type": "range",
+      "id": "batch",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "label": "Reseñas visibles de entrada",
+      "default": 9
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "Texto del botón para ver más",
+      "default": "Ver más reseñas"
+    },
+    {
+      "type": "color_scheme",
+      "id": "card_scheme",
+      "label": "Combinación de las reseñas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "featured_scheme",
+      "label": "Combinación de las destacadas",
+      "default": "scheme-3"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Combinación de colores",
+      "default": "scheme-2"
+    },
+    {
+      "type": "header",
+      "content": "Colores propios"
+    },
+    {
+      "type": "checkbox",
+      "id": "custom_colors",
+      "label": "Usar colores propios",
+      "default": false,
+      "info": "Pisan a la combinación de colores elegida arriba."
+    },
+    {
+      "type": "color",
+      "id": "cc_bg",
+      "label": "Fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color_background",
+      "id": "cc_bg_gradient",
+      "label": "Degradé de fondo",
+      "info": "Si cargás un degradé, reemplaza al color de fondo."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image",
+      "label": "Imagen de fondo",
+      "info": "Cubre todo el fondo y le gana al degradé."
+    },
+    {
+      "type": "image_picker",
+      "id": "cc_bg_image_mobile",
+      "label": "Imagen de fondo en mobile",
+      "info": "Vacía: usa la de desktop."
+    },
+    {
+      "type": "color",
+      "id": "cc_text",
+      "label": "Texto",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_accent",
+      "label": "Acento",
+      "default": "#334FB4"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_bg",
+      "label": "Fondo del botón lleno",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "cc_btn_text",
+      "label": "Texto del botón lleno",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "cc_outline",
+      "label": "Botón de contorno y enlaces",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno arriba",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno abajo",
+      "default": 36,
+      "info": "En mobile se aplica el 75 %."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad y ancla"
+    },
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        {
+          "value": "all",
+          "label": "Todos los dispositivos"
+        },
+        {
+          "value": "mobile",
+          "label": "Sólo mobile"
+        },
+        {
+          "value": "desktop",
+          "label": "Sólo desktop"
+        }
+      ],
+      "default": "all",
+      "info": "Mobile es todo lo que mide menos de 990 px."
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Nombre del ancla",
+      "placeholder": "beneficios",
+      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Reseña",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "range",
+          "id": "stars",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Estrellas",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Escribí acá lo que dijo el cliente, con sus palabras.</p>"
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Autor",
+          "default": "Nombre del cliente"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Fecha"
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Compra verificada",
+          "default": false,
+          "info": "Marcala sólo si es una compra real."
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Destacada",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Muro de reseñas",
+      "blocks": [
+        {
+          "type": "review"
+        },
+        {
+          "type": "review",
+          "settings": {
+            "featured": true
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "stars": 4
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

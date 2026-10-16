@@ -549,7 +549,8 @@
     },
     "reviews": {
       "stars": "{{ count }} out of 5 stars",
-      "verified": "Verified buyer"
+      "verified": "Verified buyer",
+      "empty": "Add reviews to show this wall."
     },
     "compare": {
       "benefit": "Benefit",
@@ -601,6 +602,12 @@
     },
     "menu": {
       "view_all": "View all"
+    },
+    "page_style": {
+      "note": "Page style: this section is not visible. It only changes the look of this page."
+    },
+    "offer": {
+      "pick": "Pick a product for this offer."
     }
   }
 }
