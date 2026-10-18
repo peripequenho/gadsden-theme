@@ -7841,7 +7841,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Las miniaturas a los costados y su cantidad se usan con el diseño \"Miniaturas en carrusel\"."
+      "content": "Las miniaturas se ven con los diseños \"Miniaturas\" y \"Miniaturas en carrusel\" (a los costados, sólo con el carrusel)."
     },
     {
       "type": "select",
@@ -7866,11 +7866,39 @@
     {
       "type": "range",
       "id": "thumbs_count",
-      "min": 4,
+      "min": 2,
       "max": 12,
       "step": 1,
-      "label": "Miniaturas visibles abajo",
-      "default": 5
+      "label": "Miniaturas visibles",
+      "default": 5,
+      "info": "Cuántas entran a la vista, abajo o a los costados. Si hay más, se deslizan."
+    },
+    {
+      "type": "range",
+      "id": "thumbs_gap",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre miniaturas",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "thumbs_fixed",
+      "label": "Elegir el tamaño de las miniaturas",
+      "default": false,
+      "info": "Apagado, se reparten el ancho según cuántas se ven."
+    },
+    {
+      "type": "range",
+      "id": "thumbs_size",
+      "min": 40,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Tamaño de las miniaturas",
+      "default": 72
     },
     {
       "type": "range",
@@ -7913,6 +7941,16 @@
     {
       "type": "header",
       "content": "Galería: mobile"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_count",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Miniaturas visibles en mobile",
+      "default": 3,
+      "info": "Cuando \"Diseño para móviles\" muestra las miniaturas."
     },
     {
       "type": "range",

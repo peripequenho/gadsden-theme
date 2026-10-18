@@ -57,6 +57,9 @@
   if gs.gallery_arrows_bare
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--bare-arrows'
   endif
+  if gs.thumbs_fixed
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-fixed'
+  endif
   if gs.m_edge
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-edge'
   endif
@@ -76,7 +79,7 @@
   {% if gs.filter_option != blank %}
     data-gad-filter-option="{{ gs.filter_option | strip | escape }}"
   {% endif %}
-  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}"
+  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --m-thumbs-count: {{ gs.m_thumbs_count | default: 3 }}; --thumbs-gap: {{ gs.thumbs_gap | default: 10 }}px; --thumbs-size: {{ gs.thumbs_size | default: 72 }}px; --vthumb-n: {{ gs.thumbs_v_width | default: 16 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}"
 >
   {%- if gs.trust_badge != blank -%}
     <div class="gad-trust-badge gad-trust-badge--{{ gs.trust_badge_position }} gad-trust-badge--{{ gs.trust_badge_size }}">
