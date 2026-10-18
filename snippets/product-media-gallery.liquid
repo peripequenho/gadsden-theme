@@ -62,6 +62,14 @@
   if gs.thumbs_scroll == 'free'
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-free'
   endif
+  assign gad_m_pos = gs.m_thumbs_position | default: 'bottom'
+  assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-thumbs-' | append: gad_m_pos
+  if gs.m_thumbs_fixed
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-thumbs-fixed'
+  endif
+  if gs.m_thumbs_scroll == 'free'
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-thumbs-free'
+  endif
   if gs.thumbs_fixed
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-fixed'
   endif
@@ -78,18 +86,21 @@
   class="{{ gad_gallery_class }}"
   aria-label="{{ 'products.product.media.gallery_viewer' | t }}"
   data-desktop-layout="{{ section.settings.gallery_layout }}"
-  {% if gs.thumbs_auto != blank and gs.thumbs_auto != 'off' %}
-    data-gad-thumbs-auto="{{ gs.thumbs_auto }}"
-    data-gad-thumbs-speed="{{ gs.thumbs_auto_speed | default: 30 }}"
-    data-gad-thumbs-interval="{{ gs.thumbs_auto_interval | default: 2.5 }}"
-  {% endif %}
+  data-gad-thumbs-auto="{{ gs.thumbs_auto | default: 'off' }}"
+  data-gad-thumbs-speed="{{ gs.thumbs_auto_speed | default: 30 }}"
+  data-gad-thumbs-interval="{{ gs.thumbs_auto_interval | default: 2.5 }}"
+  data-gad-thumbs-auto-m="{{ gs.m_thumbs_auto | default: 'off' }}"
+  data-gad-thumbs-speed-m="{{ gs.m_thumbs_auto_speed | default: 30 }}"
+  data-gad-thumbs-interval-m="{{ gs.m_thumbs_auto_interval | default: 2.5 }}"
+  data-gad-step-d="{% if gs.thumbs_scroll == 'free' %}{{ gs.thumbs_count | default: 3 }}{% else %}1{% endif %}"
+  data-gad-step-m="{% if gs.m_thumbs_scroll == 'free' %}{{ gs.m_thumbs_count | default: 3 }}{% else %}1{% endif %}"
   {% if gs.keep_media_order %}
     data-gad-keep-order="true"
   {% endif %}
   {% if gs.filter_option != blank %}
     data-gad-filter-option="{{ gs.filter_option | strip | escape }}"
   {% endif %}
-  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --m-thumbs-count: {{ gs.m_thumbs_count | default: 3 }}; --thumbs-gap: {{ gs.thumbs_gap | default: 10 }}px; --thumbs-size: {{ gs.thumbs_size | default: 72 }}px; --vthumb-n: {{ gs.thumbs_v_width | default: 16 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}"
+  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --m-thumbs-count: {{ gs.m_thumbs_count | default: 3 }}; --m-thumbs-gap: {{ gs.m_thumbs_gap | default: 10 }}px; --m-thumbs-size: {{ gs.m_thumbs_size | default: 64 }}px; --m-vthumb-n: {{ gs.m_thumbs_v_width | default: 20 }}; --thumbs-gap: {{ gs.thumbs_gap | default: 10 }}px; --thumbs-size: {{ gs.thumbs_size | default: 72 }}px; --vthumb-n: {{ gs.thumbs_v_width | default: 16 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}"
 >
   {%- if gs.trust_badge != blank -%}
     <div class="gad-trust-badge gad-trust-badge--{{ gs.trust_badge_position }} gad-trust-badge--{{ gs.trust_badge_size }}">

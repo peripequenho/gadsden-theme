@@ -8019,7 +8019,41 @@
     },
     {
       "type": "header",
-      "content": "Galería: mobile"
+      "content": "Miniaturas: mobile"
+    },
+    {
+      "type": "paragraph",
+      "content": "Se ven cuando \"Diseño para móviles\" muestra las miniaturas."
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_position",
+      "label": "Miniaturas",
+      "options": [
+        {
+          "value": "bottom",
+          "label": "Abajo"
+        },
+        {
+          "value": "left",
+          "label": "A la izquierda"
+        },
+        {
+          "value": "right",
+          "label": "A la derecha"
+        }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_v_width",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de las miniaturas a los costados",
+      "default": 20
     },
     {
       "type": "range",
@@ -8027,9 +8061,96 @@
       "min": 2,
       "max": 8,
       "step": 1,
-      "label": "Miniaturas visibles en mobile",
-      "default": 3,
-      "info": "Cuando \"Diseño para móviles\" muestra las miniaturas."
+      "label": "Miniaturas visibles",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_gap",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre miniaturas",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "m_thumbs_fixed",
+      "label": "Elegir el tamaño de las miniaturas",
+      "default": false,
+      "info": "Apagado, se reparten el ancho según cuántas se ven."
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_size",
+      "min": 40,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Tamaño de las miniaturas",
+      "default": 64
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_scroll",
+      "label": "Al mover las miniaturas",
+      "options": [
+        {
+          "value": "one",
+          "label": "De a una, con encaje"
+        },
+        {
+          "value": "free",
+          "label": "Deslizamiento libre"
+        }
+      ],
+      "default": "one"
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_auto",
+      "label": "Movimiento automático",
+      "options": [
+        {
+          "value": "off",
+          "label": "Apagado"
+        },
+        {
+          "value": "continuous",
+          "label": "Continuo"
+        },
+        {
+          "value": "step",
+          "label": "De a una"
+        }
+      ],
+      "default": "off",
+      "info": "Se frena cuando el cliente toca las miniaturas, y con \"reducir movimiento\"."
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_auto_speed",
+      "min": 10,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "Velocidad del continuo (por segundo)",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_auto_interval",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Pausa entre pasos (de a una)",
+      "default": 2.5
+    },
+    {
+      "type": "header",
+      "content": "Galería: mobile"
     },
     {
       "type": "range",

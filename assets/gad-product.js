@@ -191,11 +191,26 @@
     else if (gallery.setActiveMedia) gallery.setActiveMedia(item.dataset.mediaId, false);
   }
 
-  /* tira de miniaturas que se mueve sola: continuo (va y vuelve) o de a una; se frena al usarla */
+  /* tira de miniaturas: paso de las flechas y movimiento automático (continuo, va y vuelve, o de a una),
+     con los valores de desktop o de mobile según el ancho; se frena al usarla */
   function thumbsMotion(gallery) {
-    const mode = gallery.dataset.gadThumbsAuto;
     const list = gallery.querySelector('.thumbnail-list');
-    if (!mode || !list || (window.Gadsden && Gadsden.reduceMotion())) return;
+    if (!list) return;
+    const ds = gallery.dataset;
+    const mq = window.matchMedia('(max-width: 749px)');
+    const cfg = () =>
+      mq.matches
+        ? { mode: ds.gadThumbsAutoM, speed: ds.gadThumbsSpeedM, interval: ds.gadThumbsIntervalM, step: ds.gadStepM }
+        : { mode: ds.gadThumbsAuto, speed: ds.gadThumbsSpeed, interval: ds.gadThumbsInterval, step: ds.gadStepD };
+    const setStep = () => {
+      const s = cfg().step;
+      if (s) gallery.querySelectorAll('.thumbnail-slider .slider-button').forEach((btn) => (btn.dataset.step = s));
+    };
+    setStep();
+    mq.addEventListener('change', setStep);
+    const on = (m) => m && m !== 'off';
+    if (!on(ds.gadThumbsAuto) && !on(ds.gadThumbsAutoM)) return;
+    if (window.Gadsden && Gadsden.reduceMotion()) return;
     let paused = false;
     let visible = true;
     ['pointerenter', 'touchstart', 'focusin'].forEach((ev) => list.addEventListener(ev, () => (paused = true), { passive: true }));
@@ -206,41 +221,47 @@
     const max = () => (vertical() ? list.scrollHeight - list.clientHeight : list.scrollWidth - list.clientWidth);
     const get = () => (vertical() ? list.scrollTop : list.scrollLeft);
     const idle = () => paused || !visible || document.hidden || max() < 2;
-    if (mode === 'continuous') {
-      const speed = parseFloat(gallery.dataset.gadThumbsSpeed) || 30;
-      list.style.scrollSnapType = 'none';
-      list.style.scrollBehavior = 'auto';
-      let pos = get();
-      let dir = 1;
-      let last = 0;
-      const tick = (t) => {
-        const dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
-        last = t;
-        if (!idle()) {
+    let mode = null;
+    let pos = 0;
+    let dir = 1;
+    let last = 0;
+    let since = 0;
+    const tick = (t) => {
+      const c = cfg();
+      const m = on(c.mode) ? c.mode : null;
+      if (m !== mode) {
+        mode = m;
+        list.style.scrollSnapType = mode === 'continuous' ? 'none' : '';
+        list.style.scrollBehavior = mode === 'continuous' ? 'auto' : '';
+        pos = get();
+        since = 0;
+      }
+      const dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
+      last = t;
+      if (mode && !idle()) {
+        if (mode === 'continuous') {
           if (Math.abs(get() - pos) > 3) pos = get();
-          pos += dir * speed * dt;
+          pos += dir * (parseFloat(c.speed) || 30) * dt;
           if (pos >= max()) (pos = max()), (dir = -1);
           if (pos <= 0) (pos = 0), (dir = 1);
           if (vertical()) list.scrollTop = pos;
           else list.scrollLeft = pos;
+        } else if ((since += dt) >= (parseFloat(c.interval) || 2.5)) {
+          since = 0;
+          const items = Array.from(list.querySelectorAll('.thumbnail-list__item')).filter((li) => !li.hidden);
+          if (items.length > 1) {
+            const v = vertical();
+            const r0 = items[0].getBoundingClientRect();
+            const r1 = items[1].getBoundingClientRect();
+            const size = v ? r1.top - r0.top : r1.left - r0.left;
+            const at = get() >= max() - 2 ? 0 : get() + size;
+            list.scrollTo(v ? { top: at, behavior: 'smooth' } : { left: at, behavior: 'smooth' });
+          }
         }
-        requestAnimationFrame(tick);
-      };
+      }
       requestAnimationFrame(tick);
-    } else if (mode === 'step') {
-      const ms = (parseFloat(gallery.dataset.gadThumbsInterval) || 2.5) * 1000;
-      setInterval(() => {
-        if (idle()) return;
-        const items = Array.from(list.querySelectorAll('.thumbnail-list__item')).filter((li) => !li.hidden);
-        if (items.length < 2) return;
-        const v = vertical();
-        const a = items[0].getBoundingClientRect();
-        const b = items[1].getBoundingClientRect();
-        const size = v ? b.top - a.top : b.left - a.left;
-        const at = get() >= max() - 2 ? 0 : get() + size;
-        list.scrollTo(v ? { top: at, behavior: 'smooth' } : { left: at, behavior: 'smooth' });
-      }, ms);
-    }
+    };
+    requestAnimationFrame(tick);
   }
 
   function filterGallery() {
