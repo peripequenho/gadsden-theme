@@ -137,7 +137,10 @@
           b.type = 'button';
           b.tabIndex = -1;
           b.className = 'gad-gallery__dot';
-          b.addEventListener('click', () => list.scrollTo({ left: item.offsetLeft - list.offsetLeft, behavior: 'smooth' }));
+          b.addEventListener('click', () => {
+            if (single()) activate(gallery, item);
+            else list.scrollTo({ left: item.offsetLeft - list.offsetLeft, behavior: 'smooth' });
+          });
           dots.appendChild(b);
         });
         update();
@@ -145,6 +148,11 @@
       const update = () => {
         const items = Array.from(list.querySelectorAll(':scope > .product__media-item')).filter((li) => !li.hidden);
         if (!items.length) return;
+        if (single()) {
+          const a = items.findIndex((li) => li.classList.contains('is-active'));
+          Array.from(dots.children).forEach((d, i) => d.classList.toggle('is-active', i === Math.max(0, a)));
+          return;
+        }
         const center = list.scrollLeft + list.clientWidth / 2;
         let best = 0;
         let bestDist = Infinity;
@@ -158,7 +166,10 @@
         });
         Array.from(dots.children).forEach((d, i) => d.classList.toggle('is-active', i === best));
       };
+      // en desktop con miniaturas se ve una sola imagen: los puntos siguen a la activa
+      const single = () => window.matchMedia('(min-width: 750px)').matches && (gallery.dataset.desktopLayout || '').includes('thumbnail');
       list.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
+      new MutationObserver(() => requestAnimationFrame(update)).observe(list, { attributes: true, subtree: true, attributeFilter: ['class'] });
       gallery._gadBuildDots = build;
       build();
     }
@@ -166,15 +177,70 @@
       const btn = e.target.closest('[data-gad-gallery-step]');
       if (!btn) return;
       const step = parseInt(btn.dataset.gadGalleryStep, 10);
-      const thumbs = Array.from(gallery.querySelectorAll('.thumbnail-list__item')).filter((li) => !li.hidden);
       const items = Array.from(gallery.querySelectorAll('.product__media-list > .product__media-item')).filter((li) => !li.hidden);
       const activeIndex = Math.max(0, items.findIndex((li) => li.classList.contains('is-active')));
       const next = items[(activeIndex + step + items.length) % items.length];
-      if (!next) return;
-      const thumb = thumbs.find((t) => t.dataset.target === next.dataset.mediaId);
-      if (thumb) thumb.querySelector('button').click();
-      else if (gallery.setActiveMedia) gallery.setActiveMedia(next.dataset.mediaId, false);
+      if (next) activate(gallery, next);
     });
+    thumbsMotion(gallery);
+  }
+
+  function activate(gallery, item) {
+    const thumb = Array.from(gallery.querySelectorAll('.thumbnail-list__item')).find((t) => !t.hidden && t.dataset.target === item.dataset.mediaId);
+    if (thumb) thumb.querySelector('button').click();
+    else if (gallery.setActiveMedia) gallery.setActiveMedia(item.dataset.mediaId, false);
+  }
+
+  /* tira de miniaturas que se mueve sola: continuo (va y vuelve) o de a una; se frena al usarla */
+  function thumbsMotion(gallery) {
+    const mode = gallery.dataset.gadThumbsAuto;
+    const list = gallery.querySelector('.thumbnail-list');
+    if (!mode || !list || (window.Gadsden && Gadsden.reduceMotion())) return;
+    let paused = false;
+    let visible = true;
+    ['pointerenter', 'touchstart', 'focusin'].forEach((ev) => list.addEventListener(ev, () => (paused = true), { passive: true }));
+    ['pointerleave', 'focusout'].forEach((ev) => list.addEventListener(ev, () => (paused = false)));
+    list.addEventListener('touchend', () => setTimeout(() => (paused = false), 3000), { passive: true });
+    new IntersectionObserver((e) => (visible = e[0].isIntersecting)).observe(list);
+    const vertical = () => list.scrollHeight > list.clientHeight + 2 && list.scrollWidth <= list.clientWidth + 2;
+    const max = () => (vertical() ? list.scrollHeight - list.clientHeight : list.scrollWidth - list.clientWidth);
+    const get = () => (vertical() ? list.scrollTop : list.scrollLeft);
+    const idle = () => paused || !visible || document.hidden || max() < 2;
+    if (mode === 'continuous') {
+      const speed = parseFloat(gallery.dataset.gadThumbsSpeed) || 30;
+      list.style.scrollSnapType = 'none';
+      list.style.scrollBehavior = 'auto';
+      let pos = get();
+      let dir = 1;
+      let last = 0;
+      const tick = (t) => {
+        const dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
+        last = t;
+        if (!idle()) {
+          if (Math.abs(get() - pos) > 3) pos = get();
+          pos += dir * speed * dt;
+          if (pos >= max()) (pos = max()), (dir = -1);
+          if (pos <= 0) (pos = 0), (dir = 1);
+          if (vertical()) list.scrollTop = pos;
+          else list.scrollLeft = pos;
+        }
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    } else if (mode === 'step') {
+      const ms = (parseFloat(gallery.dataset.gadThumbsInterval) || 2.5) * 1000;
+      setInterval(() => {
+        if (idle()) return;
+        const items = Array.from(list.querySelectorAll('.thumbnail-list__item')).filter((li) => !li.hidden);
+        if (items.length < 2) return;
+        const v = vertical();
+        const a = items[0].getBoundingClientRect();
+        const b = items[1].getBoundingClientRect();
+        const size = v ? b.top - a.top : b.left - a.left;
+        const at = get() >= max() - 2 ? 0 : get() + size;
+        list.scrollTo(v ? { top: at, behavior: 'smooth' } : { left: at, behavior: 'smooth' });
+      }, ms);
+    }
   }
 
   function filterGallery() {

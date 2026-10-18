@@ -57,6 +57,11 @@
   if gs.gallery_arrows_bare
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--bare-arrows'
   endif
+  assign gad_d_pag = gs.d_pagination | default: 'hidden'
+  assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--d-pag-' | append: gad_d_pag
+  if gs.thumbs_scroll == 'free'
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-free'
+  endif
   if gs.thumbs_fixed
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-fixed'
   endif
@@ -73,6 +78,11 @@
   class="{{ gad_gallery_class }}"
   aria-label="{{ 'products.product.media.gallery_viewer' | t }}"
   data-desktop-layout="{{ section.settings.gallery_layout }}"
+  {% if gs.thumbs_auto != blank and gs.thumbs_auto != 'off' %}
+    data-gad-thumbs-auto="{{ gs.thumbs_auto }}"
+    data-gad-thumbs-speed="{{ gs.thumbs_auto_speed | default: 30 }}"
+    data-gad-thumbs-interval="{{ gs.thumbs_auto_interval | default: 2.5 }}"
+  {% endif %}
   {% if gs.keep_media_order %}
     data-gad-keep-order="true"
   {% endif %}
@@ -252,7 +262,7 @@
         name="previous"
         aria-label="{{ 'general.slider.previous_slide' | t }}"
         aria-controls="GalleryThumbnails-{{ section.id }}"
-        data-step="3"
+        data-step="{% if gs.thumbs_scroll == 'free' %}{{ gs.thumbs_count | default: 3 }}{% else %}1{% endif %}"
       >
         <span class="svg-wrapper">
           {{- 'icon-caret.svg' | inline_asset_content -}}
@@ -390,7 +400,7 @@
         name="next"
         aria-label="{{ 'general.slider.next_slide' | t }}"
         aria-controls="GalleryThumbnails-{{ section.id }}"
-        data-step="3"
+        data-step="{% if gs.thumbs_scroll == 'free' %}{{ gs.thumbs_count | default: 3 }}{% else %}1{% endif %}"
       >
         <span class="svg-wrapper">
           {{- 'icon-caret.svg' | inline_asset_content -}}

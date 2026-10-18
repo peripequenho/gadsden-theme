@@ -1564,3 +1564,48 @@ html.gad-modal-open {
     max-height: calc(var(--thumbs-count) * var(--thumbs-size) + (var(--thumbs-count) - 1) * var(--thumbs-gap) + 1rem);
   }
 }
+
+/* ---------- Tira de miniaturas libre y puntos de navegación en desktop ---------- */
+.gad-gallery--thumbs-free .thumbnail-list {
+  scroll-snap-type: none;
+}
+
+.gad-gallery--thumbs-free .thumbnail-list__item {
+  scroll-snap-align: none;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-gallery[data-desktop-layout*='thumbnail'].gad-gallery--d-pag-dots_under .gad-gallery__dots,
+  .gad-gallery[data-desktop-layout*='thumbnail'].gad-gallery--d-pag-dots_over .gad-gallery__dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--gad-dot-gap, 0.8rem);
+    margin: 1.2rem 0 0;
+  }
+
+  .gad-gallery--d-pag-dots_over > slider-component:first-of-type {
+    position: relative;
+  }
+
+  .gad-gallery--d-pag-dots_over .gad-gallery__dots {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.6rem;
+    z-index: 2;
+    margin: 0;
+  }
+
+  .gad-gallery--d-pag-dots_over .gad-gallery__dot {
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.45);
+  }
+
+  .gad-gallery--d-pag-dots_over .gad-gallery__dot.is-active {
+    background: #fff;
+  }
+
+  .gad-gallery--d-pag-hidden .gad-gallery__dots {
+    display: none;
+  }
+}
