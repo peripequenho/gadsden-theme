@@ -170,7 +170,7 @@
       assign language_selector = true
     endif
   -%}
-  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}{% unless section.settings.show_search %} gad-header--no-search{% endunless %}{% if section.settings.active_highlight %} gad-header--active-{{ section.settings.active_style }}{% endif %}">
+  <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if country_selector or language_selector %} header--has-localizations{% endif %}{% unless section.settings.show_search %} gad-header--no-search{% endunless %}{% if section.settings.active_highlight %} gad-header--active-{{ section.settings.active_style }}{% endif %}{% if section.settings.mobile_search_position == 'right' %} gad-header--m-search-right{% endif %}{% if section.settings.mobile_account == false %} gad-header--m-no-account{% endif %}">
     {%- liquid
       assign render_search_left = false
       if section.settings.logo_position == 'top-center' or section.settings.menu == blank or shop.customer_accounts_enabled
@@ -771,6 +771,10 @@
         {
           "value": "underline",
           "label": "Subrayado en el color de acento"
+        },
+        {
+          "value": "bold",
+          "label": "Negrita"
         }
       ],
       "default": "pill"
@@ -782,11 +786,61 @@
       "default": "scheme-6"
     },
     {
+      "type": "select",
+      "id": "mobile_menu_style",
+      "label": "Menú mobile",
+      "options": [
+        {
+          "value": "below",
+          "label": "Debajo de la cabecera"
+        },
+        {
+          "value": "panel",
+          "label": "Panel lateral sobre la página"
+        }
+      ],
+      "default": "below",
+      "info": "El panel lateral lleva una fila con el título y un botón para cerrar."
+    },
+    {
       "type": "text",
       "id": "mobile_menu_title",
       "label": "Título del menú mobile",
       "default": "Menú",
       "info": "Vacío: sin título."
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_menu_account",
+      "label": "Mostrar el acceso a la cuenta en el menú mobile",
+      "default": true,
+      "info": "Sólo si la tienda tiene cuentas de clientes."
+    },
+    {
+      "type": "header",
+      "content": "Íconos en mobile"
+    },
+    {
+      "type": "select",
+      "id": "mobile_search_position",
+      "label": "Lupa de búsqueda",
+      "options": [
+        {
+          "value": "left",
+          "label": "A la izquierda, junto al menú"
+        },
+        {
+          "value": "right",
+          "label": "A la derecha, con los íconos"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_account",
+      "label": "Mostrar el ícono de la cuenta en mobile",
+      "default": true
     }
   ],
   "blocks": [

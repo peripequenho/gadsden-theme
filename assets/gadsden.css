@@ -2507,6 +2507,170 @@ body:has(.gad-th-flag--hide-bars) .shopify-section-group-header-group:not(.secti
   hyphens: auto;
 }
 
+/* ---------- Menú mobile como panel lateral (cabecera > Menú mobile) ---------- */
+.js .gad-drawer--panel > summary::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  height: auto;
+  background: rgba(var(--color-foreground), 0.5);
+  display: none;
+  z-index: 9;
+  cursor: default;
+}
+
+.js .gad-drawer--panel[open].menu-opening > summary::before {
+  display: block;
+  animation: gad-veil-in var(--duration-default, 0.2s) ease;
+}
+
+@keyframes gad-veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Con el panel abierto, la cabecera (y su velo) queda por encima de las secciones con z-index propio. */
+body:has(.gad-drawer--panel[open]) .section-header {
+  z-index: 100;
+}
+
+.js .menu-drawer.gad-menu-drawer--panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: calc(100vw - 4rem);
+  height: 100vh;
+  height: var(--viewport-height, 100vh);
+  z-index: 10;
+  overflow-y: auto;
+}
+
+@media screen and (min-width: 750px) {
+  .js .menu-drawer.gad-menu-drawer--panel {
+    width: 40rem;
+  }
+}
+
+.gad-menu-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 6.8rem;
+  padding: 1rem 0.5rem 1rem 2rem;
+  border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.1);
+}
+
+.gad-menu-drawer__head-title {
+  margin: 0;
+  color: rgb(var(--color-foreground));
+}
+
+.gad-menu-drawer__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgb(var(--color-foreground));
+  cursor: pointer;
+}
+
+.gad-menu-drawer__close .svg-wrapper {
+  width: 2rem;
+  height: 2rem;
+}
+
+.gad-menu-drawer--panel .menu-drawer__inner-container,
+.gad-menu-drawer--panel .menu-drawer__navigation-container {
+  height: auto;
+  display: block;
+}
+
+.gad-menu-drawer--panel .menu-drawer__navigation {
+  padding: 1rem 0;
+}
+
+.gad-menu-drawer--panel .menu-drawer__menu-item {
+  padding: 0.9rem 2rem;
+  font-size: 1.8rem;
+  color: rgb(var(--color-foreground));
+}
+
+.gad-menu-drawer--panel .menu-drawer__utility-links {
+  padding: 1rem 2rem;
+  background: transparent;
+  border-top: 0.1rem solid rgba(var(--color-foreground), 0.1);
+}
+
+.gad-menu-drawer--panel .list-social {
+  justify-content: center;
+  margin: 0;
+}
+
+.gad-menu-drawer__account {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: -1.2rem;
+  padding: 1.2rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+}
+
+.gad-menu-drawer__account .svg-wrapper {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ---------- Cabecera en mobile: lupa a la derecha y cuenta oculta (ajustes de la cabecera) ----------
+   La clase repetida iguala la especificidad de las reglas de Dawn que eligen qué lupa mostrar. */
+@media screen and (max-width: 989px) {
+  .header.gad-header--m-search-right.gad-header--m-search-right.gad-header--m-search-right {
+    grid-template-areas: 'left-icons heading icons';
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+
+  .header.gad-header--m-search-right.gad-header--m-search-right.gad-header--m-search-right.gad-header--m-search-right > .header__search {
+    display: none;
+  }
+
+  .header.gad-header--m-search-right.gad-header--m-search-right.gad-header--m-search-right.gad-header--m-search-right .header__icons > .header__search {
+    display: inline-flex;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .gad-header--m-no-account .header__icons .header__icon--account {
+    display: none;
+  }
+}
+
+/* ---------- Link de la página actual en negrita ---------- */
+.gad-header--active-bold .header__inline-menu .header__active-menu-item {
+  font-weight: 700;
+  text-decoration: none;
+  color: rgb(var(--color-foreground));
+}
+
+/* ---------- Pie: tamaño de los íconos de redes e imagen con el redondeo de los medios ---------- */
+.footer .list-social__item :is(.svg-wrapper, .icon) {
+  width: var(--gad-social-size, 2.2rem);
+  height: var(--gad-social-size, 2.2rem);
+}
+
+.footer-block__image-wrapper {
+  border-radius: var(--media-radius);
+}
+
 /* ---------- Estilo base "Clásico" (ajuste global base_style, por defecto) ----------
    Tipografía y botones de la línea clásica de Dawn: texto al 90 % del color, títulos y botones con su
    interletrado, márgenes de los textos enriquecidos sólo fuera del primer y último párrafo. */

@@ -28,7 +28,7 @@
 {%- endstyle -%}
 
 {%- render 'gad-colors', s: section.settings, key: section.id -%}
-<footer class="footer {% render 'gad-scheme', s: section.settings, key: section.id %} section-{{ section.id }}-padding"{% if section.settings.title_scale != blank and section.settings.title_scale != '100' %} data-gad-hs="{{ section.settings.title_scale }}"{% endif %}{% if section.settings.text_scale != blank and section.settings.text_scale != '100' %} data-gad-ts="{{ section.settings.text_scale }}"{% endif %}>
+<footer class="footer {% render 'gad-scheme', s: section.settings, key: section.id %} section-{{ section.id }}-padding" style="--gad-social-size: {{ section.settings.social_icon_size | default: 22 }}px;"{% if section.settings.title_scale != blank and section.settings.title_scale != '100' %} data-gad-hs="{{ section.settings.title_scale }}"{% endif %}{% if section.settings.text_scale != blank and section.settings.text_scale != '100' %} data-gad-ts="{{ section.settings.text_scale }}"{% endif %}>
   {%- liquid
     assign has_social_icons = true
     if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
@@ -313,7 +313,16 @@
         {%- endif -%}
       </div>
     </div>
-    <div class="footer__content-bottom-wrapper page-width{% if section.settings.enable_country_selector == false and section.settings.enable_language_selector == false %} footer__content-bottom-wrapper--center{% endif %}">
+    {%- liquid
+      assign gad_copy_center = false
+      if section.settings.enable_country_selector == false and section.settings.enable_language_selector == false
+        assign gad_copy_center = true
+      endif
+      if section.settings.copyright_align == 'center'
+        assign gad_copy_center = true
+      endif
+    -%}
+    <div class="footer__content-bottom-wrapper page-width{% if gad_copy_center %} footer__content-bottom-wrapper--center{% endif %}">
       <div class="footer__copyright caption">
         {%- if section.settings.copyright_text != blank -%}
           {%- liquid
@@ -830,6 +839,16 @@
       "info": "t:sections.footer.settings.show_social.info"
     },
     {
+      "type": "range",
+      "id": "social_icon_size",
+      "label": "Tamaño de los íconos de redes",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
       "type": "checkbox",
       "id": "enable_country_selector",
       "default": true,
@@ -910,6 +929,23 @@
       "id": "copyright_text",
       "label": "Texto de marca",
       "info": "Reemplaza al copyright y al \"hecho con Shopify\". Acepta enlaces. Comodines: {año} y {tienda}."
+    },
+    {
+      "type": "select",
+      "id": "copyright_align",
+      "label": "Alineación del copyright",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Automática"
+        },
+        {
+          "value": "center",
+          "label": "Centrado"
+        }
+      ],
+      "default": "auto",
+      "info": "Automática: centrado si no hay selector de idioma o país; si hay, a la derecha en desktop."
     },
     {
       "type": "text",

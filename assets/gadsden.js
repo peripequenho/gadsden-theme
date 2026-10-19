@@ -1569,3 +1569,20 @@ Gadsden.fillDates = function (scope) {
 };
 Gadsden.fillDates(document);
 document.addEventListener('shopify:section:load', (e) => Gadsden.fillDates(e.target));
+
+/* ---------- Menú mobile como panel: el botón de cerrar cierra el menú entero ----------
+   El componente del menú de Dawn le da a todos los botones del panel el cierre de submenú; acá se corta
+   en la captura y se cierra por el summary principal (libera el scroll y el estado de la cabecera). */
+document.addEventListener(
+  'click',
+  (event) => {
+    const button = event.target.closest('.gad-menu-drawer__close');
+    if (!button) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const details = button.closest('details.gad-drawer--panel');
+    const summary = details && details.querySelector(':scope > summary');
+    if (summary && details.hasAttribute('open')) summary.click();
+  },
+  true
+);

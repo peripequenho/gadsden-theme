@@ -11,7 +11,8 @@
 
 {%- assign mega_list = section.settings.mega_links | downcase | split: ',' -%}
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
-  <details id="Details-menu-drawer-container" class="menu-drawer-container">
+  {%- assign gad_panel = false -%}{%- if section.settings.mobile_menu_style == 'panel' -%}{%- assign gad_panel = true -%}{%- endif -%}
+  <details id="Details-menu-drawer-container" class="menu-drawer-container{% if gad_panel %} gad-drawer--panel{% endif %}">
     <summary
       class="header__icon header__icon--menu header__icon--summary link focus-inset"
       aria-label="{{ 'sections.header.menu' | t }}"
@@ -21,11 +22,21 @@
         {{- 'icon-close.svg' | inline_asset_content -}}
       </span>
     </summary>
-    <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
+    <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}{% if gad_panel %} gad-menu-drawer--panel{% endif %}">
+      {%- if gad_panel -%}
+        <div class="gad-menu-drawer__head">
+          <p class="gad-menu-drawer__head-title h3">{{ section.settings.mobile_menu_title | escape }}</p>
+          <button type="button" class="gad-menu-drawer__close link focus-inset" aria-label="{{ 'accessibility.close' | t }}">
+            <span class="svg-wrapper">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
+      {%- endif -%}
       <div class="menu-drawer__inner-container">
         <div class="menu-drawer__navigation-container">
           <nav class="menu-drawer__navigation">
-            {%- if section.settings.mobile_menu_title != blank -%}
+            {%- if section.settings.mobile_menu_title != blank and gad_panel == false -%}
               <p class="gad-menu-drawer__title h4">{{ section.settings.mobile_menu_title | escape }}</p>
             {%- endif -%}
             <ul class="menu-drawer__menu has-submenu list-menu" role="list">
@@ -177,6 +188,21 @@
             {%- endif -%}
           </nav>
           <div class="menu-drawer__utility-links">
+            {%- if shop.customer_accounts_enabled and section.settings.mobile_menu_account != false -%}
+              <a
+                href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+                class="gad-menu-drawer__account link focus-inset"
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-account.svg' | inline_asset_content -}}
+                </span>
+                {%- if customer -%}
+                  {{ 'customer.account.title' | t }}
+                {%- else -%}
+                  {{ 'customer.log_in' | t }}
+                {%- endif -%}
+              </a>
+            {%- endif -%}
             {%- if show_country_selector or show_language_selector -%}
               <div class="menu-drawer__localization header-localization">
                 {%- if show_country_selector -%}
