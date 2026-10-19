@@ -228,7 +228,7 @@ class GadCarousel extends HTMLElement {
     this.index = 0;
     this.x = 0;
     this.paused = new Set();
-    this.mq = window.matchMedia('(min-width: 990px)');
+    this.mq = window.matchMedia(`(min-width: ${document.documentElement.dataset.gadBp || '750'}px)`);
 
     this.onMq = () => this.setup();
     this.mq.addEventListener('change', this.onMq);

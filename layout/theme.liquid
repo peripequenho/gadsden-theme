@@ -58,6 +58,10 @@
   dir="{{ gad_dir }}"
   data-gad-primary-host="{{ request.host }}"
   data-gad-permanent-host="{{ shop.permanent_domain }}"
+  data-gad-style="{{ settings.base_style | default: 'clasico' }}"
+  data-gad-bp="{{ settings.carousel_breakpoint | default: '750' }}"
+  data-gad-bare="{{ settings.carousel_arrow_bare_color | default: 'text' }}"
+  data-gad-icons="{{ settings.icon_weight | default: 'normal' }}"
 >
   <head>
     <meta charset="utf-8">
@@ -377,6 +381,11 @@
       }
     {% endstyle %}
 
+    {%- if settings.icon_weight == 'thin' -%}
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL@48,300,0..1&display=block');
+      </style>
+    {%- endif -%}
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'gadsden.css' | asset_url | stylesheet_tag }}
     {%- render 'gad-form-styles' -%}

@@ -127,7 +127,7 @@
     overflow: hidden;
     padding-top: var(--pt-m);
     padding-bottom: var(--pb-m);
-    font-size: var(--size-m);
+    font-size: calc(var(--size-m) * var(--font-body-scale));
     --gap: var(--gap-m);
     --img-h: var(--img-m);
     --rv-w: var(--rv-m);
@@ -316,7 +316,7 @@
     gad-ticker {
       padding-top: var(--pt-d);
       padding-bottom: var(--pb-d);
-      font-size: var(--size-d);
+      font-size: calc(var(--size-d) * var(--font-body-scale));
       --gap: var(--gap-d);
       --img-h: var(--img-d);
       --rv-w: var(--rv-d);
@@ -489,7 +489,7 @@
       "id": "gap_m",
       "min": 0,
       "max": 200,
-      "step": 4,
+      "step": 2,
       "unit": "px",
       "label": "Separación entre elementos en mobile",
       "default": 40
@@ -499,7 +499,7 @@
       "id": "gap_d",
       "min": 0,
       "max": 200,
-      "step": 4,
+      "step": 2,
       "unit": "px",
       "label": "Separación entre elementos en desktop",
       "default": 80
@@ -717,7 +717,7 @@
       "id": "padding_top_m",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Arriba en mobile",
       "default": 12
@@ -727,7 +727,7 @@
       "id": "padding_bottom_m",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Abajo en mobile",
       "default": 12
@@ -737,7 +737,7 @@
       "id": "padding_top_d",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Arriba en desktop",
       "default": 16
@@ -747,7 +747,7 @@
       "id": "padding_bottom_d",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Abajo en desktop",
       "default": 16
@@ -775,7 +775,7 @@
         }
       ],
       "default": "all",
-      "info": "Mobile es todo lo que mide menos de 990 px."
+      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
     },
     {
       "type": "text",
@@ -962,7 +962,7 @@
           "id": "rv_radius",
           "min": 0,
           "max": 40,
-          "step": 2,
+          "step": 1,
           "unit": "px",
           "label": "Redondeo",
           "default": 12
@@ -1004,7 +1004,7 @@
           "id": "rv_avatar_radius",
           "min": 0,
           "max": 40,
-          "step": 2,
+          "step": 1,
           "unit": "px",
           "label": "Redondeo del avatar",
           "default": 40
@@ -1237,7 +1237,7 @@
           "id": "ti_gap",
           "min": 0,
           "max": 40,
-          "step": 2,
+          "step": 1,
           "unit": "px",
           "label": "Separación",
           "default": 8
@@ -1259,7 +1259,7 @@
           "id": "ti_radius",
           "min": 0,
           "max": 40,
-          "step": 2,
+          "step": 1,
           "unit": "px",
           "label": "Redondeo del fondo",
           "default": 12
@@ -1269,7 +1269,7 @@
           "id": "ti_padding",
           "min": 0,
           "max": 40,
-          "step": 2,
+          "step": 1,
           "unit": "px",
           "label": "Relleno del fondo",
           "default": 12

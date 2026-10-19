@@ -91,15 +91,29 @@
     padding: 0;
   }
 
-  @media screen and (min-width: 990px) {
-    .gad-media-slider__full {
+  @media screen and (min-width: 750px) {
+    :where(html[data-gad-bp='750']) .gad-media-slider__full {
       padding-left: 5rem;
       padding-right: 5rem;
     }
   }
 
-  @media screen and (max-width: 989px) {
+  @media screen and (min-width: 990px) {
+    :where(html:not([data-gad-bp='750'])) .gad-media-slider__full {
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
     .gad-media-slider--m-full .gad-media-slider__wrap {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  @media screen and (min-width: 750px) and (max-width: 989px) {
+    :where(html:not([data-gad-bp='750'])) .gad-media-slider--m-full .gad-media-slider__wrap {
       padding-left: 0;
       padding-right: 0;
     }
@@ -148,9 +162,16 @@
     text-align: right;
   }
 
+  @media screen and (min-width: 750px) {
+    :where(html[data-gad-bp='750']) .gad-media-slider__media,
+    :where(html[data-gad-bp='750']) .gad-media-slider__desc {
+      border-radius: var(--radius-d);
+    }
+  }
+
   @media screen and (min-width: 990px) {
-    .gad-media-slider__media,
-    .gad-media-slider__desc {
+    :where(html:not([data-gad-bp='750'])) .gad-media-slider__media,
+    :where(html:not([data-gad-bp='750'])) .gad-media-slider__desc {
       border-radius: var(--radius-d);
     }
   }
@@ -294,7 +315,7 @@
       "id": "radius_d",
       "min": 0,
       "max": 60,
-      "step": 2,
+      "step": 1,
       "unit": "px",
       "label": "Redondeo en desktop",
       "default": 12
@@ -310,7 +331,7 @@
       "id": "radius_m",
       "min": 0,
       "max": 60,
-      "step": 2,
+      "step": 1,
       "unit": "px",
       "label": "Redondeo en mobile",
       "default": 8
@@ -427,7 +448,7 @@
       "id": "d_gap",
       "min": 0,
       "max": 100,
-      "step": 2,
+      "step": 1,
       "unit": "px",
       "label": "Espacio entre ítems",
       "default": 24
@@ -524,7 +545,7 @@
       "id": "m_gap",
       "min": 0,
       "max": 100,
-      "step": 2,
+      "step": 1,
       "unit": "px",
       "label": "Espacio entre ítems",
       "default": 12
@@ -603,7 +624,7 @@
       "id": "padding_top",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Relleno arriba",
       "default": 36
@@ -613,7 +634,7 @@
       "id": "padding_bottom",
       "min": 0,
       "max": 100,
-      "step": 4,
+      "step": 1,
       "unit": "px",
       "label": "Relleno abajo",
       "default": 36,
@@ -642,7 +663,7 @@
         }
       ],
       "default": "all",
-      "info": "Mobile es todo lo que mide menos de 990 px."
+      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
     },
     {
       "type": "text",

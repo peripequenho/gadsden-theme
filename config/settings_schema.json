@@ -259,7 +259,7 @@
         "id": "spacing_sections",
         "min": 0,
         "max": 100,
-        "step": 4,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.spacing_sections.label",
         "default": 0
@@ -277,7 +277,7 @@
         "id": "spacing_grid_horizontal",
         "min": 4,
         "max": 40,
-        "step": 4,
+        "step": 1,
         "default": 8,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.spacing_grid_horizontal.label"
@@ -287,7 +287,7 @@
         "id": "spacing_grid_vertical",
         "min": 4,
         "max": 40,
-        "step": 4,
+        "step": 1,
         "default": 8,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.spacing_grid_vertical.label"
@@ -451,7 +451,7 @@
         "id": "buttons_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 8
@@ -475,7 +475,7 @@
         "id": "buttons_shadow_horizontal_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -485,7 +485,7 @@
         "id": "buttons_shadow_vertical_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -599,7 +599,7 @@
         "id": "variant_pills_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 8
@@ -623,7 +623,7 @@
         "id": "variant_pills_shadow_horizontal_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -633,7 +633,7 @@
         "id": "variant_pills_shadow_vertical_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -682,7 +682,7 @@
         "id": "inputs_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 8
@@ -706,7 +706,7 @@
         "id": "inputs_shadow_horizontal_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -716,7 +716,7 @@
         "id": "inputs_shadow_vertical_offset",
         "min": -12,
         "max": 12,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -757,7 +757,7 @@
         "id": "card_image_padding",
         "min": 0,
         "max": 20,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.image_padding.label",
         "default": 0
@@ -817,7 +817,7 @@
         "id": "card_corner_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 12
@@ -841,7 +841,7 @@
         "id": "card_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -851,7 +851,7 @@
         "id": "card_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -937,7 +937,7 @@
         "id": "collection_card_image_padding",
         "min": 0,
         "max": 20,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.image_padding.label",
         "default": 0
@@ -997,7 +997,7 @@
         "id": "collection_card_corner_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 0
@@ -1021,7 +1021,7 @@
         "id": "collection_card_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1031,7 +1031,7 @@
         "id": "collection_card_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1072,7 +1072,7 @@
         "id": "blog_card_image_padding",
         "min": 0,
         "max": 20,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.image_padding.label",
         "default": 0
@@ -1132,7 +1132,7 @@
         "id": "blog_card_corner_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 0
@@ -1156,7 +1156,7 @@
         "id": "blog_card_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1166,7 +1166,7 @@
         "id": "blog_card_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1215,7 +1215,7 @@
         "id": "text_boxes_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 12
@@ -1239,7 +1239,7 @@
         "id": "text_boxes_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1249,7 +1249,7 @@
         "id": "text_boxes_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1298,7 +1298,7 @@
         "id": "media_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 12
@@ -1322,7 +1322,7 @@
         "id": "media_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1332,7 +1332,7 @@
         "id": "media_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1385,7 +1385,7 @@
         "id": "popup_corner_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 12
@@ -1409,7 +1409,7 @@
         "id": "popup_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1419,7 +1419,7 @@
         "id": "popup_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1482,7 +1482,7 @@
         "id": "drawer_shadow_horizontal_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.horizontal_offset.label",
         "default": 0
@@ -1492,7 +1492,7 @@
         "id": "drawer_shadow_vertical_offset",
         "min": -40,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.vertical_offset.label",
         "default": 0
@@ -1552,7 +1552,7 @@
         "id": "badge_corner_radius",
         "min": 0,
         "max": 40,
-        "step": 2,
+        "step": 1,
         "unit": "px",
         "label": "t:settings_schema.global.settings.corner_radius.label",
         "default": 40
@@ -1638,6 +1638,22 @@
   {
     "name": "t:settings_schema.social-media.name",
     "settings": [
+      {
+        "type": "select",
+        "id": "social_icon_style",
+        "label": "Íconos de Facebook e Instagram",
+        "options": [
+          {
+            "value": "circle",
+            "label": "Redondos"
+          },
+          {
+            "value": "square",
+            "label": "Cuadrados"
+          }
+        ],
+        "default": "circle"
+      },
       {
         "type": "text",
         "id": "social_facebook_link",
@@ -1847,6 +1863,45 @@
         "id": "customer_account_menu",
         "default": "customer-account-main-menu",
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
+      }
+    ]
+  },
+  {
+    "name": "Gadsden · Estilo",
+    "settings": [
+      {
+        "type": "select",
+        "id": "base_style",
+        "label": "Estilo base",
+        "options": [
+          {
+            "value": "clasico",
+            "label": "Clásico"
+          },
+          {
+            "value": "ecom",
+            "label": "Ecom"
+          }
+        ],
+        "default": "clasico",
+        "info": "Clásico: tipografía y botones de la línea clásica de Dawn. Ecom: títulos compactos, botones y precios en negrita, campos y cantidades redondeados. Las fuentes, colores y redondeos se eligen aparte."
+      },
+      {
+        "type": "select",
+        "id": "icon_weight",
+        "label": "Trazo de los íconos",
+        "options": [
+          {
+            "value": "normal",
+            "label": "Normal"
+          },
+          {
+            "value": "thin",
+            "label": "Fino"
+          }
+        ],
+        "default": "normal",
+        "info": "Fino carga una segunda versión de los íconos desde Google Fonts."
       }
     ]
   },
@@ -2383,6 +2438,39 @@
     "name": "Gadsden · Carruseles",
     "settings": [
       {
+        "type": "select",
+        "id": "carousel_breakpoint",
+        "label": "Carruseles: vista de desktop desde",
+        "options": [
+          {
+            "value": "750",
+            "label": "750 px (tablet)"
+          },
+          {
+            "value": "990",
+            "label": "990 px"
+          }
+        ],
+        "default": "750",
+        "info": "Ancho desde el que los carruseles, las pestañas y los sliders usan sus ajustes de desktop."
+      },
+      {
+        "type": "select",
+        "id": "carousel_arrow_bare_color",
+        "label": "Color de las flechas transparentes",
+        "options": [
+          {
+            "value": "text",
+            "label": "Texto de su combinación"
+          },
+          {
+            "value": "bg",
+            "label": "Fondo de su combinación"
+          }
+        ],
+        "default": "text"
+      },
+      {
         "type": "paragraph",
         "content": "El aspecto de las flechas y los puntos de todos los carruseles de la tienda."
       },
@@ -2395,7 +2483,7 @@
         "id": "carousel_arrow_size",
         "min": 10,
         "max": 80,
-        "step": 2,
+        "step": 1,
         "default": 40,
         "unit": "px",
         "label": "Tamaño del botón"
@@ -2528,7 +2616,7 @@
         "id": "back_to_top_x",
         "min": 0,
         "max": 100,
-        "step": 4,
+        "step": 1,
         "unit": "px",
         "label": "Separación del costado",
         "default": 20,
@@ -2731,7 +2819,7 @@
         "id": "cursor_size",
         "min": 16,
         "max": 64,
-        "step": 4,
+        "step": 1,
         "unit": "px",
         "label": "Tamaño",
         "default": 32

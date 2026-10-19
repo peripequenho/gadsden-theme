@@ -247,8 +247,16 @@ gad-carousel {
   min-width: 0;
 }
 
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) gad-carousel {
+    --pv: var(--d-pv, 3);
+    --gap: var(--d-gap, 24px);
+    --peek: var(--d-peek, 0px);
+  }
+}
+
 @media screen and (min-width: 990px) {
-  gad-carousel {
+  :where(html:not([data-gad-bp='750'])) gad-carousel {
     --pv: var(--d-pv, 3);
     --gap: var(--d-gap, 24px);
     --peek: var(--d-peek, 0px);
@@ -280,7 +288,7 @@ gad-carousel:not(.is-active) .gad-carousel__track {
 }
 
 /* sin carrusel en este dispositivo (o con menos ítems que columnas): grilla con la última fila centrada */
-@media screen and (max-width: 989px) {
+@media screen and (max-width: 749px) {
   gad-carousel:not(.gad-carousel--m-on) .gad-carousel__track,
   gad-carousel.is-static .gad-carousel__track {
     flex-wrap: wrap;
@@ -295,17 +303,47 @@ gad-carousel:not(.is-active) .gad-carousel__track {
   }
 }
 
-@media screen and (min-width: 990px) {
-  gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track,
-  gad-carousel.is-static .gad-carousel__track {
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) gad-carousel:not(.gad-carousel--m-on) .gad-carousel__track,
+  :where(html:not([data-gad-bp='750'])) gad-carousel.is-static .gad-carousel__track {
     flex-wrap: wrap;
     justify-content: center;
     row-gap: var(--gap);
     transform: none !important;
   }
 
-  gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track > *,
-  gad-carousel.is-static .gad-carousel__track > * {
+  :where(html:not([data-gad-bp='750'])) gad-carousel:not(.gad-carousel--m-on) .gad-carousel__track > *,
+  :where(html:not([data-gad-bp='750'])) gad-carousel.is-static .gad-carousel__track > * {
+    flex-basis: calc((100% - var(--gap) * (var(--pv) - 1)) / var(--pv));
+  }
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track,
+  :where(html[data-gad-bp='750']) gad-carousel.is-static .gad-carousel__track {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: var(--gap);
+    transform: none !important;
+  }
+
+  :where(html[data-gad-bp='750']) gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track > *,
+  :where(html[data-gad-bp='750']) gad-carousel.is-static .gad-carousel__track > * {
+    flex-basis: calc((100% - var(--gap) * (var(--pv) - 1)) / var(--pv));
+  }
+}
+
+@media screen and (min-width: 990px) {
+  :where(html:not([data-gad-bp='750'])) gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track,
+  :where(html:not([data-gad-bp='750'])) gad-carousel.is-static .gad-carousel__track {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: var(--gap);
+    transform: none !important;
+  }
+
+  :where(html:not([data-gad-bp='750'])) gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track > *,
+  :where(html:not([data-gad-bp='750'])) gad-carousel.is-static .gad-carousel__track > * {
     flex-basis: calc((100% - var(--gap) * (var(--pv) - 1)) / var(--pv));
   }
 }
@@ -325,14 +363,26 @@ gad-carousel.is-dragging .gad-carousel__track a {
   pointer-events: none;
 }
 
-@media screen and (max-width: 989px) {
+@media screen and (max-width: 749px) {
   gad-carousel.gad-carousel--m-auto-height .gad-carousel__track {
     align-items: flex-start;
   }
 }
 
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) gad-carousel.gad-carousel--m-auto-height .gad-carousel__track {
+    align-items: flex-start;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) gad-carousel.gad-carousel--d-auto-height .gad-carousel__track {
+    align-items: flex-start;
+  }
+}
+
 @media screen and (min-width: 990px) {
-  gad-carousel.gad-carousel--d-auto-height .gad-carousel__track {
+  :where(html:not([data-gad-bp='750'])) gad-carousel.gad-carousel--d-auto-height .gad-carousel__track {
     align-items: flex-start;
   }
 }
@@ -442,7 +492,7 @@ gad-carousel.gad-carousel--fade.is-active .gad-carousel__track > .is-active {
 }
 
 /* posiciones de flechas y puntos por dispositivo */
-@media screen and (max-width: 989px) {
+@media screen and (max-width: 749px) {
   .gad-carousel--m-arrows-hidden .gad-carousel__arrow,
   .gad-carousel--m-dots-hidden .gad-carousel__dots {
     display: none;
@@ -480,27 +530,65 @@ gad-carousel.gad-carousel--fade.is-active .gad-carousel__track > .is-active {
   }
 }
 
-@media screen and (min-width: 990px) {
-  .gad-carousel--d-arrows-hidden .gad-carousel__arrow,
-  .gad-carousel--d-dots-hidden .gad-carousel__dots {
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-arrows-hidden .gad-carousel__arrow,
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-dots-hidden .gad-carousel__dots {
     display: none;
   }
 
-  .gad-carousel--d-arrows-sides .gad-carousel__arrow {
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-arrows-sides .gad-carousel__arrow {
+    grid-area: stage;
+    align-self: center;
+    margin: 0 0.8rem;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-arrows-sides .gad-carousel__arrow--prev {
+    justify-self: start;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-arrows-sides .gad-carousel__arrow--next {
+    justify-self: end;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-dots-over .gad-carousel__dots {
+    grid-area: stage;
+    align-self: end;
+    justify-self: center;
+    min-height: 0;
+    margin: 0 0 1.2rem;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot {
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.45);
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--m-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot.is-active {
+    background: #fff;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-arrows-hidden .gad-carousel__arrow,
+  :where(html[data-gad-bp='750']) .gad-carousel--d-dots-hidden .gad-carousel__dots {
+    display: none;
+  }
+
+  :where(html[data-gad-bp='750']) .gad-carousel--d-arrows-sides .gad-carousel__arrow {
     grid-area: stage;
     align-self: center;
     margin: 0 1.2rem;
   }
 
-  .gad-carousel--d-arrows-sides .gad-carousel__arrow--prev {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-arrows-sides .gad-carousel__arrow--prev {
     justify-self: start;
   }
 
-  .gad-carousel--d-arrows-sides .gad-carousel__arrow--next {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-arrows-sides .gad-carousel__arrow--next {
     justify-self: end;
   }
 
-  .gad-carousel--d-dots-over .gad-carousel__dots {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-dots-over .gad-carousel__dots {
     grid-area: stage;
     align-self: end;
     justify-self: center;
@@ -508,12 +596,50 @@ gad-carousel.gad-carousel--fade.is-active .gad-carousel__track > .is-active {
     margin: 0 0 1.6rem;
   }
 
-  .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot {
     background: rgba(255, 255, 255, 0.55);
     box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.45);
   }
 
-  .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot.is-active {
+  :where(html[data-gad-bp='750']) .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot.is-active {
+    background: #fff;
+  }
+}
+
+@media screen and (min-width: 990px) {
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-arrows-hidden .gad-carousel__arrow,
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-dots-hidden .gad-carousel__dots {
+    display: none;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-arrows-sides .gad-carousel__arrow {
+    grid-area: stage;
+    align-self: center;
+    margin: 0 1.2rem;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-arrows-sides .gad-carousel__arrow--prev {
+    justify-self: start;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-arrows-sides .gad-carousel__arrow--next {
+    justify-self: end;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-dots-over .gad-carousel__dots {
+    grid-area: stage;
+    align-self: end;
+    justify-self: center;
+    min-height: 0;
+    margin: 0 0 1.6rem;
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot {
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.45);
+  }
+
+  :where(html:not([data-gad-bp='750'])) .gad-carousel--d-dots-over:not(.gad-carousel--dot-color) .gad-carousel__dot.is-active {
     background: #fff;
   }
 }
@@ -607,8 +733,15 @@ html.gad-reduce .scroll-trigger.animate--fade-in {
 }
 
 /* ---------- multicolumna en carrusel ---------- */
-@media screen and (max-width: 989px) {
+@media screen and (max-width: 749px) {
   .gad-multicolumn-carousel {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) .gad-multicolumn-carousel {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
@@ -1213,14 +1346,26 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
   height: auto;
 }
 
-@media screen and (max-width: 989px) {
+@media screen and (max-width: 749px) {
   .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--m-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
     border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
   }
 }
 
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--m-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
+    border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--d-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
+    border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
+  }
+}
+
 @media screen and (min-width: 990px) {
-  .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--d-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
+  :where(html:not([data-gad-bp='750'])) .gad-ann-bar--sep gad-carousel:is(:not(.gad-carousel--d-on), .is-static) .gad-carousel__track > .gad-ann__item + .gad-ann__item {
     border-inline-start: 0.1rem solid rgba(var(--color-foreground), 0.3);
   }
 }
@@ -2188,130 +2333,130 @@ body:has(.gad-th-flag--hide-bars) .shopify-section-group-header-group:not(.secti
   display: none;
 }
 
-/* ---------- Estética ecom: tipografía, botones, precios y etiquetas ---------- */
-body {
+/* ---------- Estilo base "Ecom" (ajuste global base_style): tipografía, botones, precios y etiquetas ---------- */
+:where(html[data-gad-style='ecom']) body {
   letter-spacing: 0.01rem;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-.h0,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.hxl {
+:where(html[data-gad-style='ecom']) h1,
+:where(html[data-gad-style='ecom']) h2,
+:where(html[data-gad-style='ecom']) h3,
+:where(html[data-gad-style='ecom']) h4,
+:where(html[data-gad-style='ecom']) h5,
+:where(html[data-gad-style='ecom']) .h0,
+:where(html[data-gad-style='ecom']) .h1,
+:where(html[data-gad-style='ecom']) .h2,
+:where(html[data-gad-style='ecom']) .h3,
+:where(html[data-gad-style='ecom']) .h4,
+:where(html[data-gad-style='ecom']) .h5,
+:where(html[data-gad-style='ecom']) .hxl {
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
 
-.button,
-.shopify-payment-button__button--unbranded,
-.customer button {
+:where(html[data-gad-style='ecom']) .button,
+:where(html[data-gad-style='ecom']) .shopify-payment-button__button--unbranded,
+:where(html[data-gad-style='ecom']) .customer button {
   font-weight: 700;
   letter-spacing: 0.02rem;
 }
 
-.button--primary,
-.product-form__submit {
+:where(html[data-gad-style='ecom']) .button--primary,
+:where(html[data-gad-style='ecom']) .product-form__submit {
   font-size: 1.6rem;
 }
 
-.price .price-item {
+:where(html[data-gad-style='ecom']) .price .price-item {
   font-weight: 700;
 }
 
-.price .price__sale s.price-item,
-.price--on-sale .price-item--regular {
+:where(html[data-gad-style='ecom']) .price .price__sale s.price-item,
+:where(html[data-gad-style='ecom']) .price--on-sale .price-item--regular {
   font-weight: 400;
   opacity: 0.6;
 }
 
-.product .price .price-item--sale,
-.product .price__regular .price-item--regular {
+:where(html[data-gad-style='ecom']) .product .price .price-item--sale,
+:where(html[data-gad-style='ecom']) .product .price__regular .price-item--regular {
   font-size: 2.4rem;
 }
 
 @media screen and (min-width: 750px) {
-  .product .price .price-item--sale,
-  .product .price__regular .price-item--regular {
+  :where(html[data-gad-style='ecom']) .product .price .price-item--sale,
+  :where(html[data-gad-style='ecom']) .product .price__regular .price-item--regular {
     font-size: 2.8rem;
   }
 }
 
-.badge {
+:where(html[data-gad-style='ecom']) .badge {
   font-weight: 700;
   letter-spacing: 0.02rem;
 }
 
 .card__heading,
-.card-information > .price {
+:where(html[data-gad-style='ecom']) .card-information > .price {
   font-weight: 600;
 }
 
-.header__menu-item {
+:where(html[data-gad-style='ecom']) .header__menu-item {
   font-weight: 500;
 }
 
-.field__input:focus,
-.select__select:focus,
-.customer .field input:focus {
+:where(html[data-gad-style='ecom']) .field__input:focus,
+:where(html[data-gad-style='ecom']) .select__select:focus,
+:where(html[data-gad-style='ecom']) .customer .field input:focus {
   box-shadow: 0 0 0 0.2rem rgba(var(--color-button), 0.35);
 }
 
-.announcement-bar__message {
+:where(html[data-gad-style='ecom']) .announcement-bar__message {
   font-weight: 600;
   letter-spacing: 0.02rem;
 }
 
-.product-form .shopify-payment-button__button--unbranded,
-.product-form .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+:where(html[data-gad-style='ecom']) .product-form .shopify-payment-button__button--unbranded,
+:where(html[data-gad-style='ecom']) .product-form .shopify-payment-button__button--unbranded:hover:not([disabled]) {
   border-radius: var(--buttons-radius-outset, var(--buttons-radius));
   background-color: transparent;
   color: rgb(var(--color-foreground));
   box-shadow: inset 0 0 0 0.2rem rgb(var(--color-foreground));
 }
 
-.product-form .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+:where(html[data-gad-style='ecom']) .product-form .shopify-payment-button__button--unbranded:hover:not([disabled]) {
   background-color: rgba(var(--color-foreground), 0.05);
 }
 
-.product-form .shopify-payment-button__button--unbranded::after,
-.product-form .shopify-payment-button__button--unbranded::before {
+:where(html[data-gad-style='ecom']) .product-form .shopify-payment-button__button--unbranded::after,
+:where(html[data-gad-style='ecom']) .product-form .shopify-payment-button__button--unbranded::before {
   box-shadow: none;
 }
 
-.quantity,
-.quantity::before,
-.quantity::after {
+:where(html[data-gad-style='ecom']) .quantity,
+:where(html[data-gad-style='ecom']) .quantity::before,
+:where(html[data-gad-style='ecom']) .quantity::after {
   border-radius: var(--inputs-radius);
 }
 
-.quantity__input {
+:where(html[data-gad-style='ecom']) .quantity__input {
   font-weight: 600;
 }
 
-.gad-offer__tick,
-.gad-cl__items .gad-icon,
-.gad-gr__points .gad-icon,
-.gad-qz__benefits .gad-icon,
-.gad-plans__check,
-.gad-p-qgifts__item.is-unlocked .gad-icon {
+:where(html[data-gad-style='ecom']) .gad-offer__tick,
+:where(html[data-gad-style='ecom']) .gad-cl__items .gad-icon,
+:where(html[data-gad-style='ecom']) .gad-gr__points .gad-icon,
+:where(html[data-gad-style='ecom']) .gad-qz__benefits .gad-icon,
+:where(html[data-gad-style='ecom']) .gad-plans__check,
+:where(html[data-gad-style='ecom']) .gad-p-qgifts__item.is-unlocked .gad-icon {
   --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
   color: rgb(var(--color-accent, var(--color-button)));
 }
 
 /* ---------- Tarjetas de producto: título legible y botón de agregado rápido compacto ---------- */
-.card__heading.h5 {
+:where(html[data-gad-style='ecom']) .card__heading.h5 {
   font-size: 1.4rem;
   line-height: 1.35;
 }
 
-.card--text .card__inner .card__heading {
+:where(html[data-gad-style='ecom']) .card--text .card__inner .card__heading {
   font-size: 1.5rem;
   line-height: 1.25;
   word-break: normal;
@@ -2319,7 +2464,7 @@ h5,
   hyphens: auto;
 }
 
-.quick-add__submit.button {
+:where(html[data-gad-style='ecom']) .quick-add__submit.button {
   min-height: 4rem;
   padding: 0.6rem 0.4rem;
   font-size: 1.2rem;
@@ -2327,30 +2472,30 @@ h5,
 }
 
 @media screen and (min-width: 750px) {
-  .card__heading.h5 {
+  :where(html[data-gad-style='ecom']) .card__heading.h5 {
     font-size: 1.5rem;
   }
 
-  .card--text .card__inner .card__heading {
+  :where(html[data-gad-style='ecom']) .card--text .card__inner .card__heading {
     font-size: 2rem;
   }
 
-  .quick-add__submit.button {
+  :where(html[data-gad-style='ecom']) .quick-add__submit.button {
     padding: 0.6rem 1rem;
     font-size: 1.4rem;
   }
 }
 
 /* ---------- Campos, filtros y nombre de la tienda: interletrado justo ---------- */
-.field__label,
-.customer .field label,
-.field__input,
-.customer .field input,
-.select__select,
-.mobile-facets__open-label,
-.facet-filters__label,
-.facets__summary,
-.product-count__text {
+:where(html[data-gad-style='ecom']) .field__label,
+:where(html[data-gad-style='ecom']) .customer .field label,
+:where(html[data-gad-style='ecom']) .field__input,
+:where(html[data-gad-style='ecom']) .customer .field input,
+:where(html[data-gad-style='ecom']) .select__select,
+:where(html[data-gad-style='ecom']) .mobile-facets__open-label,
+:where(html[data-gad-style='ecom']) .facet-filters__label,
+:where(html[data-gad-style='ecom']) .facets__summary,
+:where(html[data-gad-style='ecom']) .product-count__text {
   letter-spacing: 0.01rem;
 }
 
@@ -2360,6 +2505,90 @@ h5,
 
 .card__heading {
   hyphens: auto;
+}
+
+/* ---------- Estilo base "Clásico" (ajuste global base_style, por defecto) ----------
+   Tipografía y botones de la línea clásica de Dawn: texto al 90 % del color, títulos y botones con su
+   interletrado, márgenes de los textos enriquecidos sólo fuera del primer y último párrafo. */
+:where(html[data-gad-style='clasico']) body,
+:where(html[data-gad-style='clasico']) [class*='color-scheme-'],
+:where(html[data-gad-style='clasico']) .gad-cc {
+  color: rgba(var(--color-foreground), 0.9);
+}
+
+:where(html[data-gad-style='clasico']) body {
+  letter-spacing: 0.02em;
+  line-height: calc(1 + 0.5 / var(--font-body-scale));
+}
+
+:where(html[data-gad-style='clasico']) .hxl {
+  font-size: calc(var(--font-heading-scale) * 4rem);
+}
+
+:where(html[data-gad-style='clasico']) .h0 {
+  font-size: calc(var(--font-heading-scale) * 3.25rem);
+}
+
+:where(html[data-gad-style='clasico']) :is(h1, .h1) {
+  font-size: calc(var(--font-heading-scale) * 2.25rem);
+}
+
+:where(html[data-gad-style='clasico']) :is(h4, .h4) {
+  font-size: calc(var(--font-heading-scale) * 1.45rem);
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-style='clasico']) .hxl {
+    font-size: calc(var(--font-heading-scale) * 5.5rem);
+  }
+
+  :where(html[data-gad-style='clasico']) .h0 {
+    font-size: calc(var(--font-heading-scale) * 4.25rem);
+  }
+
+  :where(html[data-gad-style='clasico']) :is(h1, .h1) {
+    font-size: calc(var(--font-heading-scale) * 3rem);
+  }
+}
+
+:where(html[data-gad-style='clasico']) :is(.button, .button-label, .shopify-challenge__button, .customer button) {
+  font-size: 1.6rem;
+  letter-spacing: 0.1rem;
+  font-weight: 700;
+}
+
+:where(html[data-gad-style='clasico']) .rte > :first-child:not(p) {
+  margin-top: revert;
+}
+
+:where(html[data-gad-style='clasico']) .rte > :last-child:not(p) {
+  margin-bottom: revert;
+}
+
+:where(html[data-gad-style='clasico']) :is(.header__menu-item, .footer .list-menu__item--link) {
+  color: rgba(var(--color-foreground), 0.9);
+}
+
+/* Velo de las tarjetas: el fondo de su combinación con un 4 % del color del texto encima. */
+:where(html[data-gad-style='clasico']) .gad-tint {
+  background: linear-gradient(rgba(var(--color-foreground), 0.04), rgba(var(--color-foreground), 0.04)),
+    rgb(var(--color-background));
+}
+
+/* ---------- Imágenes dentro de textos y de bloques de apps: sin el espacio del descendente ---------- */
+.rte :is(img, video),
+.shopify-app-block :is(img, video) {
+  vertical-align: bottom;
+}
+
+/* ---------- Flechas transparentes con el color del fondo de su combinación (ajuste global) ---------- */
+:where(html[data-gad-bare='bg']) :is(.gad-carousel--bare-arrows .gad-carousel__arrow, .gad-gallery--m-bare-arrows .gad-gallery__arrow, .gad-gallery--bare-arrows .gad-gallery__main-arrow) {
+  color: rgb(var(--color-background));
+}
+
+/* ---------- Íconos de trazo fino (ajuste global) ---------- */
+:where(html[data-gad-icons='thin']) .material-symbols-outlined {
+  font-weight: 300;
 }
 
 /* ---------- Tamaño de la letra (títulos y textos por sección, letra por bloque de la ficha) ----------

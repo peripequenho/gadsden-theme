@@ -878,50 +878,50 @@ cart-drawer.is-empty .drawer__footer {
   border-radius: var(--img-r, 0);
 }
 
-/* ---------- Estética ecom: total en negrita y pie compacto en mobile ---------- */
-.totals__total-value,
-.gad-cart-sub .totals__total-value {
+/* ---------- Estilo base "Ecom": total en negrita y pie compacto en mobile ---------- */
+:where(html[data-gad-style='ecom']) .totals__total-value,
+:where(html[data-gad-style='ecom']) .gad-cart-sub .totals__total-value {
   font-weight: 700;
 }
 
-.gad-cart-checkout__total {
+:where(html[data-gad-style='ecom']) .gad-cart-checkout__total {
   white-space: nowrap;
 }
 
 @media screen and (max-width: 749px) {
-  .drawer__footer {
+  :where(html[data-gad-style='ecom']) .drawer__footer {
     padding: 1rem 0;
   }
 
-  .drawer__footer summary {
+  :where(html[data-gad-style='ecom']) .drawer__footer summary {
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
 
-  .drawer__footer > details {
+  :where(html[data-gad-style='ecom']) .drawer__footer > details {
     margin-top: -1rem;
   }
 
-  .cart-drawer__footer > * + * {
+  :where(html[data-gad-style='ecom']) .cart-drawer__footer > * + * {
     margin-top: 0.6rem;
   }
 
-  .drawer__footer .field__input,
-  .drawer__footer .field__label {
+  :where(html[data-gad-style='ecom']) .drawer__footer .field__input,
+  :where(html[data-gad-style='ecom']) .drawer__footer .field__label {
     font-size: 1.4rem;
     letter-spacing: 0;
   }
 
-  .drawer__footer .field__input {
+  :where(html[data-gad-style='ecom']) .drawer__footer .field__input {
     height: 4.4rem;
     min-height: 4.4rem;
   }
 
-  .drawer__footer .gad-coupon__btn {
+  :where(html[data-gad-style='ecom']) .drawer__footer .gad-coupon__btn {
     min-height: 4.4rem;
   }
 
-  .gad-cart-checkout .cart__checkout-button {
+  :where(html[data-gad-style='ecom']) .gad-cart-checkout .cart__checkout-button {
     font-size: 1.5rem;
     min-height: 4.8rem;
   }
