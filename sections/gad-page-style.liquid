@@ -143,6 +143,13 @@
       background-size: 0.8rem 0.8rem;
     }
   {%- endif -%}
+  {%- if s.title_zoom_m != blank and s.title_zoom_m < 100 -%}
+    @media screen and (max-width: 749px) {
+      #MainContent :is(.gad-heading__title, .collapsible-content__heading, .gad-icc__heading) {
+        zoom: {{ s.title_zoom_m | divided_by: 100.0 }};
+      }
+    }
+  {%- endif -%}
   {%- if s.page_width > 0 -%}
     :root {
       --page-width: {{ s.page_width | divided_by: 10 }}rem;
@@ -541,6 +548,17 @@
       "label": "Ancho de la página",
       "default": 0,
       "info": "0: el de Configuración del tema."
+    },
+    {
+      "type": "range",
+      "id": "title_zoom_m",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Títulos de las secciones en mobile",
+      "default": 100,
+      "info": "Achica los títulos grandes en el celular."
     }
   ],
   "presets": [

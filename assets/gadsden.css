@@ -1882,7 +1882,7 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
   border-top: 0;
 }
 
-.gad-acc--box summary {
+.gad-acc.gad-acc--box summary {
   padding: 1.6rem 2rem;
 }
 
@@ -1895,7 +1895,7 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
   color: inherit;
 }
 
-.gad-acc--box .accordion__content {
+.gad-acc.gad-acc--box .accordion__content {
   margin: 1.6rem 0;
   padding: 0 2rem;
 }

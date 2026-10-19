@@ -117,10 +117,18 @@
     text-align: center;
   }
 
-  /* video o imagen del ancho de la página, con borde */
-  .gad-st2--media-page .gad-st2__media {
-    border: var(--gad-skin-border, 0.2rem solid rgba(var(--color-accent, var(--color-button)), 0.45));
-    border-radius: var(--media-radius, 0);
+  /* video o imagen del ancho de la página, con borde (en mobile, a todo el ancho) */
+  @media screen and (min-width: 750px) {
+    .gad-st2--media-page .gad-st2__media {
+      border: var(--gad-skin-border, 0.2rem solid rgba(var(--color-accent, var(--color-button)), 0.45));
+      border-radius: var(--media-radius, 0);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-st2--media-page > .page-width:first-child {
+      padding: 0;
+    }
   }
 
   /* sellos en caja: palabra grande a la izquierda, sin inclinación */
