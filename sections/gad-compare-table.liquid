@@ -38,6 +38,9 @@
     --reg-zebra: {{ s.reg_zebra | divided_by: 100.0 }};
     --min-line: {{ s.min_line | divided_by: 100.0 }};
     --own-size: {{ s.own_size }}px;
+    {%- if s.partial_color != blank %}
+      --partial: {{ s.partial_color }};
+    {%- endif %}
     --own-logo-d: {{ s.own_logo_width_d }}px;
     --own-logo-m: {{ s.own_logo_width_m }}px;
     {%- for i in (1..3) -%}
@@ -101,7 +104,11 @@
         <thead>
           <tr>
             <th class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__corner gad-cmp__first {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}" scope="col">
-              <span class="visually-hidden">{{ 'gadsden.compare.benefit' | t }}</span>
+              {%- if s.feature_label != blank -%}
+                <span class="gad-cmp__feature-label">{{ s.feature_label | escape }}</span>
+              {%- else -%}
+                <span class="visually-hidden">{{ 'gadsden.compare.benefit' | t }}</span>
+              {%- endif -%}
             </th>
             <th class="gad-cmp__cell gad-cmp__own gad-cmp__head {% if s.hl_style == 'scheme' %}color-{{ s.hl_scheme }}{% endif %}" scope="col">
               {%- if s.own_logo != blank -%}
@@ -133,7 +140,9 @@
                 {{- b.benefit -}}
               </th>
               <td class="gad-cmp__cell gad-cmp__own {% if s.hl_style == 'scheme' %}color-{{ s.hl_scheme }}{% endif %}">
-                {%- if b.own -%}
+                {%- if b.own and b.own_partial -%}
+                  <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--partial">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
+                {%- elsif b.own -%}
                   <span class="gad-cmp__icon gad-cmp__icon--check">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
                 {%- else -%}
                   <span class="gad-cmp__icon gad-cmp__icon--cross gad-cmp__icon--odd">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
@@ -141,8 +150,11 @@
               </td>
               {%- for i in (1..n) -%}
                 {%- assign k_val = 'c' | append: i -%}
+                {%- assign k_partial = 'c' | append: i | append: '_partial' -%}
                 <td class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__other {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}">
-                  {%- if b[k_val] -%}
+                  {%- if b[k_val] and b[k_partial] -%}
+                    <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--partial">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
+                  {%- elsif b[k_val] -%}
                     <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--odd">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
                   {%- else -%}
                     <span class="gad-cmp__icon gad-cmp__icon--cross">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
@@ -206,6 +218,27 @@
 
     .gad-cmp-layout--table-first .gad-cmp-layout__table {
       order: -1;
+    }
+
+    .gad-cmp-layout--table-top {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 3.2rem;
+    }
+
+    .gad-cmp-layout--table-top > .gad-cmp-layout__text {
+      max-width: 80rem;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gad-cmp-layout--table-top > .gad-cmp-layout__text .gad-buttons {
+      justify-content: center;
+    }
+
+    .gad-cmp-layout--table-top > .gad-cmp-layout__table {
+      width: 100%;
+      max-width: 80rem;
+      margin: 0 auto;
     }
 
     .gad-cmp--a-left {
@@ -275,6 +308,12 @@
 
   .gad-cmp__corner {
     background: transparent;
+  }
+
+  .gad-cmp__feature-label {
+    display: block;
+    font-weight: 700;
+    text-align: left;
   }
 
   .gad-cmp__label {
@@ -364,6 +403,16 @@
 
   .gad-cmp--inverted.gad-cmp--cross-filled .gad-cmp__icon--cross.gad-cmp__icon--odd {
     background: var(--chk-bg);
+  }
+
+  /* tilde parcial: la misma tilde en el color de "parcial" (llena: el fondo) */
+  .gad-cmp__icon--partial {
+    --chk: var(--partial, rgba(var(--color-foreground), 0.45));
+  }
+
+  .gad-cmp--check-filled .gad-cmp__icon--partial {
+    --chk: inherit;
+    --chk-bg: var(--partial, rgba(var(--color-foreground), 0.3));
   }
 
   /* clásico y centrado: columna propia destacada con esquinas redondeadas, separadores y cebra */
@@ -757,9 +806,14 @@
         {
           "value": "second",
           "label": "Tabla segundo"
+        },
+        {
+          "value": "top",
+          "label": "Texto arriba, centrado"
         }
       ],
-      "default": "second"
+      "default": "second",
+      "info": "En mobile el texto va siempre arriba."
     },
     {
       "type": "select",
@@ -788,6 +842,12 @@
       "label": "Columna propia que sobresale abajo",
       "default": false,
       "info": "Con el estilo clásico: la columna destacada termina un poco más abajo que la tabla."
+    },
+    {
+      "type": "text",
+      "id": "feature_label",
+      "label": "Encabezado de la columna de características",
+      "info": "Vacío: sin encabezado."
     },
     {
       "type": "range",
@@ -1052,6 +1112,12 @@
       "id": "cross_bg",
       "label": "Círculo de la cruz",
       "default": "#E4E4E4"
+    },
+    {
+      "type": "color",
+      "id": "partial_color",
+      "label": "Color de la tilde parcial",
+      "info": "Para las filas con \"parcial\". Vacío: el texto, suave."
     },
     {
       "type": "checkbox",
@@ -1372,6 +1438,34 @@
           "type": "checkbox",
           "id": "c3",
           "label": "El competidor 3 lo tiene",
+          "default": false
+        },
+        {
+          "type": "paragraph",
+          "content": "Parcial: la tilde va en otro color. Sólo cuenta si la columna está tildada."
+        },
+        {
+          "type": "checkbox",
+          "id": "own_partial",
+          "label": "Parcial en la columna propia",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "c1_partial",
+          "label": "Parcial en el competidor 1",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "c2_partial",
+          "label": "Parcial en el competidor 2",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "c3_partial",
+          "label": "Parcial en el competidor 3",
           "default": false
         }
       ]

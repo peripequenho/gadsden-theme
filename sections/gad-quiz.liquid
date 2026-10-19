@@ -50,7 +50,16 @@
             {%- if row == blank -%}{%- continue -%}{%- endif -%}
             {%- assign parts = row | split: '|' -%}
             {%- assign tag = parts[1] | strip | downcase -%}
-            <button type="button" class="gad-qz__opt" data-gad-qz-opt data-tag="{{ tag | escape }}">{{ parts[0] | strip | escape }}</button>
+            {%- assign label = parts[0] | strip -%}
+            {%- assign two = label | split: ' — ' -%}
+            <button type="button" class="gad-qz__opt" data-gad-qz-opt data-tag="{{ tag | escape }}">
+              {%- if s.option_two_lines and two.size > 1 -%}
+                <span class="gad-qz__opt-title">{{ two[0] | strip | escape }}</span>
+                <span class="gad-qz__opt-desc">{{ label | remove_first: two[0] | remove_first: ' — ' | strip | escape }}</span>
+              {%- else -%}
+                <span class="gad-qz__opt-title">{{ label | escape }}</span>
+              {%- endif -%}
+            </button>
           {%- endfor -%}
         </div>
       </div>
@@ -59,6 +68,12 @@
     <div class="gad-qz__screen gad-qz__result color-{{ s.cut_scheme }}" data-gad-qz="cut" hidden>
       <h3 class="h2">{{ s.cut_title | escape }}</h3>
       <div class="rte">{{ s.cut_text }}</div>
+      {%- if s.summary_title != blank -%}
+        <div class="gad-qz__summary" data-gad-qz-summary hidden>
+          <p class="gad-qz__summary-title">{{ s.summary_title | escape }}</p>
+          <ul class="gad-qz__summary-list list-unstyled" role="list"></ul>
+        </div>
+      {%- endif -%}
       <button type="button" class="link gad-qz__restart" data-gad-qz-restart>{{ s.restart_label | escape }}</button>
     </div>
 
@@ -92,6 +107,12 @@
             {%- endif -%}
           </div>
         </div>
+        {%- if s.summary_title != blank -%}
+          <div class="gad-qz__summary" data-gad-qz-summary hidden>
+            <p class="gad-qz__summary-title">{{ s.summary_title | escape }}</p>
+            <ul class="gad-qz__summary-list list-unstyled" role="list"></ul>
+          </div>
+        {%- endif -%}
         <button type="button" class="link gad-qz__restart" data-gad-qz-restart>{{ s.restart_label | escape }}</button>
       </div>
     {%- endfor -%}
@@ -129,6 +150,10 @@
     color: inherit;
     font: inherit;
     cursor: pointer;
+  }
+
+  .gad-qz__back[hidden] {
+    display: none;
   }
 
   .gad-qz__count {
@@ -187,6 +212,43 @@
     text-align: left;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
+  }
+
+  .gad-qz__opt-title,
+  .gad-qz__opt-desc {
+    display: block;
+  }
+
+  .gad-qz__opt-desc {
+    margin-top: 0.2rem;
+    font-size: 1.35rem;
+    opacity: 0.72;
+  }
+
+  .gad-qz__summary {
+    margin: 2rem 0 0;
+    padding: 1.6rem;
+    border-radius: 1rem;
+    background: rgba(var(--color-foreground), 0.05);
+    text-align: left;
+  }
+
+  .gad-qz__summary-title {
+    margin: 0 0 0.8rem;
+    font-weight: 700;
+  }
+
+  .gad-qz__summary-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .gad-qz__summary-list span {
+    display: block;
+    opacity: 0.72;
+    font-size: 1.25rem;
   }
 
   .gad-qz__opt:hover,
@@ -307,6 +369,8 @@
       screen.querySelectorAll('[data-gad-qz-opt]').forEach((o) => o.classList.toggle('is-picked', o === btn));
       this.answers[i] = btn.dataset.tag || '';
       this.answers.length = i + 1;
+      this.picked = (this.picked || []).slice(0, i);
+      this.picked[i] = btn;
       setTimeout(() => (i + 1 < this.qs.length ? this.show(this.qs[i + 1]) : this.finish()), 220);
     }
 
@@ -317,12 +381,36 @@
 
     restart() {
       this.answers = [];
+      this.picked = [];
       this.querySelectorAll('.is-picked').forEach((o) => o.classList.remove('is-picked'));
       this.show(this.screens[0]);
     }
 
+    // Resumen de respuestas: pregunta y opción elegida, armado con el texto de la página (no se guarda ni se envía).
+    summary(screen) {
+      const box = screen.querySelector('[data-gad-qz-summary]');
+      if (!box) return;
+      const list = box.querySelector('ul');
+      list.replaceChildren(
+        ...(this.picked || []).map((btn, i) => {
+          const li = document.createElement('li');
+          const q = document.createElement('span');
+          q.textContent = this.qs[i].querySelector('.gad-qz__q').textContent.trim();
+          const a = document.createElement('b');
+          a.textContent = btn.querySelector('.gad-qz__opt-title').textContent.trim();
+          li.append(q, a);
+          return li;
+        })
+      );
+      box.hidden = !list.children.length;
+    }
+
     finish() {
-      if (this.answers.includes('!')) return this.show(this.screens.find((s) => s.dataset.gadQz === 'cut'));
+      if (this.answers.includes('!')) {
+        const cut = this.screens.find((s) => s.dataset.gadQz === 'cut');
+        this.summary(cut);
+        return this.show(cut);
+      }
       const score = {};
       this.answers.filter((t) => t && t !== '!').forEach((t) => (score[t] = (score[t] || 0) + 1));
       const results = this.screens.filter((s) => s.dataset.gadQz === 'result');
@@ -332,7 +420,10 @@
         if (p && (score[p] || 0) > 0 && (!best || score[p] > (score[best.dataset.profile] || 0))) best = r;
       });
       if (!best) best = results.find((r) => !r.dataset.profile) || results[0];
-      if (best) this.show(best);
+      if (best) {
+        this.summary(best);
+        this.show(best);
+      }
     }
   }
 
@@ -424,6 +515,19 @@
       "id": "cheer",
       "label": "Aliento a mitad de camino",
       "default": "Vas por la mitad. Ya casi."
+    },
+    {
+      "type": "checkbox",
+      "id": "option_two_lines",
+      "label": "Opciones en dos líneas",
+      "default": false,
+      "info": "Lo que va después de \" — \" (raya con espacios) baja a una segunda línea más chica."
+    },
+    {
+      "type": "text",
+      "id": "summary_title",
+      "label": "Título del resumen de respuestas",
+      "info": "Se muestra en el resultado con lo que eligió el visitante. Vacío: sin resumen."
     },
     {
       "type": "text",

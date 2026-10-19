@@ -567,7 +567,8 @@
     "compare": {
       "benefit": "Beneficio",
       "yes": "Incluido",
-      "no": "No incluido"
+      "no": "No incluido",
+      "partial": "Parcial"
     },
     "before_after": {
       "label": "Arrastrá para comparar el antes y el después"

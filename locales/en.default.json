@@ -555,7 +555,8 @@
     "compare": {
       "benefit": "Benefit",
       "yes": "Included",
-      "no": "Not included"
+      "no": "Not included",
+      "partial": "Partial"
     },
     "before_after": {
       "label": "Drag to compare before and after"
