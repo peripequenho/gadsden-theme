@@ -11,6 +11,8 @@
 - Cuestionario: opciones en dos líneas (lo que va después de " — " baja a una línea más chica) y resumen de las respuestas en el resultado (no se guarda ni se envía). Corregido: "Volver" ya no aparece en la primera pregunta.
 - Nota: estilo **Diario** (portal de noticias: letra de lectura con serifa, volanta en el color del botón, líneas finas en lugar de cajas y sombras; los colores siguen siendo los de la combinación) y chips de **temas** al pie.
 - Íconos con contenido: bloque **Video o imagen** (con proporción, ancho máximo y redondeo) que va con el título y el texto, y **pulso** alrededor de los íconos (quieto con "reducir movimiento").
+- Lista de colecciones: estilo **Título sobre la imagen** (posición, velo con color y opacidad, color y tamaño del título por pantalla, flecha, redondeo), **carrusel** compartido (bucle, pase automático, por pantalla, de a cuántos, vista previa, flechas y puntos por pantalla), ancho completo sin márgenes en desktop e **imagen y título propios** por colección (también con el estilo del tema).
+- Estilo de esta página: fuente del texto y etiqueta de oferta de la ficha (fondo, texto, inclinación y mayúsculas).
 
 ## 1.0.1
 

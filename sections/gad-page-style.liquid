@@ -1,12 +1,22 @@
 {%- comment -%}
   Estilo de esta página (L19): sección invisible que cambia el aspecto sólo de la página donde está:
-  colores de la combinación 1, fuente y forma de los títulos, botón de compra, borde de las fotos de la
+  colores de la combinación 1, fuente y forma de los títulos, fuente del texto, botón de compra, etiqueta de oferta, borde de las fotos de la
   ficha y colores de la barra de anuncios. Borrarla vuelve todo atrás.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
 {%- style -%}
   {%- if s.title_font_on -%}
     {{ s.title_font | font_face: font_display: 'swap' }}
+  {%- endif -%}
+  {%- if s.body_font_on -%}
+    {{ s.body_font | font_face: font_display: 'swap' }}
+    {{ s.body_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
+    :root {
+      --font-body-family: {{ s.body_font.family }}, {{ s.body_font.fallback_families }};
+      --font-body-style: {{ s.body_font.style }};
+      --font-body-weight: {{ s.body_font.weight }};
+      --font-body-weight-bold: {{ s.body_font.weight | plus: 300 | at_most: 1000 }};
+    }
   {%- endif -%}
   {%- if s.colors_on -%}
     :root, body, .color-scheme-1 {
@@ -46,6 +56,14 @@
     }
     .product-form__submit::after, .gad-atc__btn::after, [data-gad-bundle-add]::after {
       border-radius: {{ s.atc_radius }}px;
+    }
+  {%- endif -%}
+  {%- if s.badge_on -%}
+    .product .gad-price__badge, .product .price__badge-sale {
+      {%- if s.badge_bg != blank -%}--color-background: {{ s.badge_bg.red }},{{ s.badge_bg.green }},{{ s.badge_bg.blue }}; background-color: {{ s.badge_bg }}; border-color: {{ s.badge_bg }};{%- endif -%}
+      {%- if s.badge_text != blank -%}--color-foreground: {{ s.badge_text.red }},{{ s.badge_text.green }},{{ s.badge_text.blue }}; color: {{ s.badge_text }};{%- endif -%}
+      {%- if s.badge_skew != 0 -%}transform: skewX({{ s.badge_skew }}deg);{%- endif -%}
+      {%- if s.badge_upper -%}text-transform: uppercase; letter-spacing: 0.08rem;{%- endif -%}
     }
   {%- endif -%}
   {%- if s.media_border > 0 -%}
@@ -171,6 +189,26 @@
     },
     {
       "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "checkbox",
+      "id": "body_font_on",
+      "label": "Cambiar la fuente del texto",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Fuente del texto",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "header",
       "content": "Botón de compra"
     },
     {
@@ -213,6 +251,47 @@
     {
       "type": "checkbox",
       "id": "atc_upper",
+      "label": "Mayúsculas",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Etiqueta de oferta de la ficha"
+    },
+    {
+      "type": "header",
+      "content": "Etiqueta de oferta de la ficha"
+    },
+    {
+      "type": "checkbox",
+      "id": "badge_on",
+      "label": "Cambiar la etiqueta de oferta",
+      "default": false,
+      "info": "La que va junto al precio en la ficha y en el producto destacado."
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Fondo"
+    },
+    {
+      "type": "color",
+      "id": "badge_text",
+      "label": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "badge_skew",
+      "min": -12,
+      "max": 0,
+      "step": 1,
+      "unit": "°",
+      "label": "Inclinación",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "badge_upper",
       "label": "Mayúsculas",
       "default": false
     },

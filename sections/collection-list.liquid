@@ -18,17 +18,40 @@
 {%- endstyle -%}
 
 {%- liquid
+  assign s = section.settings
   assign columns_mobile_int = section.settings.columns_mobile | plus: 0
+  assign columns_desktop_int = section.settings.columns_desktop | plus: 0
+  assign gad_carousel = false
+  if s.d_carousel or s.m_carousel
+    assign gad_carousel = true
+  endif
   assign show_mobile_slider = false
-  if section.settings.swipe_on_mobile and section.blocks.size > columns_mobile_int
+  if section.settings.swipe_on_mobile and section.blocks.size > columns_mobile_int and gad_carousel == false
     assign show_mobile_slider = true
+  endif
+  assign overlay = false
+  if s.card_layout == 'overlay'
+    assign overlay = true
+  endif
+  assign item_tag = 'li'
+  if gad_carousel
+    assign item_tag = 'div'
+  endif
+  assign columns = section.blocks.size
+  if columns > 3
+    assign columns = 3
   endif
 -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
-  <div class="collection-list-wrapper page-width isolate{% if show_mobile_slider %} page-width-desktop{% endif %}{% if section.settings.title == blank %} no-heading{% endif %}{% if section.settings.show_view_all == false or section.blocks.size > collections.size %} no-mobile-link{% endif %} section-{{ section.id }}-padding">
+  <div
+    class="collection-list-wrapper {% if s.full_width %}gad-cl--full{% else %}page-width{% endif %} isolate{% if show_mobile_slider %} page-width-desktop{% endif %}{% if section.settings.title == blank %} no-heading{% endif %}{% if section.settings.show_view_all == false or section.blocks.size > collections.size %} no-mobile-link{% endif %} section-{{ section.id }}-padding"
+    {% if overlay %}
+      style="--clo-veil: {{ s.overlay_color }}; --clo-opacity: {{ s.overlay_opacity | divided_by: 100.0 }}; --clo-text: {{ s.overlay_text }}; --clo-t-d: {{ s.card_title_d }}px; --clo-t-m: {{ s.card_title_m }}px; --clo-r: {{ s.card_radius }}px;"
+    {% endif %}
+  >
     {%- unless section.settings.title == blank -%}
-      <div class="title-wrapper-with-link{% if show_mobile_slider %} title-wrapper--self-padded-tablet-down{% else %} title-wrapper--self-padded-mobile{% endif %} title-wrapper--no-top-margin">
+      <div class="title-wrapper-with-link{% if s.full_width %} page-width{% elsif show_mobile_slider %} title-wrapper--self-padded-tablet-down{% else %} title-wrapper--self-padded-mobile{% endif %} title-wrapper--no-top-margin">
         <h2
           id="SectionHeading-{{ section.id }}"
           class="collection-list-title inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
@@ -49,70 +72,122 @@
       </div>
     {%- endunless -%}
 
-    <slider-component class="slider-mobile-gutter{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-      <ul
-        class="collection-list contains-card contains-card--collection{% if settings.card_style == 'standard' %} contains-card--standard{% endif %} grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down{% if section.settings.swipe_on_mobile %} slider slider--tablet grid--peek{% endif %} collection-list--{{ section.blocks.size }}-items"
-        id="Slider-{{ section.id }}"
-        role="list"
-      >
+    {%- capture gad_items -%}
+      {%- for block in section.blocks -%}
         {%- liquid
-          assign columns = section.blocks.size
-          if columns > 3
-            assign columns = 3
-          endif
+          assign b = block.settings
+          assign placeholder_image_index = forloop.index0 | modulo: 4 | plus: 1
+          assign placeholder_image = 'collection-apparel-' | append: placeholder_image_index
+          assign card_image = b.image | default: b.collection.featured_image
+          assign card_title = b.title | default: b.collection.title
         -%}
-        {%- for block in section.blocks -%}
-          <li
-            id="Slide-{{ section.id }}-{{ forloop.index }}"
-            class="collection-list__item grid__item{% if show_mobile_slider %} slider__slide{% endif %}{% if block.settings.collection.featured_image == nil %} collection-list__item--no-media{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-            {{ block.shopify_attributes }}
-            {% if settings.animations_reveal_on_scroll %}
-              data-cascade
-              style="--animation-order: {{ forloop.index }};"
-            {% endif %}
-          >
-            {%- assign placeholder_image_index = forloop.index0 | modulo: 4 | plus: 1 -%}
-            {%- assign placeholder_image = 'collection-apparel-' | append: placeholder_image_index -%}
+        <{{ item_tag }}
+          id="Slide-{{ section.id }}-{{ forloop.index }}"
+          class="collection-list__item{% unless gad_carousel %} grid__item{% endunless %}{% if show_mobile_slider %} slider__slide{% endif %}{% if card_image == blank %} collection-list__item--no-media{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+          {{ block.shopify_attributes }}
+          {% if settings.animations_reveal_on_scroll %}
+            data-cascade
+            style="--animation-order: {{ forloop.index }};"
+          {% endif %}
+        >
+          {%- if overlay -%}
+            {%- liquid
+              assign clo_ratio = '1 / 1'
+              if s.image_ratio == 'portrait'
+                assign clo_ratio = '4 / 5'
+              elsif s.image_ratio == 'adapt' and card_image != blank
+                assign clo_ratio = card_image.aspect_ratio
+              endif
+            -%}
+            <a
+              class="gad-clo gad-clo--{{ s.overlay_position }}"
+              {% if b.collection == blank %}
+                role="link" aria-disabled="true"
+              {% else %}
+                href="{{ b.collection.url }}"
+              {% endif %}
+              style="--clo-ratio: {{ clo_ratio }};"
+            >
+              {%- if card_image != blank -%}
+                {{ card_image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: '', class: 'gad-clo__img', sizes: '(min-width: 990px) 33vw, 50vw', widths: '375, 550, 750, 1100, 1500' }}
+              {%- else -%}
+                {{ placeholder_image | placeholder_svg_tag: 'gad-clo__img placeholder-svg' }}
+              {%- endif -%}
+              <span class="gad-clo__veil" aria-hidden="true"></span>
+              <span class="gad-clo__title">
+                {%- if card_title == blank -%}{{ 'onboarding.collection_title' | t }}{%- else -%}{{ card_title | escape }}{%- endif -%}
+                {%- if s.card_arrow -%}
+                  <span class="svg-wrapper gad-clo__arrow">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+                {%- endif -%}
+              </span>
+            </a>
+          {%- else -%}
             {% render 'card-collection',
-              card_collection: block.settings.collection,
+              card_collection: b.collection,
+              image: b.image,
+              title: b.title,
               media_aspect_ratio: section.settings.image_ratio,
               columns: columns,
               placeholder_image: placeholder_image
             %}
-          </li>
-        {%- endfor -%}
-      </ul>
-      {%- if show_mobile_slider -%}
-        <div class="slider-buttons">
-          <button
-            type="button"
-            class="slider-button slider-button--prev"
-            name="previous"
-            aria-label="{{ 'general.slider.previous_slide' | t }}"
-          >
-            <span class="svg-wrapper">
-              {{- 'icon-caret.svg' | inline_asset_content -}}
-            </span>
-          </button>
-          <div class="slider-counter caption">
-            <span class="slider-counter--current">1</span>
-            <span aria-hidden="true"> / </span>
-            <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
-            <span class="slider-counter--total">{{ section.blocks.size }}</span>
+          {%- endif -%}
+        </{{ item_tag }}>
+      {%- endfor -%}
+    {%- endcapture -%}
+
+    {%- if gad_carousel -%}
+      <div class="gad-cl-carousel contains-card contains-card--collection{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        {%- render 'gad-carousel',
+          s: s,
+          key: section.id,
+          slides: gad_items,
+          d_per_view: columns_desktop_int,
+          m_per_view: columns_mobile_int,
+          label: section.settings.title,
+          class: 'collection-list'
+        -%}
+      </div>
+    {%- else -%}
+      <slider-component class="slider-mobile-gutter{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <ul
+          class="collection-list contains-card contains-card--collection{% if settings.card_style == 'standard' %} contains-card--standard{% endif %} grid grid--{{ section.settings.columns_desktop }}-col-desktop grid--{{ section.settings.columns_mobile }}-col-tablet-down{% if show_mobile_slider %} slider slider--tablet grid--peek{% endif %} collection-list--{{ section.blocks.size }}-items"
+          id="Slider-{{ section.id }}"
+          role="list"
+        >
+          {{ gad_items }}
+        </ul>
+        {%- if show_mobile_slider -%}
+          <div class="slider-buttons">
+            <button
+              type="button"
+              class="slider-button slider-button--prev"
+              name="previous"
+              aria-label="{{ 'general.slider.previous_slide' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </button>
+            <div class="slider-counter caption">
+              <span class="slider-counter--current">1</span>
+              <span aria-hidden="true"> / </span>
+              <span class="visually-hidden">{{ 'general.slider.of' | t }}</span>
+              <span class="slider-counter--total">{{ section.blocks.size }}</span>
+            </div>
+            <button
+              type="button"
+              class="slider-button slider-button--next"
+              name="next"
+              aria-label="{{ 'general.slider.next_slide' | t }}"
+            >
+              <span class="svg-wrapper">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </button>
           </div>
-          <button
-            type="button"
-            class="slider-button slider-button--next"
-            name="next"
-            aria-label="{{ 'general.slider.next_slide' | t }}"
-          >
-            <span class="svg-wrapper">
-              {{- 'icon-caret.svg' | inline_asset_content -}}
-            </span>
-          </button>
-        </div>
-      {%- endif -%}
-    </slider-component>
+        {%- endif -%}
+      </slider-component>
+    {%- endif -%}
 
     {%- if section.settings.show_view_all and section.blocks.size < collections.size -%}
       <div
@@ -133,6 +208,94 @@
     {%- endif -%}
   </div>
 </div>
+
+{% stylesheet %}
+  /* Lista de colecciones: ancho completo y tarjetas con el título sobre la imagen */
+  .gad-cl--full {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-cl--full {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .gad-clo {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+    aspect-ratio: var(--clo-ratio, 1);
+    border-radius: var(--clo-r, 0);
+    color: var(--clo-text, #fff);
+    text-decoration: none;
+  }
+
+  .gad-clo > * {
+    grid-area: 1 / 1;
+  }
+
+  .gad-clo__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-long, 0.5s) ease;
+  }
+
+  .gad-clo__veil {
+    background: var(--clo-veil, #000);
+    opacity: var(--clo-opacity, 0.4);
+  }
+
+  .gad-clo__title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    align-self: center;
+    padding: 1.2rem;
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    font-size: var(--clo-t-m, 16px);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .gad-clo--bottom .gad-clo__title {
+    align-self: end;
+  }
+
+  .gad-clo__arrow {
+    display: inline-flex;
+    width: 0.8em;
+    transition: transform var(--duration-short, 0.1s) ease;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-clo__title {
+      font-size: var(--clo-t-d, 24px);
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .gad-clo:hover .gad-clo__img {
+      transform: scale(1.04);
+    }
+
+    .gad-clo:hover .gad-clo__arrow {
+      transform: translateX(0.3rem);
+    }
+  }
+
+  .gad-clo:focus-visible {
+    outline: 0.2rem solid rgb(var(--color-foreground));
+    outline-offset: 0.3rem;
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -252,7 +415,375 @@
       "type": "checkbox",
       "id": "swipe_on_mobile",
       "default": false,
-      "label": "t:sections.collection-list.settings.swipe_on_mobile.label"
+      "label": "t:sections.collection-list.settings.swipe_on_mobile.label",
+      "info": "Deslizador simple de Dawn. Con el carrusel de abajo prendido en algún dispositivo, manda el carrusel."
+    },
+    {
+      "type": "header",
+      "content": "Tarjetas de esta sección"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Ancho completo, sin márgenes en desktop",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Tarjetas de esta sección"
+    },
+    {
+      "type": "select",
+      "id": "card_layout",
+      "label": "Estilo",
+      "default": "theme",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Como el tema"
+        },
+        {
+          "value": "overlay",
+          "label": "Título sobre la imagen"
+        }
+      ],
+      "info": "Como el tema: Configuración del tema > Tarjetas de colección."
+    },
+    {
+      "type": "select",
+      "id": "overlay_position",
+      "label": "Posición del título",
+      "default": "center",
+      "options": [
+        {
+          "value": "center",
+          "label": "Centro"
+        },
+        {
+          "value": "bottom",
+          "label": "Abajo"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color del velo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del velo",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "overlay_text",
+      "label": "Color del título",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "card_title_d",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título en desktop",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_title_m",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título en mobile",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "card_arrow",
+      "label": "Mostrar flecha",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "select",
+      "id": "car_type",
+      "label": "Tipo",
+      "options": [
+        {
+          "value": "classic",
+          "label": "Clásico (se frena en los extremos)"
+        },
+        {
+          "value": "loop",
+          "label": "Infinito"
+        }
+      ],
+      "default": "classic"
+    },
+    {
+      "type": "select",
+      "id": "car_drag",
+      "label": "Arrastre con mouse o dedo",
+      "options": [
+        {
+          "value": "off",
+          "label": "Desactivado"
+        },
+        {
+          "value": "on",
+          "label": "Activado"
+        },
+        {
+          "value": "free",
+          "label": "Libre (sin encastre)"
+        }
+      ],
+      "default": "on"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_autoplay",
+      "label": "Pase automático",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "car_speed",
+      "min": 1,
+      "max": 15,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Velocidad del pase",
+      "default": 5
+    },
+    {
+      "type": "color_scheme",
+      "id": "car_arrows_scheme",
+      "label": "Colores de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "car_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "car_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "d_carousel",
+      "label": "Mostrar como carrusel en desktop",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "d_per_move",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "d_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "d_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "d_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "d_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "hidden"
+    },
+    {
+      "type": "select",
+      "id": "d_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "sides"
+    },
+    {
+      "type": "header",
+      "content": "Carrusel en mobile"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_carousel",
+      "label": "Mostrar como carrusel en mobile",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "m_per_move",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Cuántos pasan por movimiento",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "m_gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Espacio entre ítems",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "m_peek",
+      "min": 0,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Vista previa de los vecinos",
+      "default": 0,
+      "info": "Cuánto se ve del ítem anterior y del siguiente."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_edge_fit",
+      "label": "Ajustar el primero y el último",
+      "default": true,
+      "info": "Que la vista previa no deje un hueco en los extremos."
+    },
+    {
+      "type": "checkbox",
+      "id": "m_auto_height",
+      "label": "Alto adaptable",
+      "default": false,
+      "info": "El alto se ajusta a los ítems que se ven."
+    },
+    {
+      "type": "select",
+      "id": "m_dots",
+      "label": "Puntos",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "over",
+          "label": "Encima"
+        }
+      ],
+      "default": "under"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "under",
+          "label": "Abajo"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "hidden"
     },
     {
       "type": "header",
@@ -413,6 +944,18 @@
           "type": "collection",
           "id": "collection",
           "label": "t:sections.collection-list.blocks.featured_collection.settings.collection.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen propia",
+          "info": "Vacía: la de la colección."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título propio",
+          "info": "Vacío: el de la colección."
         }
       ]
     }
