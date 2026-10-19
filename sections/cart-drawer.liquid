@@ -211,6 +211,13 @@
       ],
       "default": "100",
       "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
+    },
+    {
+      "type": "checkbox",
+      "id": "money_no_cents",
+      "label": "Ocultar los centavos cuando son cero",
+      "default": false,
+      "info": "En el ahorro de cada producto, el total ahorrado y lo que falta en la barra de progreso."
     }
   ],
   "blocks": [
@@ -409,6 +416,23 @@
           "label": "Texto del ahorro",
           "default": "Ahorrás {monto}",
           "info": "{monto}: lo que se ahorra en esa línea."
+        },
+        {
+          "type": "select",
+          "id": "savings_position",
+          "label": "Ahorro de cada producto",
+          "options": [
+            {
+              "value": "title",
+              "label": "Debajo del nombre"
+            },
+            {
+              "value": "price",
+              "label": "Debajo del precio"
+            }
+          ],
+          "default": "title",
+          "visible_if": "{{ block.settings.savings }}"
         },
         {
           "type": "select",

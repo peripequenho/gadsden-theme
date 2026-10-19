@@ -2010,6 +2010,23 @@
         "id": "cart_continue_url",
         "label": "Enlace del botón",
         "info": "Vacío: lleva a todos los productos."
+      },
+      {
+        "type": "select",
+        "id": "cart_qty_min",
+        "label": "Botón \"menos\" en el carrito",
+        "options": [
+          {
+            "value": "zero",
+            "label": "Puede llegar a cero (quita el producto)"
+          },
+          {
+            "value": "product",
+            "label": "Se detiene en el mínimo del producto"
+          }
+        ],
+        "default": "zero",
+        "info": "Con el mínimo del producto, para quitarlo se usa el tacho."
       }
     ]
   },

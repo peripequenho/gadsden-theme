@@ -35,6 +35,7 @@
   endfor
   assign ib = items_block.settings
   assign compare_source = ib.compare_source | default: 'auto'
+  assign no_cents = s.money_no_cents
   assign price_left = false
   if ib.price_position == 'left'
     assign price_left = true
@@ -313,11 +314,18 @@
                             </div>
                           {%- endif -%}
 
-                          {%- if items_block and ib.savings and line_saving > 0 -%}
-                            {%- liquid
-                              assign saving_money = line_saving | money
+                          {%- liquid
+                            assign saving_text = ''
+                            if items_block and ib.savings and line_saving > 0
+                              if no_cents
+                                assign saving_money = line_saving | money_without_trailing_zeros
+                              else
+                                assign saving_money = line_saving | money
+                              endif
                               assign saving_text = ib.savings_text | replace: '{monto}', saving_money
-                            -%}
+                            endif
+                          -%}
+                          {%- if saving_text != '' and ib.savings_position != 'price' -%}
                             <p class="gad-ci__saving">{{ saving_text }}</p>
                           {%- endif -%}
 
@@ -416,6 +424,9 @@
                                 measurement: item.unit_price_measurement
                               %}
                             {%- endif -%}
+                            {%- if saving_text != '' and ib.savings_position == 'price' -%}
+                              <p class="gad-ci__saving gad-ci__saving--price">{{ saving_text }}</p>
+                            {%- endif -%}
                           </div>
                         </td>
                         {%- liquid
@@ -466,7 +477,7 @@
                                     value="{{ item.quantity }}"
                                     {% # theme-check-disable %}
                                     data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
-                                    min="0"
+                                    min="{% if settings.cart_qty_min == 'product' %}{{ item.variant.quantity_rule.min }}{% else %}0{% endif %}"
                                     data-min="{{ item.variant.quantity_rule.min }}"
                                     {% if item.variant.quantity_rule.max != null %}
                                       max="{{ item.variant.quantity_rule.max }}"
@@ -649,7 +660,7 @@
                 echo items_html
                 assign items_done = true
               else
-                render 'gad-cart-block', block: block, zone: 'body', count: count
+                render 'gad-cart-block', block: block, zone: 'body', compare_source: compare_source, no_cents: no_cents, count: count
               endif
             endfor
             unless items_done
@@ -663,14 +674,14 @@
         {%- if cart != empty -%}
           {%- if section.blocks.size > 0 -%}
             {%- for block in section.blocks -%}
-              {%- render 'gad-cart-block', block: block, zone: 'footer', count: count -%}
+              {%- render 'gad-cart-block', block: block, zone: 'footer', compare_source: compare_source, no_cents: no_cents, count: count -%}
             {%- endfor -%}
           {%- else -%}
             {%- if settings.show_cart_note -%}
-              {%- render 'gad-cart-block', block: nil, zone: 'footer', fallback: 'note' -%}
+              {%- render 'gad-cart-block', block: nil, zone: 'footer', compare_source: compare_source, no_cents: no_cents, fallback: 'note' -%}
             {%- endif -%}
-            {%- render 'gad-cart-block', block: nil, zone: 'footer', fallback: 'subtotals' -%}
-            {%- render 'gad-cart-block', block: nil, zone: 'footer', fallback: 'checkout' -%}
+            {%- render 'gad-cart-block', block: nil, zone: 'footer', compare_source: compare_source, no_cents: no_cents, fallback: 'subtotals' -%}
+            {%- render 'gad-cart-block', block: nil, zone: 'footer', compare_source: compare_source, no_cents: no_cents, fallback: 'checkout' -%}
           {%- endif -%}
         {%- endif -%}
       </div>

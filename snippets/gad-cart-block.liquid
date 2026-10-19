@@ -48,11 +48,13 @@
       assign remaining = goal | minus: current
       assign pct = 100
       if goal > 0
-        assign pct = current | times: 100 | divided_by: goal | at_most: 100
+        assign pct = current | times: 100.0 | divided_by: goal | at_most: 100
       endif
       if remaining > 0
         if b.goal_type == 'quantity'
           assign remaining_txt = remaining
+        elsif no_cents
+          assign remaining_txt = remaining | money_without_trailing_zeros
         else
           assign remaining_txt = remaining | money
         endif
@@ -220,10 +222,10 @@
       assign base_total = 0
       for item in cart.items
         assign line_base = item.final_line_price
-        if item.original_line_price > line_base
+        if compare_source != 'compare' and item.original_line_price > line_base
           assign line_base = item.original_line_price
         endif
-        if item.variant.compare_at_price > item.variant.price
+        if compare_source != 'cart' and item.variant.compare_at_price > item.variant.price
           assign by_compare = item.variant.compare_at_price | times: item.quantity
           if by_compare > line_base
             assign line_base = by_compare
@@ -232,7 +234,11 @@
         assign base_total = base_total | plus: line_base
       endfor
       assign savings = base_total | minus: cart.total_price
-      assign savings_money = savings | money
+      if no_cents
+        assign savings_money = savings | money_without_trailing_zeros
+      else
+        assign savings_money = savings | money
+      endif
       assign subtotal_money = cart.total_price | money
       if block == nil
         assign show_subtotal = true
