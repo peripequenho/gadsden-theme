@@ -78,6 +78,9 @@
   if gs.m_edge
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-edge'
   endif
+  if section.settings.enable_sticky_info and section.settings.sticky_info_only != true
+    assign gad_gallery_class = gad_gallery_class | append: ' product__column-sticky'
+  endif
   if section.settings.d_viewer_height == 'tallest'
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--d-tallest'
   endif

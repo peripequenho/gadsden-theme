@@ -7814,6 +7814,14 @@
     },
     {
       "type": "checkbox",
+      "id": "sticky_info_only",
+      "label": "Con \"info fija\", la galería no acompaña",
+      "default": false,
+      "visible_if": "{{ section.settings.enable_sticky_info }}",
+      "info": "Sólo la columna de información queda fija al bajar; la galería sigue de largo."
+    },
+    {
+      "type": "checkbox",
       "id": "gad_sticky_media",
       "label": "Imagen fija al bajar",
       "default": false,
