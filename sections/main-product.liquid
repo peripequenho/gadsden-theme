@@ -7901,6 +7901,38 @@
       "default": 72
     },
     {
+      "type": "range",
+      "id": "thumbs_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Redondeo de las miniaturas",
+      "default": 10,
+      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo."
+    },
+    {
+      "type": "select",
+      "id": "thumbs_align",
+      "label": "Alineación de las miniaturas",
+      "options": [
+        {
+          "value": "start",
+          "label": "Al principio (izquierda o arriba)"
+        },
+        {
+          "value": "center",
+          "label": "Centradas"
+        },
+        {
+          "value": "end",
+          "label": "Al final (derecha o abajo)"
+        }
+      ],
+      "default": "start",
+      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen."
+    },
+    {
       "type": "select",
       "id": "thumbs_scroll",
       "label": "Al mover las miniaturas",
@@ -7959,27 +7991,6 @@
       "default": 2.5
     },
     {
-      "type": "select",
-      "id": "d_pagination",
-      "label": "Puntos de navegación en desktop",
-      "options": [
-        {
-          "value": "hidden",
-          "label": "Ocultos"
-        },
-        {
-          "value": "dots_under",
-          "label": "Debajo de la imagen"
-        },
-        {
-          "value": "dots_over",
-          "label": "Encima de la imagen"
-        }
-      ],
-      "default": "hidden",
-      "info": "Con los diseños de miniaturas. En mobile se eligen en \"Paginación\"."
-    },
-    {
       "type": "range",
       "id": "thumbs_v_width",
       "min": 10,
@@ -7988,18 +7999,6 @@
       "unit": "%",
       "label": "Ancho de las miniaturas a los costados",
       "default": 16
-    },
-    {
-      "type": "checkbox",
-      "id": "thumbs_v_hide_arrows",
-      "label": "Ocultar las flechas de las miniaturas",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "main_arrows",
-      "label": "Flechas a los costados de la imagen grande",
-      "default": false
     },
     {
       "type": "select",
@@ -8092,6 +8091,38 @@
       "default": 64
     },
     {
+      "type": "range",
+      "id": "m_thumbs_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Redondeo de las miniaturas",
+      "default": 10,
+      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo."
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_align",
+      "label": "Alineación de las miniaturas",
+      "options": [
+        {
+          "value": "start",
+          "label": "Al principio (izquierda o arriba)"
+        },
+        {
+          "value": "center",
+          "label": "Centradas"
+        },
+        {
+          "value": "end",
+          "label": "Al final (derecha o abajo)"
+        }
+      ],
+      "default": "start",
+      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen."
+    },
+    {
       "type": "select",
       "id": "m_thumbs_scroll",
       "label": "Al mover las miniaturas",
@@ -8174,50 +8205,6 @@
     },
     {
       "type": "select",
-      "id": "m_pagination",
-      "label": "Paginación",
-      "options": [
-        {
-          "value": "hidden",
-          "label": "Oculta"
-        },
-        {
-          "value": "numbers",
-          "label": "Números"
-        },
-        {
-          "value": "dots_under",
-          "label": "Puntos debajo"
-        },
-        {
-          "value": "dots_over",
-          "label": "Puntos encima de la imagen"
-        }
-      ],
-      "default": "numbers"
-    },
-    {
-      "type": "select",
-      "id": "m_arrows",
-      "label": "Flechas",
-      "options": [
-        {
-          "value": "hidden",
-          "label": "Ocultas"
-        },
-        {
-          "value": "pagination",
-          "label": "Junto a la paginación"
-        },
-        {
-          "value": "sides",
-          "label": "A los costados"
-        }
-      ],
-      "default": "pagination"
-    },
-    {
-      "type": "select",
       "id": "m_peek_type",
       "label": "Que asome la imagen siguiente",
       "options": [
@@ -8284,7 +8271,40 @@
     },
     {
       "type": "header",
-      "content": "Galería: flechas y puntos"
+      "content": "Navegación: desktop"
+    },
+    {
+      "type": "select",
+      "id": "d_pagination",
+      "label": "Puntos de navegación",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultos"
+        },
+        {
+          "value": "dots_under",
+          "label": "Debajo de la imagen"
+        },
+        {
+          "value": "dots_over",
+          "label": "Encima de la imagen"
+        }
+      ],
+      "default": "hidden",
+      "info": "Con los diseños de miniaturas."
+    },
+    {
+      "type": "checkbox",
+      "id": "main_arrows",
+      "label": "Flechas a los costados de la imagen grande",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "thumbs_v_hide_arrows",
+      "label": "Ocultar las flechas de las miniaturas",
+      "default": false
     },
     {
       "type": "color_scheme",
@@ -8301,6 +8321,72 @@
     {
       "type": "color",
       "id": "gallery_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto."
+    },
+    {
+      "type": "header",
+      "content": "Navegación: mobile"
+    },
+    {
+      "type": "select",
+      "id": "m_pagination",
+      "label": "Paginación (puntos o números)",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Oculta"
+        },
+        {
+          "value": "numbers",
+          "label": "Números"
+        },
+        {
+          "value": "dots_under",
+          "label": "Puntos debajo"
+        },
+        {
+          "value": "dots_over",
+          "label": "Puntos encima de la imagen"
+        }
+      ],
+      "default": "numbers"
+    },
+    {
+      "type": "select",
+      "id": "m_arrows",
+      "label": "Flechas",
+      "options": [
+        {
+          "value": "hidden",
+          "label": "Ocultas"
+        },
+        {
+          "value": "pagination",
+          "label": "Junto a la paginación"
+        },
+        {
+          "value": "sides",
+          "label": "A los costados"
+        }
+      ],
+      "default": "pagination"
+    },
+    {
+      "type": "color_scheme",
+      "id": "m_arrows_scheme",
+      "label": "Combinación de las flechas",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "m_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "m_dots_color",
       "label": "Color de los puntos",
       "info": "Vacío: el color del texto."
     },

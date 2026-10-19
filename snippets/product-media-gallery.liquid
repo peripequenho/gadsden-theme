@@ -29,10 +29,6 @@
     assign single_media_visible_mobile = true
   endif
 
-  if media_count == 0 or single_media_visible_mobile or section.settings.mobile_thumbnails == 'show' or section.settings.mobile_thumbnails == 'columns' and media_count < 3
-    assign hide_mobile_slider = true
-  endif
-
   assign gad_variant_first = true
   if section.settings.variant_media_first == false
     assign gad_variant_first = false
@@ -54,6 +50,9 @@
   if gs.thumbs_v_hide_arrows
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--v-no-arrows'
   endif
+  if gs.m_arrows_bare
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-bare-arrows'
+  endif
   if gs.gallery_arrows_bare
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--bare-arrows'
   endif
@@ -70,6 +69,9 @@
   if gs.m_thumbs_scroll == 'free'
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-thumbs-free'
   endif
+  assign gad_t_align = gs.thumbs_align | default: 'start'
+  assign gad_m_align = gs.m_thumbs_align | default: 'start'
+  assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-align-' | append: gad_t_align | append: ' gad-gallery--m-thumbs-align-' | append: gad_m_align
   if gs.thumbs_fixed
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--thumbs-fixed'
   endif
@@ -100,7 +102,7 @@
   {% if gs.filter_option != blank %}
     data-gad-filter-option="{{ gs.filter_option | strip | escape }}"
   {% endif %}
-  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --m-thumbs-count: {{ gs.m_thumbs_count | default: 3 }}; --m-thumbs-gap: {{ gs.m_thumbs_gap | default: 10 }}px; --m-thumbs-size: {{ gs.m_thumbs_size | default: 64 }}px; --m-vthumb-n: {{ gs.m_thumbs_v_width | default: 20 }}; --thumbs-gap: {{ gs.thumbs_gap | default: 10 }}px; --thumbs-size: {{ gs.thumbs_size | default: 72 }}px; --vthumb-n: {{ gs.thumbs_v_width | default: 16 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}"
+  style="--thumbs-count: {{ gs.thumbs_count | default: 5 }}; --m-thumbs-count: {{ gs.m_thumbs_count | default: 3 }}; --m-thumbs-gap: {{ gs.m_thumbs_gap | default: 10 }}px; --thumbs-radius: {{ gs.thumbs_radius | default: 10 }}%; --m-thumbs-radius: {{ gs.m_thumbs_radius | default: 10 }}%; --m-thumbs-size: {{ gs.m_thumbs_size | default: 64 }}px; --m-vthumb-n: {{ gs.m_thumbs_v_width | default: 20 }}; --thumbs-gap: {{ gs.thumbs_gap | default: 10 }}px; --thumbs-size: {{ gs.thumbs_size | default: 72 }}px; --vthumb-n: {{ gs.thumbs_v_width | default: 16 }}; --vthumb-w: {{ gs.thumbs_v_width | default: 16 }}%; --m-radius: {{ gs.m_radius | default: 0 }}px; --m-gap: {{ gs.m_gap | default: 0 }}px; --m-peek-pct: {{ gs.m_peek_pct | default: 0 }}%; --m-peek-px: {{ gs.m_peek_px | default: 0 }}px; --m-container: {{ gs.m_container | default: 100 }}%; --m-image: {{ gs.m_image_width | default: 100 }}%;{% if gs.gallery_dots_color != blank %} --gad-dot-color: {{ gs.gallery_dots_color.red }},{{ gs.gallery_dots_color.green }},{{ gs.gallery_dots_color.blue }};{% endif %}{% if gs.m_dots_color != blank %} --gad-dot-color-m: {{ gs.m_dots_color.red }},{{ gs.m_dots_color.green }},{{ gs.m_dots_color.blue }};{% endif %}"
 >
   {%- if gs.trust_badge != blank -%}
     <div class="gad-trust-badge gad-trust-badge--{{ gs.trust_badge_position }} gad-trust-badge--{{ gs.trust_badge_size }}">
@@ -196,10 +198,10 @@
         {%- endunless -%}
       {%- endfor -%}
     </ul>
-    <div class="slider-buttons quick-add-hidden{% if hide_mobile_slider %} small-hide{% endif %}">
+    <div class="slider-buttons quick-add-hidden{% if media_count < 2 or single_media_visible_mobile %} small-hide{% endif %}">
       <button
         type="button"
-        class="slider-button slider-button--prev gad-gallery__arrow color-{{ gs.gallery_arrows_scheme | default: 'scheme-1' }}"
+        class="slider-button slider-button--prev gad-gallery__arrow color-{{ gs.m_arrows_scheme | default: 'scheme-1' }}"
         name="previous"
         aria-label="{{ 'general.slider.previous_slide' | t }}"
       >
@@ -215,7 +217,7 @@
       </div>
       <button
         type="button"
-        class="slider-button slider-button--next gad-gallery__arrow color-{{ gs.gallery_arrows_scheme | default: 'scheme-1' }}"
+        class="slider-button slider-button--next gad-gallery__arrow color-{{ gs.m_arrows_scheme | default: 'scheme-1' }}"
         name="next"
         aria-label="{{ 'general.slider.next_slide' | t }}"
       >

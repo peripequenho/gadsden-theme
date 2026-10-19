@@ -832,7 +832,7 @@ html.gad-modal-open {
   box-shadow: 0 0 0 0.1rem rgba(var(--color-foreground), 0.12);
 }
 
-.gad-gallery--bare-arrows .gad-gallery__arrow,
+.gad-gallery--m-bare-arrows .gad-gallery__arrow,
 .gad-gallery--bare-arrows .gad-gallery__main-arrow {
   background: transparent;
   box-shadow: none;
@@ -1690,5 +1690,93 @@ html.gad-modal-open {
 
   .gad-gallery--d-pag-hidden .gad-gallery__dots {
     display: none;
+  }
+}
+
+/* ---------- Redondeo de las miniaturas (desktop y mobile; 50 % en cuadradas = círculo) ---------- */
+.gad-gallery .thumbnail.global-media-settings {
+  border-radius: var(--m-thumbs-radius, var(--media-radius));
+}
+
+.gad-gallery .thumbnail.global-media-settings img {
+  border-radius: inherit;
+}
+
+@media screen and (min-width: 750px) {
+  .gad-gallery .thumbnail.global-media-settings {
+    border-radius: var(--thumbs-radius, var(--media-radius));
+  }
+}
+
+/* ---------- Alineación de las miniaturas: abajo de izquierda a derecha, a los costados de arriba abajo ----------
+   En la tira se centra con márgenes automáticos (no con justify-content) para que, si desborda, se pueda deslizar desde el principio. */
+@media screen and (max-width: 749px) {
+  .gad-gallery--m-thumbs-bottom.gad-gallery--m-thumbs-align-center .thumbnail-slider {
+    justify-content: center;
+  }
+
+  .gad-gallery--m-thumbs-bottom.gad-gallery--m-thumbs-align-end .thumbnail-slider {
+    justify-content: flex-end;
+  }
+
+  .gad-gallery--m-thumbs-bottom:is(.gad-gallery--m-thumbs-align-center, .gad-gallery--m-thumbs-align-end) .thumbnail-list__item:first-child {
+    margin-left: auto;
+  }
+
+  .gad-gallery--m-thumbs-bottom.gad-gallery--m-thumbs-align-center .thumbnail-list__item:last-child {
+    margin-right: auto;
+  }
+
+  :is(.gad-gallery--m-thumbs-left, .gad-gallery--m-thumbs-right).gad-gallery--m-thumbs-align-center .thumbnail-slider {
+    align-self: center;
+  }
+
+  :is(.gad-gallery--m-thumbs-left, .gad-gallery--m-thumbs-right).gad-gallery--m-thumbs-align-end .thumbnail-slider {
+    align-self: flex-end;
+  }
+}
+
+@media screen and (min-width: 750px) {
+  .gad-gallery--thumbs-bottom.gad-gallery--thumbs-align-center .thumbnail-slider {
+    justify-content: center;
+  }
+
+  .gad-gallery--thumbs-bottom.gad-gallery--thumbs-align-end .thumbnail-slider {
+    justify-content: flex-end;
+  }
+
+  .gad-gallery--thumbs-bottom:is(.gad-gallery--thumbs-align-center, .gad-gallery--thumbs-align-end) .thumbnail-list.slider--tablet-up .thumbnail-list__item:first-child {
+    margin-left: auto;
+  }
+
+  .gad-gallery--thumbs-bottom.gad-gallery--thumbs-align-center .thumbnail-list.slider--tablet-up .thumbnail-list__item:last-child {
+    margin-right: auto;
+  }
+
+  .gad-gallery--thumbs-bottom.gad-gallery--thumbs-align-center .thumbnail-list:not(.slider--tablet-up) {
+    justify-content: center;
+  }
+
+  .gad-gallery--thumbs-bottom.gad-gallery--thumbs-align-end .thumbnail-list:not(.slider--tablet-up) {
+    justify-content: end;
+  }
+
+  :is(.gad-gallery--thumbs-left, .gad-gallery--thumbs-right).gad-gallery--thumbs-align-center .thumbnail-slider {
+    align-self: center;
+  }
+
+  :is(.gad-gallery--thumbs-left, .gad-gallery--thumbs-right).gad-gallery--thumbs-align-end .thumbnail-slider {
+    align-self: flex-end;
+  }
+}
+
+/* ---------- Color de los puntos en mobile (el de desktop no se mete) ---------- */
+@media screen and (max-width: 749px) {
+  .gad-gallery:not(.gad-gallery--m-pag-dots_over) .gad-gallery__dot {
+    background: rgba(var(--gad-dot-color-m, var(--color-foreground)), 0.3);
+  }
+
+  .gad-gallery:not(.gad-gallery--m-pag-dots_over) .gad-gallery__dot.is-active {
+    background: rgb(var(--gad-dot-color-m, var(--color-foreground)));
   }
 }
