@@ -10,7 +10,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width{% if s.full_width %} page-width--full{% endif %}">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
     <gad-shoppable class="gad-shop__media">
       {%- if s.image != blank -%}
         {{ s.image | image_url: width: 2000 | image_tag: loading: 'lazy', alt: s.image.alt, sizes: '100vw', widths: '750, 1100, 1500, 2000' }}
@@ -254,6 +254,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

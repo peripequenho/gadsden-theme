@@ -10,7 +10,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
     <gad-color-switcher class="gad-cs__list" role="radiogroup" aria-label="{{ s.heading | strip_html | escape }}">
       <button type="button" class="gad-cs__item is-active" role="radio" aria-checked="true" data-gad-palette="">
         <span class="gad-cs__dot gad-cs__dot--default"></span>
@@ -87,6 +87,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

@@ -16,7 +16,7 @@
 >
   {%- if s.heading != blank -%}
     <div class="page-width{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, align: 'center' -%}
+      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, align: 'center' -%}
     </div>
   {%- endif -%}
 
@@ -203,6 +203,18 @@
       "label": "Mostrar las diapositivas vacías",
       "default": false,
       "info": "Las que no tienen imagen ni video se ven con el marcador gris de Shopify. Apagado, sólo se ven en el editor."
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
     },
     {
       "type": "inline_richtext",

@@ -20,7 +20,7 @@
 >
   <div class="page-width page-width--narrow">
     <div class="gad-qz__screen" data-gad-qz="intro">
-      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
       <div class="gad-qz__center">
         <button type="button" class="button" data-gad-qz-start>{{ s.start_label | escape }}</button>
         {%- if s.intro_note != blank -%}<p class="gad-qz__note">{{ s.intro_note }}</p>{%- endif -%}
@@ -345,6 +345,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

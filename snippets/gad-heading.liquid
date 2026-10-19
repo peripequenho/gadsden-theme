@@ -3,6 +3,8 @@
   en el título se pinta con el color de resaltado. Sin color elegido, usa el acento de la combinación.
 
   Accepts:
+  - caption: {String} volanta: texto chico arriba del título (opcional)
+  - caption_color: {Color} color de la volanta (opcional; vacío = el del texto)
   - title: {String} título (texto corto con formato)
   - size: {String} clase de tamaño de Dawn: 'h2', 'h1' o 'h0' (opcional, 'h1' por defecto)
   - accent: {Color} color de resaltado (opcional)
@@ -14,9 +16,14 @@
   Usage:
   {% render 'gad-heading', title: section.settings.heading, size: section.settings.heading_size, accent: section.settings.heading_accent, text: section.settings.text, align: 'center' %}
 {%- endcomment -%}
-{%- if title != blank or text != blank -%}
+{%- if title != blank or text != blank or caption != blank -%}
   {%- assign heading_tag = tag | default: 'h2' -%}
   <div class="gad-heading{% if align %} gad-heading--{{ align }}{% endif %}{% if class %} {{ class }}{% endif %}">
+    {%- if caption != blank -%}
+      <p class="gad-heading__caption caption-with-letter-spacing caption-with-letter-spacing--medium"{% if caption_color != blank %} style="color: {{ caption_color }};"{% endif %}>
+        {{- caption | escape -}}
+      </p>
+    {%- endif -%}
     {%- if title != blank -%}
       <{{ heading_tag }} class="gad-heading__title gad-hl inline-richtext {{ size | default: 'h1' }}"{% if accent != blank %} style="--gad-hl: {{ accent }};"{% endif %}>
         {{- title -}}

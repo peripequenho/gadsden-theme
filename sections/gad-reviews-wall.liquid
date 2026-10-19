@@ -12,7 +12,7 @@
     {% render 'gad-section-attrs', s: s %}
   >
     <div class="page-width">
-      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
       {%- if s.average != blank -%}
         {%- assign avg = s.average | replace: ',', '.' | times: 1.0 | round -%}
         <div class="gad-rw__summary">
@@ -49,6 +49,9 @@
           {%- assign b = block.settings -%}
           <article
             class="gad-rw__card color-{% if b.featured %}{{ s.featured_scheme }}{% else %}{{ s.card_scheme }}{% endif %}{% if b.featured %} gad-rw__card--featured{% endif %}"
+            {% if b.featured and s.featured_custom %}
+              style="--color-background: {{ s.featured_bg.red }},{{ s.featured_bg.green }},{{ s.featured_bg.blue }}; --color-foreground: {{ s.featured_text.red }},{{ s.featured_text.green }},{{ s.featured_text.blue }}; background: {{ s.featured_bg }}; color: {{ s.featured_text }};"
+            {% endif %}
             {% if forloop.index > s.batch %}
               hidden data-gad-rw-more
             {% endif %}
@@ -282,6 +285,18 @@
   "class": "section gad-section",
   "settings": [
     {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
+    {
       "type": "inline_richtext",
       "id": "heading",
       "label": "Título",
@@ -387,6 +402,25 @@
       "id": "featured_scheme",
       "label": "Combinación de las destacadas",
       "default": "scheme-3"
+    },
+    {
+      "type": "checkbox",
+      "id": "featured_custom",
+      "label": "Colores propios para las destacadas",
+      "default": false,
+      "info": "Pisan a la combinación de las destacadas."
+    },
+    {
+      "type": "color",
+      "id": "featured_bg",
+      "label": "Fondo de las destacadas",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "featured_text",
+      "label": "Texto de las destacadas",
+      "default": "#121212"
     },
     {
       "type": "color_scheme",

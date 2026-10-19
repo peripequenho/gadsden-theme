@@ -72,6 +72,10 @@
   margin: 0;
 }
 
+.gad-heading__caption {
+  margin: 0 0 1rem;
+}
+
 .gad-heading__text {
   margin-top: 1.2rem;
 }
@@ -1816,6 +1820,14 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
   border-top: 0;
 }
 
+.gad-acc__footer {
+  margin-top: 2rem;
+}
+
+.gad-acc__footer > :first-child {
+  margin-top: 0;
+}
+
 .gad-acc__plus {
   position: relative;
   flex: 0 0 auto;
@@ -1856,6 +1868,10 @@ details[open] > summary .gad-acc__plus::after {
 }
 
 /* ---------- E05 formulario de contacto ---------- */
+.contact .gad-cf__button--full .button {
+  width: 100%;
+}
+
 .gad-cf__row {
   display: grid;
   grid-template-columns: 1fr;

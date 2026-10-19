@@ -29,7 +29,7 @@
         {%- if s.badge != blank -%}<span class="gad-offer__badge">{{ s.badge | escape }}</span>{%- endif -%}
       </div>
       <div class="gad-offer__info">
-        {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
+        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
         {%- if section.blocks.size > 0 -%}
           <ul class="gad-offer__points list-unstyled" role="list">
             {%- for block in section.blocks -%}
@@ -203,6 +203,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

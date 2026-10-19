@@ -13,6 +13,11 @@
     {%- assign b = block.settings -%}
     {%- case block.type -%}
       {%- when 'heading' -%}
+        {%- if b.caption != blank -%}
+          <p class="gad-heading__caption caption-with-letter-spacing caption-with-letter-spacing--medium"{% if b.caption_color != blank %} style="color: {{ b.caption_color }};"{% endif %} {{ block.shopify_attributes }}>
+            {{- b.caption | escape -}}
+          </p>
+        {%- endif -%}
         {%- if b.title != blank -%}
           <h2 class="gad-icc__heading gad-hl inline-richtext {{ b.heading_size }}"{% if b.heading_accent != blank %} style="--gad-hl: {{ b.heading_accent }};"{% endif %} {{ block.shopify_attributes }}>
             {{- b.title -}}
@@ -36,7 +41,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
     {%- if is_cols -%}
       <div class="gad-icc{% if s.content_first_d %} gad-icc--d-content-first{% endif %}{% if s.content_first_m %} gad-icc--m-content-first{% endif %}">
         <div class="gad-icc__items gad-icc__items--{{ s.item_align }} gad-icc__items--icon-{{ s.row_icon_size }} gad-icc__items--title-{{ s.row_title_size }}">
@@ -365,6 +370,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",
@@ -918,6 +935,18 @@
       "type": "heading",
       "name": "Título",
       "settings": [
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Volanta",
+          "info": "Texto chico arriba del título. Vacío: no se muestra."
+        },
+        {
+          "type": "color",
+          "id": "caption_color",
+          "label": "Color de la volanta",
+          "info": "Vacío: el color del texto."
+        },
         {
           "type": "inline_richtext",
           "id": "title",

@@ -15,7 +15,7 @@
   <div class="page-width gad-results__layout{% if has_intro %} gad-results__layout--two gad-results__layout--results-{{ s.position }}{% endif %}">
     {%- if has_intro -%}
       <div class="gad-results__intro{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 1;"{% endif %}>
-        {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
+        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
         {%- if s.video != blank -%}
           <div class="gad-results__media">
             {%- render 'gad-video', video: s.video, poster: s.image, autoplay: s.autoplay, loop: true, tap: true, width: 1500 -%}
@@ -314,6 +314,18 @@
     {
       "type": "header",
       "content": "Columna de presentación"
+    },
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
     },
     {
       "type": "inline_richtext",

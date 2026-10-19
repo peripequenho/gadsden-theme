@@ -124,6 +124,9 @@
             {%- endfor -%}
           </div>
         </div>
+        {%- if s.footer != blank -%}
+          <div class="gad-acc__footer rte" style="text-align: {{ section.settings.heading_alignment }};">{{ s.footer }}</div>
+        {%- endif -%}
       </div>
     </div>
   </div>
@@ -411,6 +414,12 @@
       "id": "top_border",
       "label": "Borde arriba de cada fila",
       "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "footer",
+      "label": "Texto al pie",
+      "info": "Va debajo de las filas, con la alineación del título."
     },
     {
       "type": "header",

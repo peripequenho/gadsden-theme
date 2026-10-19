@@ -10,7 +10,7 @@
 >
   <div class="page-width page-width--narrow">
     {%- if s.heading != blank -%}
-      {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, align: 'center' -%}
+      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, align: 'center' -%}
     {%- endif -%}
     {%- if s.audio_url != blank -%}
       {%- render 'gad-music', src: s.audio_url, volume: s.volume, title: s.title, artist: s.artist, cover: s.cover, key: section.id -%}
@@ -26,6 +26,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

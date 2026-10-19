@@ -33,7 +33,7 @@
     {%- endfor -%}
   </div>
   <div class="gad-px__content page-width gad-px__content--{{ s.align }}">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.align -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.align -%}
     {%- if s.button_label != blank or s.button_label_2 != blank -%}
       <div class="gad-px__buttons">
         {%- if s.button_label != blank -%}<a href="{{ s.button_link | default: '#' }}" class="button">{{ s.button_label | escape }}</a>{%- endif -%}
@@ -166,6 +166,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

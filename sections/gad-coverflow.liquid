@@ -12,7 +12,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
   </div>
   {%- if section.blocks.size > 0 -%}
     <gad-coverflow class="gad-cf__stage" data-range="{{ s.play_range }}" tabindex="0" role="region" aria-roledescription="{{ 'gadsden.carousel.roledescription' | t }}" aria-label="{{ s.heading | strip_html | escape }}">
@@ -280,6 +280,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

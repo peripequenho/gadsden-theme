@@ -156,7 +156,7 @@
             {%- endcase -%}
           {%- endfor -%}
         {%- endif -%}
-        <div class="contact__button">
+        <div class="contact__button{% if s.button_full_width %} gad-cf__button--full{% endif %}">
           <button type="submit" class="button">
             {%- if s.button_label != blank -%}{{ s.button_label | escape }}{%- else -%}{{ 'templates.contact.form.send' | t }}{%- endif -%}
           </button>
@@ -223,6 +223,12 @@
       "id": "button_label",
       "label": "Texto del botón",
       "info": "Vacío: \"Enviar\"."
+    },
+    {
+      "type": "checkbox",
+      "id": "button_full_width",
+      "label": "Botón de enviar a todo el ancho",
+      "default": false
     },
     {
       "type": "color_scheme",

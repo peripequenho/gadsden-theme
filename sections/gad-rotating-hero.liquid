@@ -64,7 +64,7 @@
         </span>
         {{ s.heading_after | escape -}}
       </h1>
-      {%- if s.promise != blank -%}<p class="gad-rh__promise">{{ promise }}</p>{%- endif -%}
+      {%- if s.promise != blank -%}<p class="gad-rh__promise"{% if s.promise_color != blank %} style="--gad-rh-mark: {{ s.promise_color }};"{% endif %}>{{ promise }}</p>{%- endif -%}
       {%- if s.pill_1 != blank or s.pill_2 != blank or s.pill_3 != blank -%}
         <ul class="gad-rh__pill list-unstyled" role="list">
           {%- for i in (1..3) -%}
@@ -221,7 +221,7 @@
 
   .gad-rh__promise mark {
     padding: 0 0.2em;
-    background: rgba(var(--color-button), 0.25);
+    background: var(--gad-rh-mark, rgba(var(--color-button), 0.25));
     color: inherit;
   }
 
@@ -460,6 +460,12 @@
       "id": "promise_mark",
       "label": "Palabras resaltadas de la promesa",
       "default": "desde la primera semana"
+    },
+    {
+      "type": "color",
+      "id": "promise_color",
+      "label": "Color del resaltado de la promesa",
+      "info": "Vacío: el color del botón, suave."
     },
     {
       "type": "text",

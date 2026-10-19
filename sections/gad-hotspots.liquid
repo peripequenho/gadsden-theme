@@ -16,7 +16,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="{% if is_full and s.full_width %}gad-hsf__full{% else %}page-width{% endif %}">
-    {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
     {%- if is_full -%}
       <gad-hotspots-full class="gad-hsf__wrap">
         <div class="gad-hsf__media{% if s.image_radius %} gad-hsf__media--radius{% endif %}">
@@ -476,6 +476,18 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "text",
+      "id": "caption",
+      "label": "Volanta",
+      "info": "Texto chico arriba del título. Vacío: no se muestra."
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color de la volanta",
+      "info": "Vacío: el color del texto."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",

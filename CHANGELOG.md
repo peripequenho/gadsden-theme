@@ -1,5 +1,13 @@
 # Cambios
 
+## Sin publicar
+
+- **Volanta** (texto chico arriba del título, con color propio opcional) en todas las secciones Gadsden con título: muros y cintas de reseñas, pasos, pósters, sellos, capítulos, carrusel 3D, cuestionario, tabla comparativa, íconos con contenido (también en su bloque Título) y el resto. Vacía, nada cambia.
+- Formulario de contacto: botón de enviar a todo el ancho.
+- Contenido desplegable: texto al pie, debajo de las filas.
+- Muro de reseñas: colores propios (fondo y texto) para las destacadas.
+- Hero con palabra que rota: color del resaltado de la promesa.
+
 ## 1.0.1
 
 - Apoyo por Cafecito: grupo *Gadsden · Apoyá el proyecto* en Configuración del tema y link de soporte en Información del tema. Sólo lo ve quien administra la tienda; en el storefront no cambia nada. Y una serpiente escondida en `layout/theme.liquid`.
