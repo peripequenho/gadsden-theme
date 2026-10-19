@@ -5,7 +5,7 @@
     "theme_version": "1.0.0",
     "theme_author": "Gero",
     "theme_documentation_url": "https://github.com/peripequenho/gadsden-theme",
-    "theme_support_url": "https://github.com/peripequenho/gadsden-theme/issues"
+    "theme_support_url": "https://cafecito.app/elcucholg"
   },
   {
     "name": "t:settings_schema.logo.name",
@@ -3068,6 +3068,15 @@
         "unit": "px",
         "label": "Redondeo",
         "default": 5
+      }
+    ]
+  },
+  {
+    "name": "Gadsden · Apoyá el proyecto",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Gadsden es gratis y lo va a seguir siendo. Si te ahorra horas de laburo, podés invitarme un cafecito en [cafecito.app/elcucholg](https://cafecito.app/elcucholg). Gracias por usarlo."
       }
     ]
   }

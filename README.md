@@ -79,6 +79,76 @@ shopify theme check
 - Las combinaciones de color se arman en *Configuración del tema > Colores*. Si el theme anterior pintaba el fondo de la imagen de las tarjetas de producto con el esquema de las tarjetas de colección, copiá ese esquema en *Tarjetas de producto > Combinación*.
 - Si venías de un theme con medidas en saltos de 2 o 4 px, acá todos los rangos van de a 1 px: los valores se cargan tal cual.
 
+## Apoyá el proyecto
+
+Gadsden es gratis y lo va a seguir siendo. Si te ahorra horas de laburo, podés invitarme un cafecito en [cafecito.app/elcucholg](https://cafecito.app/elcucholg). El link también está en *Configuración del tema > Gadsden · Apoyá el proyecto* y en *Información del tema*.
+
+Y como en los README de los jueguitos de antes, adentro de `layout/theme.liquid` hay una serpiente. Shopify la descarta al renderizar: no llega a la tienda.
+
+```text
+             OOOOOOOOOOO
+         OOOOOOOOOOOOOOOOOOO
+     OOOOOOOO OOOOOOOOOOOOOOOO
+>---    OOOOOOOOOOOOOOOOOOOOOOOOO
+     OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+                 OOOOOOOOOOOOOOOOOOOOOOO
+                              OOOOOOOOOOOO
+                                  OOOOOOOOOO
+                                     OOOOOOOOO
+                                       OOOOOOOO
+                                        OOOOOOOO
+                                         OOOOOOOO
+                                          OOOOOOOO
+                                          oOOOOOOO
+                     ooooooooooooooooooo  ooOOOO
+                ooooooooooooooooooooooooo  oOOOOOOO
+              oooooooooooooooooooooooooooo  OOOOOOOO
+            oooooooooooooooooooooooooooooo  OOOOOOOO
+           oOOOOOOoooo                 ooo  OOOOOOOO o
+           OOOOOOO                        OOOOOOOOO  oo
+           OOOOOOOO                     OOOOOOOOOO  ooooo
+           OOOOOOOOOOO               OOOOOOOOOOOO  OOOOOO
+         o  OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO  OOOOOOOOO
+       ooooo  OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO     OOOOOOOO
+      oOOOOOoo   OOOOOOOOOOOOOOOOOOOOOOOOO       OOOOOOOOO
+     oOOOOOOOOo       OOOOOOOOOOOOOO             OOOOOOOOO oo
+     OOOOOOOOO                                 OOOOOOOOOO  ooo
+      OOOOOOOOO                              OOOOOOOOOOO  oooo
+      OOOOOOOOOOOO                       OOOOOOOOOOOOOO  oOOOoo
+       OOOOOOOOOOOOOOOOOO        OOOOOOOOOOOOOOOOOOOO  oOOOOOOO
+         OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO    oOOOOOOOO
+            OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO         OOOOOOOO
+               OOOOOOOOOOOOOOOOOOOOOOOOOOOO              OOOOOOO
+                      OOOOOOOOOOOOOO                     OOOOOOOO
+                                                          OOOOOOO
+                                                          OOOOOOO
+                                                          OOOOOOO
+                                                          OOOOOO
+                                                          OOOOO
+                                                          OOOO
+                                                         8888
+                                                         888
+                                                        888
+                                                         8
+
+                N  O     M  E     P  I  S  E  S
+
+  G A D S D E N  ..  theme libre para Shopify
+  ---------------------------------------------
+  Hecho por Gero en Tucuman, entre mate y madrugada.
+  Es gratis y lo va a seguir siendo: sin version pro,
+  sin licencia por tienda, sin letra chica.
+
+  Si te ahorra horas de laburo, invitame un cafecito:
+      https://cafecito.app/elcucholg
+
+  Codigo, issues y novedades:
+      https://github.com/peripequenho/gadsden-theme
+
+  Saludos a los que leen los comentarios del codigo.
+  Son pocos, pero son los mejores.
+```
+
 ## Licencias
 
 - El código de Dawn se distribuye bajo la licencia de Shopify (`LICENSE-DAWN.md`), que permite usarlo para hacer themes de Shopify.
