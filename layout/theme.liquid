@@ -48,6 +48,27 @@
   if settings.badge_flush
     assign gad_html_classes = gad_html_classes | append: ' gad-badge-flush'
   endif
+  if settings.card_price_order == 'sale_first'
+    assign gad_html_classes = gad_html_classes | append: ' gad-cp-sale-first'
+  endif
+  if settings.card_price_color == 'accent'
+    assign gad_html_classes = gad_html_classes | append: ' gad-cp-accent'
+  endif
+  if settings.card_compare_bold
+    assign gad_html_classes = gad_html_classes | append: ' gad-cp-compare-bold'
+  endif
+  if settings.card_title_weight != blank and settings.card_title_weight != 'auto'
+    assign gad_html_classes = gad_html_classes | append: ' gad-ctw-' | append: settings.card_title_weight
+  endif
+  if settings.card_radius_half_mobile
+    assign gad_html_classes = gad_html_classes | append: ' gad-card-r-half'
+  endif
+  if settings.badge_top_center_style == 'edge'
+    assign gad_html_classes = gad_html_classes | append: ' gad-badge-edge'
+  endif
+  if settings.page_title_align == 'center'
+    assign gad_html_classes = gad_html_classes | append: ' gad-pt-center'
+  endif
   if settings.card_title_lines != blank and settings.card_title_lines != 'none'
     assign gad_html_classes = gad_html_classes | append: ' gad-ct-' | append: settings.card_title_lines
   endif

@@ -291,6 +291,23 @@
         "default": 8,
         "unit": "px",
         "label": "t:settings_schema.layout.settings.spacing_grid_vertical.label"
+      },
+      {
+        "type": "select",
+        "id": "page_title_align",
+        "label": "Alineación de los títulos de página",
+        "options": [
+          {
+            "value": "left",
+            "label": "Izquierda"
+          },
+          {
+            "value": "center",
+            "label": "Centro"
+          }
+        ],
+        "default": "left",
+        "info": "Página, blog, carrito, búsqueda, lista de colecciones y banner de colección."
       }
     ]
   },
@@ -747,6 +764,10 @@
           {
             "value": "card",
             "label": "t:settings_schema.cards.settings.style.options__2.label"
+          },
+          {
+            "value": "tint",
+            "label": "Con velo"
           }
         ],
         "default": "standard",
@@ -910,6 +931,78 @@
           }
         ],
         "default": "outline"
+      },
+      {
+        "type": "header",
+        "content": "Precio y título de la tarjeta"
+      },
+      {
+        "type": "select",
+        "id": "card_price_order",
+        "label": "Orden de los precios",
+        "options": [
+          {
+            "value": "compare_first",
+            "label": "Precio anterior primero"
+          },
+          {
+            "value": "sale_first",
+            "label": "Precio de oferta primero"
+          }
+        ],
+        "default": "compare_first"
+      },
+      {
+        "type": "select",
+        "id": "card_price_color",
+        "label": "Color del precio de oferta",
+        "options": [
+          {
+            "value": "text",
+            "label": "Color del texto"
+          },
+          {
+            "value": "accent",
+            "label": "Color del botón"
+          }
+        ],
+        "default": "text"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_compare_bold",
+        "label": "Precio anterior en negrita",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "card_title_weight",
+        "label": "Peso del título",
+        "options": [
+          {
+            "value": "auto",
+            "label": "Según el estilo base"
+          },
+          {
+            "value": "400",
+            "label": "Normal"
+          },
+          {
+            "value": "600",
+            "label": "Semi negrita"
+          },
+          {
+            "value": "700",
+            "label": "Negrita"
+          }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_radius_half_mobile",
+        "label": "Redondeo a la mitad con dos columnas en mobile",
+        "default": false
       }
     ]
   },
@@ -927,6 +1020,10 @@
           {
             "value": "card",
             "label": "t:settings_schema.collection_cards.settings.style.options__2.label"
+          },
+          {
+            "value": "tint",
+            "label": "Con velo"
           }
         ],
         "default": "standard",
@@ -1539,6 +1636,71 @@
         ],
         "default": "top left",
         "label": "t:settings_schema.badges.settings.position.label"
+      },
+      {
+        "type": "select",
+        "id": "card_badge_position",
+        "label": "Posición en las tarjetas de producto",
+        "options": [
+          {
+            "value": "global",
+            "label": "La misma de arriba"
+          },
+          {
+            "value": "bottom left",
+            "label": "t:settings_schema.badges.settings.position.options__1.label"
+          },
+          {
+            "value": "bottom right",
+            "label": "t:settings_schema.badges.settings.position.options__2.label"
+          },
+          {
+            "value": "top left",
+            "label": "t:settings_schema.badges.settings.position.options__3.label"
+          },
+          {
+            "value": "top right",
+            "label": "t:settings_schema.badges.settings.position.options__4.label"
+          },
+          {
+            "value": "top center",
+            "label": "Arriba al centro"
+          }
+        ],
+        "default": "global",
+        "info": "La de arriba sigue valiendo para artículos y páginas en la búsqueda."
+      },
+      {
+        "type": "select",
+        "id": "badge_top_center_style",
+        "label": "Etiqueta arriba al centro",
+        "options": [
+          {
+            "value": "inside",
+            "label": "Dentro de la imagen"
+          },
+          {
+            "value": "edge",
+            "label": "Montada sobre el borde"
+          }
+        ],
+        "default": "inside"
+      },
+      {
+        "type": "select",
+        "id": "card_badges_mode",
+        "label": "Etiquetas en las tarjetas",
+        "options": [
+          {
+            "value": "all",
+            "label": "Agotado, oferta y propias"
+          },
+          {
+            "value": "no_sale",
+            "label": "Agotado y propias (sin la de oferta)"
+          }
+        ],
+        "default": "all"
       },
       {
         "type": "checkbox",

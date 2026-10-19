@@ -30,7 +30,7 @@
   <span id="{{ id }}" class="badge badge--bottom-left color-{{ settings.sold_out_badge_color_scheme }}">
     {{- 'products.product.sold_out' | t -}}
   </span>
-{%- elsif card_product.compare_at_price > card_product.price -%}
+{%- elsif card_product.compare_at_price > card_product.price and settings.card_badges_mode != 'no_sale' -%}
   <span id="{{ id }}" class="badge badge--bottom-left gad-sale-badge color-{{ settings.sale_badge_color_scheme }}">
     {%- render 'gad-sale-label', price: price, compare_at_price: compare -%}
   </span>

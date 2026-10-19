@@ -719,7 +719,7 @@ html.gad-reduce .scroll-trigger.animate--fade-in {
 }
 
 .gad-sale-badge .gad-icon {
-  font-size: 1.25em;
+  font-size: 1em;
 }
 
 /* en el precio de Dawn la etiqueta es inline-block: el ícono se alinea con el texto */
@@ -2669,6 +2669,99 @@ body:has(.gad-drawer--panel[open]) .section-header {
 
 .footer-block__image-wrapper {
   border-radius: var(--media-radius);
+}
+
+/* ---------- Tarjetas con velo (Tarjetas > Estilo: Con velo) ---------- */
+.card--card.gad-card-tint,
+.card--card.gad-card-tint .card__inner {
+  background: linear-gradient(rgba(var(--color-foreground), 0.04), rgba(var(--color-foreground), 0.04)),
+    rgb(var(--color-background));
+}
+
+/* ---------- Precio y título de la tarjeta de producto (ajustes de Tarjetas) ---------- */
+html.gad-cp-sale-first .card-information .price__sale {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap-reverse;
+  justify-content: flex-end;
+  align-items: baseline;
+  column-gap: 0.8rem;
+}
+
+html.gad-cp-sale-first .card-information .price--on-sale .price__sale .price-item--regular {
+  margin-right: 0;
+}
+
+html.gad-cp-accent .card-information .price--on-sale .price-item--sale {
+  color: rgb(var(--color-button));
+}
+
+html.gad-cp-compare-bold .card-information .price--on-sale .price-item--regular {
+  font-weight: 700;
+}
+
+html.gad-ctw-400 .card__heading {
+  font-weight: 400;
+}
+
+html.gad-ctw-600 .card__heading {
+  font-weight: 600;
+}
+
+html.gad-ctw-700 .card__heading {
+  font-weight: 700;
+}
+
+@media screen and (max-width: 749px) {
+  html.gad-card-r-half .grid--2-col-tablet-down .card-wrapper .card,
+  html.gad-card-r-half .grid--2-col-tablet-down .card-wrapper .card__inner,
+  html.gad-card-r-half .grid--2-col-tablet-down .card-wrapper .card__media {
+    --border-radius: calc(var(--product-card-corner-radius, 0rem) / 2);
+  }
+}
+
+/* ---------- Etiqueta arriba al centro montada sobre el borde de la imagen ---------- */
+html.gad-badge-edge .card:not(.card--horizontal) .card__badge.top.center {
+  align-self: start;
+  margin-top: 0;
+  transform: translateY(-50%);
+}
+
+/* ---------- Títulos de página centrados (Diseño > Alineación de los títulos de página) ---------- */
+html.gad-pt-center :is(.main-page-title, .title--primary, .collection-hero__title) {
+  text-align: center;
+}
+
+html.gad-pt-center .title-wrapper-with-link:has(> .title--primary) {
+  justify-content: center;
+}
+
+/* ---------- Suscripción con botón debajo del campo ---------- */
+.gad-newsletter__button {
+  width: 100%;
+  margin-top: 1.2rem;
+}
+
+/* ---------- Lista de colecciones: rellenos y título en desktop ---------- */
+.gad-lc {
+  padding-top: calc(var(--lc-pt, 36px) * 0.75);
+  padding-bottom: calc(var(--lc-pb, 36px) * 0.75);
+}
+
+@media screen and (min-width: 750px) {
+  .gad-lc {
+    padding-top: var(--lc-pt, 36px);
+    padding-bottom: var(--lc-pb, 36px);
+  }
+
+  .gad-lc .card__heading {
+    font-size: var(--lc-t-d, 18px);
+  }
+}
+
+/* ---------- Clásico: compra rápida sin aire arriba de la información ---------- */
+:where(html[data-gad-style='clasico']) .quick-add-modal__content-info .product__info-wrapper {
+  padding-top: 0;
 }
 
 /* ---------- Estilo base "Clásico" (ajuste global base_style, por defecto) ----------

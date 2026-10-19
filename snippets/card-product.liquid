@@ -35,6 +35,13 @@
   {{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
 {%- endunless -%}
 {%- assign gad_card_scheme = card_scheme | default: settings.card_color_scheme -%}
+{%- assign gad_cs = settings.card_style | replace: 'tint', 'card' -%}
+{%- liquid
+  assign gad_badge_pos = settings.badge_position
+  if settings.card_badge_position != blank and settings.card_badge_position != 'global'
+    assign gad_badge_pos = settings.card_badge_position
+  endif
+-%}
 {%- if card_product and card_product != empty -%}
   {%- liquid
     assign ratio = 1
@@ -52,18 +59,18 @@
     <div class="card-wrapper product-card-wrapper underline-links-hover">
       <div
         class="
-          card card--{{ settings.card_style }}
+          card card--{{ gad_cs }}{% if settings.card_style == 'tint' %} gad-card-tint{% endif %}
           {% if card_product.featured_media %} card--media{% else %} card--text{% endif %}
-          {% if settings.card_style == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
+          {% if gad_cs == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
           {% if image_shape and image_shape != 'default' %} card--shape{% endif %}
           {% if extend_height %} card--extend-height{% endif %}
-          {% if card_product.featured_media == nil and settings.card_style == 'card' %} ratio{% endif %}
+          {% if card_product.featured_media == nil and gad_cs == 'card' %} ratio{% endif %}
           {% if horizontal_class %} card--horizontal{% endif %}
         "
         style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
       >
         <div
-          class="card__inner {% if settings.card_style == 'standard' %}color-{{ gad_card_scheme }} gradient{% endif %}{% if card_product.featured_media or settings.card_style == 'standard' %} ratio{% endif %}"
+          class="card__inner {% if gad_cs == 'standard' %}color-{{ gad_card_scheme }} gradient{% endif %}{% if card_product.featured_media or gad_cs == 'standard' %} ratio{% endif %}"
           style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
         >
           {%- if card_product.featured_media -%}
@@ -119,7 +126,7 @@
             <div class="card__information">
               <h3
                 class="card__heading"
-                {% if card_product.featured_media == null and settings.card_style == 'standard' %}
+                {% if card_product.featured_media == null and gad_cs == 'standard' %}
                   id="title-{{ section_id }}-{{ card_product.id }}"
                 {% endif %}
               >
@@ -133,7 +140,7 @@
                 </a>
               </h3>
             </div>
-            <div class="card__badge {{ settings.badge_position }}">
+            <div class="card__badge {{ gad_badge_pos }}">
               {%- assign gad_badge_id = 'NoMediaStandardBadge-' | append: section_id | append: '-' | append: card_product.id -%}
               {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id, mode: badges -%}
             </div>
@@ -145,8 +152,8 @@
               {%- render 'gad-card-swatches', product: card_product, option: swatch_option, size_d: swatch_size_d, size_m: swatch_size_m, max: swatch_max -%}
             {%- endif -%}
             <h3
-              class="card__heading{% if card_product.featured_media or settings.card_style == 'standard' %} h5{% endif %}"
-              {% if card_product.featured_media or settings.card_style == 'card' %}
+              class="card__heading{% if card_product.featured_media or gad_cs == 'standard' %} h5{% endif %}"
+              {% if card_product.featured_media or gad_cs == 'card' %}
                 id="title-{{ section_id }}-{{ card_product.id }}"
               {% endif %}
             >
@@ -550,7 +557,7 @@
               </div>
             {% endif %}
           {% endif %}
-          <div class="card__badge {{ settings.badge_position }}">
+          <div class="card__badge {{ gad_badge_pos }}">
             {%- assign gad_badge_id = 'Badge-' | append: section_id | append: '-' | append: card_product.id -%}
             {%- render 'gad-card-badges', card_product: card_product, id: gad_badge_id, mode: badges -%}
           </div>
@@ -569,15 +576,15 @@
   <div class="card-wrapper product-card-wrapper underline-links-hover">
     <div
       class="
-        card card--{{ settings.card_style }}
+        card card--{{ gad_cs }}{% if settings.card_style == 'tint' %} gad-card-tint{% endif %}
         {% if extend_height %} card--extend-height{% endif %}
         {% if image_shape and image_shape != 'default' %} card--shape{% endif %}
-        {% if settings.card_style == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
+        {% if gad_cs == 'card' %} color-{{ gad_card_scheme }} gradient{% endif %}
       "
       style="--ratio-percent: {{ 1 | divided_by: ratio | times: 100 }}%;"
     >
       <div
-        class="card__inner{% if settings.card_style == 'standard' %} color-{{ gad_card_scheme }} gradient{% endif %} ratio"
+        class="card__inner{% if gad_cs == 'standard' %} color-{{ gad_card_scheme }} gradient{% endif %} ratio"
       >
         <div
           class="card__media {% if image_shape and image_shape != 'default' %} shape--{{ image_shape }} color-{{ gad_card_scheme }} gradient{% endif %}"
@@ -595,7 +602,7 @@
       </div>
       <div class="card__content">
         <div class="card__information">
-          <h3 class="card__heading card__heading--placeholder{% if settings.card_style == 'standard' %} h5{% endif %}">
+          <h3 class="card__heading card__heading--placeholder{% if gad_cs == 'standard' %} h5{% endif %}">
             <a role="link" aria-disabled="true" class="full-unstyled-link">
               {{ 'onboarding.product_title' | t }}
             </a>

@@ -79,6 +79,7 @@
                   <label class="field__label" for="NewsletterForm--{{ section.id }}">
                     {{ 'newsletter.label' | t }}
                   </label>
+                  {%- unless block.settings.button_style == 'below' -%}
                   <button
                     type="submit"
                     class="newsletter-form__button field__button"
@@ -90,7 +91,13 @@
                       {{- 'icon-arrow.svg' | inline_asset_content -}}
                     </span>
                   </button>
+                  {%- endunless -%}
                 </div>
+                {%- if block.settings.button_style == 'below' -%}
+                  <button type="submit" class="button gad-newsletter__button" name="commit">
+                    {%- if block.settings.button_label != blank -%}{{ block.settings.button_label | escape }}{%- else -%}{{ 'newsletter.button_label' | t }}{%- endif -%}
+                  </button>
+                {%- endif -%}
                 {%- if form.errors -%}
                   <small class="newsletter-form__message form__message" id="Newsletter-error--{{ section.id }}">
                     <span class="svg-wrapper">
@@ -427,7 +434,32 @@
     {
       "type": "email_form",
       "name": "t:sections.newsletter.blocks.email_form.name",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Botón",
+          "options": [
+            {
+              "value": "arrow",
+              "label": "Flecha dentro del campo"
+            },
+            {
+              "value": "below",
+              "label": "Botón debajo del campo"
+            }
+          ],
+          "default": "arrow"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "default": "Suscribirme",
+          "visible_if": "{{ block.settings.button_style == 'below' }}"
+        }
+      ]
     },
     {
       "type": "@app"

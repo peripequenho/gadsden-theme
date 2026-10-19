@@ -1,7 +1,7 @@
 {{ 'component-card.css' | asset_url | stylesheet_tag }}
 {{ 'section-collection-list.css' | asset_url | stylesheet_tag }}
 
-<div style="--lc-t-m: {{ section.settings.card_title_m }}px;" class="gad-lc-title-m page-width">
+<div style="--lc-t-m: {{ section.settings.card_title_m }}px; --lc-t-d: {{ section.settings.card_title_d | default: 18 }}px; --lc-pt: {{ section.settings.padding_top | default: 36 }}px; --lc-pb: {{ section.settings.padding_bottom | default: 36 }}px;" class="gad-lc-title-m gad-lc page-width">
   <h1 class="title title--primary inline-richtext{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--fade-in{% endif %}">
     {{ section.settings.title }}
   </h1>
@@ -144,6 +144,41 @@
       "unit": "px",
       "label": "Título de las tarjetas en mobile",
       "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_title_d",
+      "label": "Tamaño del título de la tarjeta en desktop",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Relleno de la sección"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Relleno arriba",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36,
+      "info": "En mobile se usa el 75 %."
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Relleno abajo",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
     }
   ]
 }
