@@ -2679,7 +2679,7 @@ body:has(.gad-drawer--panel[open]) .section-header {
 }
 
 /* ---------- Precio y título de la tarjeta de producto (ajustes de Tarjetas) ---------- */
-html.gad-cp-sale-first .card-information .price__sale {
+html.gad-cp-sale-first .card-information .price--on-sale .price__sale {
   display: inline-flex;
   flex-direction: row-reverse;
   flex-wrap: wrap-reverse;
@@ -2813,6 +2813,18 @@ html.gad-pt-center .title-wrapper-with-link:has(> .title--primary) {
 @media screen and (min-width: 990px) {
   :where(html:not([data-gad-bp='750'])) gad-carousel.gad-carousel--d-arrows-sides.gad-carousel--d-dots-hidden {
     grid-template-areas: 'stage stage stage stage stage';
+  }
+}
+
+/* ---------- Nombre de la tienda sin logo: no se corta a mitad de palabra; en mobile se achica si no entra ---------- */
+.header__heading-link .h2 {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+@media screen and (max-width: 749px) {
+  .header__heading-link .h2 {
+    font-size: min(calc(var(--font-heading-scale) * 2rem), 4.8vw);
   }
 }
 

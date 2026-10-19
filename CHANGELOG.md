@@ -1,5 +1,10 @@
 # Cambios
 
+## Sin publicar
+
+- Tarjetas con "precio de oferta primero": los productos sin oferta mostraban el precio dos veces.
+- Nombre de la tienda sin logo: ya no se corta a mitad de palabra y en mobile se achica si no entra.
+
 ## 1.0.0
 
 Primera versión estable.
