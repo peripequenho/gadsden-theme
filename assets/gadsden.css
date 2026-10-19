@@ -920,6 +920,15 @@ gad-video:not(.is-muted) .gad-video__icon-sound {
   }
 }
 
+/* Secciones que son elementos propios: como bloque, para que su fondo (colores propios) pinte detrás del contenido. */
+gad-article,
+gad-merge,
+gad-quiz,
+gad-reveal-cards,
+gad-timed-steps {
+  display: block;
+}
+
 .gad-buttons {
   display: flex;
   flex-wrap: wrap;

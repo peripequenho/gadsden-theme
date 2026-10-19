@@ -13,6 +13,9 @@
 - Íconos con contenido: bloque **Video o imagen** (con proporción, ancho máximo y redondeo) que va con el título y el texto, y **pulso** alrededor de los íconos (quieto con "reducir movimiento").
 - Lista de colecciones: estilo **Título sobre la imagen** (posición, velo con color y opacidad, color y tamaño del título por pantalla, flecha, redondeo), **carrusel** compartido (bucle, pase automático, por pantalla, de a cuántos, vista previa, flechas y puntos por pantalla), ancho completo sin márgenes en desktop e **imagen y título propios** por colección (también con el estilo del tema).
 - Estilo de esta página: fuente del texto y etiqueta de oferta de la ficha (fondo, texto, inclinación y mayúsculas).
+- Hero con palabra que rota: **tamaño de la promesa** "como el título", con resaltado de marcador; sin título cargado, la promesa pasa a ser el título.
+- Íconos con contenido: pulso también **por ícono** (además del de toda la sección).
+- Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios (ahora son bloque).
 
 ## 1.0.1
 

@@ -15,6 +15,7 @@ Trae dos estilos base, que se eligen en *Configuración del tema > Gadsden · Es
 **En todas las secciones**
 - Colores propios por sección (además de las combinaciones de la paleta), con degradé o imagen de fondo.
 - Palabras resaltadas en los títulos (lo que se marca en negrita toma el color de acento).
+- Volanta (texto chico arriba del título) con color propio.
 - Modo carrusel con flechas, puntos, arrastre, pase automático y cantidad por pantalla, por dispositivo. La vista de desktop empieza en 750 px o en 990 px (ajuste global).
 - Mostrar sólo en mobile o sólo en desktop, y nombre de ancla para que un botón lleve hasta la sección.
 - Íconos de Material Symbols por nombre.
@@ -45,6 +46,8 @@ Progreso de lectura, estilo propio de una página, oferta del producto, muro de 
 Las animaciones respetan "reducir movimiento" del sistema.
 
 **Más en la v1**: puntos sobre imagen a todo el ancho con una ventana por punto, testimonios estilo red social con reacciones y comentarios, íconos con contenido en dos columnas, separadores con formas animadas y en dos capas, antes y después con caja de texto y manija con triángulos, resultados y tabla comparativa con más opciones.
+
+**Más en la 1.1**: lista de colecciones con el título sobre la imagen, carrusel e imagen y título propios; tabla comparativa con el texto arriba y tilde parcial; cuestionario con resumen de respuestas; nota con estilo diario y temas; íconos con contenido con video o imagen y pulso; estilo de página con fuente del texto y etiqueta de oferta.
 
 **Ajustes globales**
 Estilo base, etiquetas de oferta con porcentaje, etiquetas propias por tag, estilos de tarjeta (también "con velo"), precio y título de la tarjeta, alineación de los títulos de página, íconos de redes redondos o cuadrados, trazo de los íconos, tipografía extra (por enlace), cursor y barra de scroll propios, idiomas de derecha a izquierda, ventana para cambiar de idioma, bloqueo por país y protección de contenido.

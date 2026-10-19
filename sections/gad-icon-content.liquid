@@ -66,7 +66,7 @@
               {%- assign b = block.settings -%}
               <div class="gad-icc__item" {{ block.shopify_attributes }}>
                 <h3 class="gad-icc__item-title {{ s.row_title_size }}">
-                  <span class="gad-icc__item-icon{% if s.icon_custom_color == blank %} gad-accent-{{ s.icon_color }}{% endif %}">
+                  <span class="gad-icc__item-icon{% if b.pulse %} gad-ic__icon--pulse{% endif %}{% if s.icon_custom_color == blank %} gad-accent-{{ s.icon_color }}{% endif %}">
                     {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image -%}
                   </span>
                   {%- if b.title != blank -%}<span>{{ b.title }}</span>{%- endif -%}
@@ -93,7 +93,7 @@
           {%- if block.type == 'item' -%}
             {%- assign b = block.settings -%}
             <div class="gad-ic__item" {{ block.shopify_attributes }}>
-              <span class="gad-ic__icon{% if s.icon_custom_color == blank %} gad-accent-{{ s.icon_color }}{% endif %}">
+              <span class="gad-ic__icon{% if b.pulse %} gad-ic__icon--pulse{% endif %}{% if s.icon_custom_color == blank %} gad-accent-{{ s.icon_color }}{% endif %}">
                 {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: s.icon_size -%}
               </span>
               {%- if b.title != blank -%}<h3 class="gad-ic__title h4">{{ b.title }}</h3>{%- endif -%}
@@ -197,14 +197,17 @@
 
   /* pulso: dos ondas que salen del ícono en su color */
   .gad-ic--pulse .gad-ic__icon,
-  .gad-ic--pulse .gad-icc__item-icon {
+  .gad-ic--pulse .gad-icc__item-icon,
+  .gad-ic__icon--pulse {
     position: relative;
   }
 
   .gad-ic--pulse .gad-ic__icon::before,
   .gad-ic--pulse .gad-ic__icon::after,
   .gad-ic--pulse .gad-icc__item-icon::before,
-  .gad-ic--pulse .gad-icc__item-icon::after {
+  .gad-ic--pulse .gad-icc__item-icon::after,
+  .gad-ic__icon--pulse::before,
+  .gad-ic__icon--pulse::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -216,7 +219,8 @@
   }
 
   .gad-ic--pulse .gad-ic__icon::after,
-  .gad-ic--pulse .gad-icc__item-icon::after {
+  .gad-ic--pulse .gad-icc__item-icon::after,
+  .gad-ic__icon--pulse::after {
     animation-delay: 1.2s;
   }
 
@@ -234,14 +238,16 @@
 
   @media (prefers-reduced-motion: reduce) {
     .gad-ic--pulse .gad-ic__icon::before,
-    .gad-ic--pulse .gad-icc__item-icon::before {
+    .gad-ic--pulse .gad-icc__item-icon::before,
+    .gad-ic__icon--pulse::before {
       animation: none;
       opacity: 0.35;
       transform: scale(1.15);
     }
 
     .gad-ic--pulse .gad-ic__icon::after,
-    .gad-ic--pulse .gad-icc__item-icon::after {
+    .gad-ic--pulse .gad-icc__item-icon::after,
+    .gad-ic__icon--pulse::after {
       animation: none;
     }
   }
@@ -999,6 +1005,13 @@
           "type": "image_picker",
           "id": "icon_image",
           "label": "Ícono propio (imagen)"
+        },
+        {
+          "type": "checkbox",
+          "id": "pulse",
+          "label": "Pulso alrededor de este ícono",
+          "default": false,
+          "info": "Con \"Pulso alrededor de los íconos\" de la sección prendido, lo tienen todos."
         },
         {
           "type": "inline_richtext",
