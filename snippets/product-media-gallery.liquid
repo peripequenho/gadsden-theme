@@ -46,7 +46,7 @@
 
 {%- liquid
   assign gs = section.settings
-  assign gad_gallery_class = 'gad-gallery gad-gallery--thumbs-' | append: gs.thumbs_position | append: ' gad-gallery--m-pag-' | append: gs.m_pagination | append: ' gad-gallery--m-arrows-' | append: gs.m_arrows | append: ' gad-gallery--ratio-' | append: gs.thumbs_ratio | append: ' gad-gallery--peek-' | append: gs.m_peek_type | append: ' gad-gallery--video-' | append: gs.video_mode
+  assign gad_gallery_class = 'gad-gallery gad-gallery--thumbs-' | append: gs.thumbs_position | append: ' gad-gallery--m-pag-' | append: gs.m_pagination | append: ' gad-gallery--m-arrows-' | append: gs.m_arrows | append: ' gad-gallery--ratio-' | append: gs.thumbs_ratio | append: ' gad-gallery--m-ratio-' | append: gs.m_thumbs_ratio | append: ' gad-gallery--peek-' | append: gs.m_peek_type | append: ' gad-gallery--video-' | append: gs.video_mode
   if gs.thumbs_v_hide_arrows
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--v-no-arrows'
   endif

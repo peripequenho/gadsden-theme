@@ -873,13 +873,15 @@
           "type": "color",
           "id": "button_color",
           "label": "Fondo del botón",
-          "default": "#121212"
+          "default": "#121212",
+          "visible_if": "{{ block.settings.custom_button }}"
         },
         {
           "type": "color",
           "id": "button_text_color",
           "label": "Texto del botón",
-          "default": "#FFFFFF"
+          "default": "#FFFFFF",
+          "visible_if": "{{ block.settings.custom_button }}"
         },
         {
           "type": "color_scheme",
@@ -1164,7 +1166,8 @@
           "type": "color",
           "id": "rv_bg",
           "label": "Color del fondo",
-          "default": "#F3F3F3"
+          "default": "#F3F3F3",
+          "visible_if": "{{ block.settings.rv_custom_bg }}"
         },
         {
           "type": "range",
@@ -1285,7 +1288,8 @@
           "step": 0.5,
           "unit": "s",
           "label": "Velocidad",
-          "default": 5
+          "default": 5,
+          "visible_if": "{{ block.settings.car_autoplay }}"
         },
         {
           "type": "checkbox",
@@ -2250,50 +2254,6 @@
             "vimeo"
           ],
           "info": "Si cargás un video, se muestra en lugar de la imagen."
-        },
-        {
-          "type": "select",
-          "id": "fs_scale",
-          "label": "Tamaño de la letra",
-          "options": [
-            {
-              "value": "70",
-              "label": "70 %"
-            },
-            {
-              "value": "80",
-              "label": "80 %"
-            },
-            {
-              "value": "90",
-              "label": "90 %"
-            },
-            {
-              "value": "100",
-              "label": "Normal"
-            },
-            {
-              "value": "110",
-              "label": "110 %"
-            },
-            {
-              "value": "125",
-              "label": "125 %"
-            },
-            {
-              "value": "150",
-              "label": "150 %"
-            },
-            {
-              "value": "175",
-              "label": "175 %"
-            },
-            {
-              "value": "200",
-              "label": "200 %"
-            }
-          ],
-          "default": "100"
         }
       ]
     },
@@ -2790,7 +2750,8 @@
           "type": "color",
           "id": "ti_bg_color",
           "label": "Color del fondo",
-          "default": "#F3F3F3"
+          "default": "#F3F3F3",
+          "visible_if": "{{ block.settings.ti_bg }}"
         },
         {
           "type": "range",
@@ -2800,7 +2761,8 @@
           "step": 2,
           "unit": "px",
           "label": "Redondeo del fondo",
-          "default": 12
+          "default": 12,
+          "visible_if": "{{ block.settings.ti_bg }}"
         },
         {
           "type": "range",
@@ -2810,7 +2772,8 @@
           "step": 2,
           "unit": "px",
           "label": "Relleno del fondo",
-          "default": 12
+          "default": 12,
+          "visible_if": "{{ block.settings.ti_bg }}"
         },
         {
           "type": "range",
@@ -2820,13 +2783,15 @@
           "step": 1,
           "unit": "px",
           "label": "Borde",
-          "default": 0
+          "default": 0,
+          "visible_if": "{{ block.settings.ti_bg }}"
         },
         {
           "type": "color",
           "id": "ti_border_color",
           "label": "Color del borde",
-          "default": "#121212"
+          "default": "#121212",
+          "visible_if": "{{ block.settings.ti_bg and block.settings.ti_border > 0 }}"
         },
         {
           "type": "header",
@@ -2968,7 +2933,8 @@
           "max": 20,
           "step": 1,
           "label": "Cantidad",
-          "default": 1
+          "default": 1,
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "range",
@@ -2978,29 +2944,34 @@
           "step": 1,
           "unit": "%",
           "label": "Descuento",
-          "default": 0
+          "default": 0,
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "text",
           "id": "offer_1_label",
           "label": "Nombre",
-          "default": "1 unidad"
+          "default": "1 unidad",
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "text",
           "id": "offer_1_badge",
-          "label": "Insignia"
+          "label": "Insignia",
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "image_picker",
           "id": "offer_1_image",
-          "label": "Imagen"
+          "label": "Imagen",
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "textarea",
           "id": "offer_1_benefits",
           "label": "Beneficios",
-          "info": "Uno por renglón."
+          "info": "Uno por renglón.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
           "type": "header",
@@ -3019,7 +2990,8 @@
           "max": 20,
           "step": 1,
           "label": "Cantidad",
-          "default": 2
+          "default": 2,
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "range",
@@ -3029,29 +3001,34 @@
           "step": 1,
           "unit": "%",
           "label": "Descuento",
-          "default": 10
+          "default": 10,
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "text",
           "id": "offer_2_label",
           "label": "Nombre",
-          "default": "2 unidades"
+          "default": "2 unidades",
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "text",
           "id": "offer_2_badge",
           "label": "Insignia",
-          "default": "Más elegido"
+          "default": "Más elegido",
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "image_picker",
           "id": "offer_2_image",
-          "label": "Imagen"
+          "label": "Imagen",
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "textarea",
           "id": "offer_2_benefits",
-          "label": "Beneficios"
+          "label": "Beneficios",
+          "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
           "type": "header",
@@ -3070,7 +3047,8 @@
           "max": 20,
           "step": 1,
           "label": "Cantidad",
-          "default": 3
+          "default": 3,
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "range",
@@ -3080,28 +3058,33 @@
           "step": 1,
           "unit": "%",
           "label": "Descuento",
-          "default": 15
+          "default": 15,
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "text",
           "id": "offer_3_label",
           "label": "Nombre",
-          "default": "3 unidades"
+          "default": "3 unidades",
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "text",
           "id": "offer_3_badge",
-          "label": "Insignia"
+          "label": "Insignia",
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "image_picker",
           "id": "offer_3_image",
-          "label": "Imagen"
+          "label": "Imagen",
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "textarea",
           "id": "offer_3_benefits",
-          "label": "Beneficios"
+          "label": "Beneficios",
+          "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
           "type": "header",
@@ -3120,7 +3103,8 @@
           "max": 20,
           "step": 1,
           "label": "Cantidad",
-          "default": 4
+          "default": 4,
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "range",
@@ -3130,28 +3114,33 @@
           "step": 1,
           "unit": "%",
           "label": "Descuento",
-          "default": 20
+          "default": 20,
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "text",
           "id": "offer_4_label",
           "label": "Nombre",
-          "default": "4 unidades"
+          "default": "4 unidades",
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "text",
           "id": "offer_4_badge",
-          "label": "Insignia"
+          "label": "Insignia",
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "image_picker",
           "id": "offer_4_image",
-          "label": "Imagen"
+          "label": "Imagen",
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "textarea",
           "id": "offer_4_benefits",
-          "label": "Beneficios"
+          "label": "Beneficios",
+          "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
           "type": "header",
@@ -4567,19 +4556,22 @@
         {
           "type": "text",
           "id": "placeholder",
-          "label": "Texto de ayuda dentro del campo"
+          "label": "Texto de ayuda dentro del campo",
+          "visible_if": "{{ block.settings.type == 'text' or block.settings.type == 'textarea' }}"
         },
         {
           "type": "text",
           "id": "options",
           "label": "Opciones",
-          "info": "Para la lista: separadas por coma."
+          "info": "Para la lista: separadas por coma.",
+          "visible_if": "{{ block.settings.type == 'select' }}"
         },
         {
           "type": "text",
           "id": "checked_value",
           "label": "Valor de la casilla marcada",
-          "default": "Sí"
+          "default": "Sí",
+          "visible_if": "{{ block.settings.type == 'checkbox' }}"
         },
         {
           "type": "range",
@@ -4589,7 +4581,8 @@
           "step": 5,
           "label": "Largo máximo",
           "default": 0,
-          "info": "0: sin límite."
+          "info": "0: sin límite.",
+          "visible_if": "{{ block.settings.type == 'text' or block.settings.type == 'textarea' }}"
         },
         {
           "type": "checkbox",
@@ -5107,7 +5100,8 @@
           "id": "badge_text",
           "label": "Texto de la etiqueta propia",
           "default": "{icono1} Ahorrás {porcentaje}",
-          "info": "Podés usar {icono1}, {icono2}, {porcentaje} y {monto}."
+          "info": "Podés usar {icono1}, {icono2}, {porcentaje} y {monto}.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "range",
@@ -5117,42 +5111,49 @@
           "step": 5,
           "unit": "%",
           "label": "Escala de los íconos",
-          "default": 140
+          "default": 140,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "text",
           "id": "badge_icon_1",
           "label": "Ícono 1",
           "default": "sell",
-          "info": "Nombre en inglés de Material Symbols. Acepta metacampos."
+          "info": "Nombre en inglés de Material Symbols. Acepta metacampos.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "checkbox",
           "id": "badge_icon_1_filled",
           "label": "Relleno",
-          "default": true
+          "default": true,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "image_picker",
           "id": "badge_icon_1_image",
-          "label": "Ícono propio (imagen)"
+          "label": "Ícono propio (imagen)",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "text",
           "id": "badge_icon_2",
           "label": "Ícono 2",
-          "info": "Nombre en inglés de Material Symbols. Acepta metacampos."
+          "info": "Nombre en inglés de Material Symbols. Acepta metacampos.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "checkbox",
           "id": "badge_icon_2_filled",
           "label": "Relleno",
-          "default": true
+          "default": true,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "image_picker",
           "id": "badge_icon_2_image",
-          "label": "Ícono propio (imagen)"
+          "label": "Ícono propio (imagen)",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
         },
         {
           "type": "header",
@@ -5733,13 +5734,15 @@
           "type": "color",
           "id": "color",
           "label": "Fondo del botón",
-          "default": "#121212"
+          "default": "#121212",
+          "visible_if": "{{ block.settings.custom_color }}"
         },
         {
           "type": "color",
           "id": "text_color",
           "label": "Texto del botón",
-          "default": "#FFFFFF"
+          "default": "#FFFFFF",
+          "visible_if": "{{ block.settings.custom_color }}"
         },
         {
           "type": "image_picker",
@@ -5785,35 +5788,41 @@
           "type": "text",
           "id": "second_label",
           "label": "Texto",
-          "placeholder": "Comprar ahora"
+          "placeholder": "Comprar ahora",
+          "visible_if": "{{ block.settings.second_button }}"
         },
         {
           "type": "checkbox",
           "id": "second_custom_color",
           "label": "Color propio",
-          "default": false
+          "default": false,
+          "visible_if": "{{ block.settings.second_button }}"
         },
         {
           "type": "color",
           "id": "second_color",
           "label": "Color del botón",
-          "default": "#121212"
+          "default": "#121212",
+          "visible_if": "{{ block.settings.second_button and block.settings.second_custom_color }}"
         },
         {
           "type": "color",
           "id": "second_text_color",
           "label": "Texto del botón",
-          "default": "#FFFFFF"
+          "default": "#FFFFFF",
+          "visible_if": "{{ block.settings.second_button and block.settings.second_custom_color }}"
         },
         {
           "type": "image_picker",
           "id": "second_icon_before",
-          "label": "Ícono antes del texto"
+          "label": "Ícono antes del texto",
+          "visible_if": "{{ block.settings.second_button }}"
         },
         {
           "type": "image_picker",
           "id": "second_icon_after",
-          "label": "Ícono después del texto"
+          "label": "Ícono después del texto",
+          "visible_if": "{{ block.settings.second_button }}"
         },
         {
           "type": "header",
@@ -7841,7 +7850,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Las miniaturas se ven con los diseños \"Miniaturas\" y \"Miniaturas en carrusel\" (a los costados, sólo con el carrusel)."
+      "content": "Las miniaturas aparecen con los diseños \"Miniaturas\" y \"Miniaturas en carrusel\" (arriba, en Multimedia)."
     },
     {
       "type": "select",
@@ -7861,7 +7870,19 @@
           "label": "A la derecha"
         }
       ],
-      "default": "bottom"
+      "default": "bottom",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
+    },
+    {
+      "type": "range",
+      "id": "thumbs_v_width",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de las miniaturas a los costados",
+      "default": 16,
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' and section.settings.thumbs_position != 'bottom' and section.settings.thumbs_fixed == false }}"
     },
     {
       "type": "range",
@@ -7871,7 +7892,8 @@
       "step": 1,
       "label": "Miniaturas visibles",
       "default": 5,
-      "info": "Cuántas entran a la vista, abajo o a los costados. Si hay más, se deslizan."
+      "info": "Cuántas entran a la vista, abajo o a los costados. Si hay más, se deslizan.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "range",
@@ -7881,14 +7903,16 @@
       "step": 2,
       "unit": "px",
       "label": "Separación entre miniaturas",
-      "default": 10
+      "default": 10,
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "checkbox",
       "id": "thumbs_fixed",
       "label": "Elegir el tamaño de las miniaturas",
       "default": false,
-      "info": "Apagado, se reparten el ancho según cuántas se ven."
+      "info": "Apagado, se reparten el ancho según cuántas se ven.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "range",
@@ -7898,7 +7922,8 @@
       "step": 4,
       "unit": "px",
       "label": "Tamaño de las miniaturas",
-      "default": 72
+      "default": 72,
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' and section.settings.thumbs_fixed }}"
     },
     {
       "type": "range",
@@ -7909,7 +7934,8 @@
       "unit": "%",
       "label": "Redondeo de las miniaturas",
       "default": 10,
-      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo."
+      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "select",
@@ -7930,7 +7956,25 @@
         }
       ],
       "default": "start",
-      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen."
+      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
+    },
+    {
+      "type": "select",
+      "id": "thumbs_ratio",
+      "label": "Proporción de las miniaturas",
+      "options": [
+        {
+          "value": "square",
+          "label": "Cuadradas"
+        },
+        {
+          "value": "original",
+          "label": "Original"
+        }
+      ],
+      "default": "square",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "select",
@@ -7947,7 +7991,8 @@
         }
       ],
       "default": "one",
-      "info": "Con las flechas: de a una miniatura, o de a una tanda (las visibles)."
+      "info": "Con las flechas: de a una miniatura, o de a una tanda (las visibles).",
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' }}"
     },
     {
       "type": "select",
@@ -7968,7 +8013,8 @@
         }
       ],
       "default": "off",
-      "info": "Se frena cuando el cliente pasa el mouse o toca las miniaturas, y con \"reducir movimiento\"."
+      "info": "Se frena cuando el cliente pasa el mouse o toca las miniaturas, y con \"reducir movimiento\".",
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' }}"
     },
     {
       "type": "range",
@@ -7978,7 +8024,8 @@
       "step": 10,
       "unit": "px",
       "label": "Velocidad del continuo (por segundo)",
-      "default": 30
+      "default": 30,
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' and section.settings.thumbs_auto == 'continuous' }}"
     },
     {
       "type": "range",
@@ -7988,196 +8035,73 @@
       "step": 0.5,
       "unit": "s",
       "label": "Pausa entre pasos (de a una)",
-      "default": 2.5
-    },
-    {
-      "type": "range",
-      "id": "thumbs_v_width",
-      "min": 10,
-      "max": 30,
-      "step": 1,
-      "unit": "%",
-      "label": "Ancho de las miniaturas a los costados",
-      "default": 16
-    },
-    {
-      "type": "select",
-      "id": "thumbs_ratio",
-      "label": "Proporción de las miniaturas",
-      "options": [
-        {
-          "value": "square",
-          "label": "Cuadradas"
-        },
-        {
-          "value": "original",
-          "label": "Original"
-        }
-      ],
-      "default": "square"
+      "default": 2.5,
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' and section.settings.thumbs_auto == 'step' }}"
     },
     {
       "type": "header",
-      "content": "Miniaturas: mobile"
+      "content": "Navegación: desktop"
     },
     {
       "type": "paragraph",
-      "content": "Se ven cuando \"Diseño para móviles\" muestra las miniaturas."
+      "content": "Con los diseños de miniaturas, donde se ve una imagen por vez."
     },
     {
       "type": "select",
-      "id": "m_thumbs_position",
-      "label": "Miniaturas",
+      "id": "d_pagination",
+      "label": "Puntos de navegación",
       "options": [
         {
-          "value": "bottom",
-          "label": "Abajo"
+          "value": "hidden",
+          "label": "Ocultos"
         },
         {
-          "value": "left",
-          "label": "A la izquierda"
+          "value": "dots_under",
+          "label": "Debajo de la imagen"
         },
         {
-          "value": "right",
-          "label": "A la derecha"
+          "value": "dots_over",
+          "label": "Encima de la imagen"
         }
       ],
-      "default": "bottom"
-    },
-    {
-      "type": "range",
-      "id": "m_thumbs_v_width",
-      "min": 10,
-      "max": 30,
-      "step": 1,
-      "unit": "%",
-      "label": "Ancho de las miniaturas a los costados",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "m_thumbs_count",
-      "min": 2,
-      "max": 8,
-      "step": 1,
-      "label": "Miniaturas visibles",
-      "default": 3
-    },
-    {
-      "type": "range",
-      "id": "m_thumbs_gap",
-      "min": 0,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "label": "Separación entre miniaturas",
-      "default": 10
+      "default": "hidden",
+      "info": "Con los diseños de miniaturas.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
       "type": "checkbox",
-      "id": "m_thumbs_fixed",
-      "label": "Elegir el tamaño de las miniaturas",
+      "id": "main_arrows",
+      "label": "Flechas a los costados de la imagen grande",
       "default": false,
-      "info": "Apagado, se reparten el ancho según cuántas se ven."
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' }}"
     },
     {
-      "type": "range",
-      "id": "m_thumbs_size",
-      "min": 40,
-      "max": 160,
-      "step": 4,
-      "unit": "px",
-      "label": "Tamaño de las miniaturas",
-      "default": 64
+      "type": "checkbox",
+      "id": "thumbs_v_hide_arrows",
+      "label": "Ocultar las flechas de las miniaturas",
+      "default": false,
+      "visible_if": "{{ section.settings.gallery_layout == 'thumbnail_slider' and section.settings.thumbs_position != 'bottom' }}"
     },
     {
-      "type": "range",
-      "id": "m_thumbs_radius",
-      "min": 0,
-      "max": 50,
-      "step": 1,
-      "unit": "%",
-      "label": "Redondeo de las miniaturas",
-      "default": 10,
-      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo."
+      "type": "color_scheme",
+      "id": "gallery_arrows_scheme",
+      "label": "Combinación de las flechas",
+      "default": "scheme-1",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' and section.settings.main_arrows }}"
     },
     {
-      "type": "select",
-      "id": "m_thumbs_align",
-      "label": "Alineación de las miniaturas",
-      "options": [
-        {
-          "value": "start",
-          "label": "Al principio (izquierda o arriba)"
-        },
-        {
-          "value": "center",
-          "label": "Centradas"
-        },
-        {
-          "value": "end",
-          "label": "Al final (derecha o abajo)"
-        }
-      ],
-      "default": "start",
-      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen."
+      "type": "checkbox",
+      "id": "gallery_arrows_bare",
+      "label": "Flechas transparentes",
+      "default": false,
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' and section.settings.main_arrows }}"
     },
     {
-      "type": "select",
-      "id": "m_thumbs_scroll",
-      "label": "Al mover las miniaturas",
-      "options": [
-        {
-          "value": "one",
-          "label": "De a una, con encaje"
-        },
-        {
-          "value": "free",
-          "label": "Deslizamiento libre"
-        }
-      ],
-      "default": "one"
-    },
-    {
-      "type": "select",
-      "id": "m_thumbs_auto",
-      "label": "Movimiento automático",
-      "options": [
-        {
-          "value": "off",
-          "label": "Apagado"
-        },
-        {
-          "value": "continuous",
-          "label": "Continuo"
-        },
-        {
-          "value": "step",
-          "label": "De a una"
-        }
-      ],
-      "default": "off",
-      "info": "Se frena cuando el cliente toca las miniaturas, y con \"reducir movimiento\"."
-    },
-    {
-      "type": "range",
-      "id": "m_thumbs_auto_speed",
-      "min": 10,
-      "max": 120,
-      "step": 10,
-      "unit": "px",
-      "label": "Velocidad del continuo (por segundo)",
-      "default": 30
-    },
-    {
-      "type": "range",
-      "id": "m_thumbs_auto_interval",
-      "min": 1,
-      "max": 8,
-      "step": 0.5,
-      "unit": "s",
-      "label": "Pausa entre pasos (de a una)",
-      "default": 2.5
+      "type": "color",
+      "id": "gallery_dots_color",
+      "label": "Color de los puntos",
+      "info": "Vacío: el color del texto.",
+      "visible_if": "{{ section.settings.gallery_layout contains 'thumbnail' and section.settings.d_pagination != 'hidden' }}"
     },
     {
       "type": "header",
@@ -8231,7 +8155,8 @@
       "step": 5,
       "unit": "%",
       "label": "Cuánto asoma (porcentaje)",
-      "default": 15
+      "default": 15,
+      "visible_if": "{{ section.settings.m_peek_type == 'pct' }}"
     },
     {
       "type": "range",
@@ -8241,7 +8166,8 @@
       "step": 5,
       "unit": "px",
       "label": "Cuánto asoma (píxeles)",
-      "default": 40
+      "default": 40,
+      "visible_if": "{{ section.settings.m_peek_type == 'px' }}"
     },
     {
       "type": "checkbox",
@@ -8271,58 +8197,195 @@
     },
     {
       "type": "header",
-      "content": "Navegación: desktop"
+      "content": "Miniaturas: mobile"
+    },
+    {
+      "type": "paragraph",
+      "content": "Se ven cuando \"Diseño para móviles\" muestra las miniaturas."
     },
     {
       "type": "select",
-      "id": "d_pagination",
-      "label": "Puntos de navegación",
+      "id": "m_thumbs_position",
+      "label": "Miniaturas",
       "options": [
         {
-          "value": "hidden",
-          "label": "Ocultos"
+          "value": "bottom",
+          "label": "Abajo"
         },
         {
-          "value": "dots_under",
-          "label": "Debajo de la imagen"
+          "value": "left",
+          "label": "A la izquierda"
         },
         {
-          "value": "dots_over",
-          "label": "Encima de la imagen"
+          "value": "right",
+          "label": "A la derecha"
         }
       ],
-      "default": "hidden",
-      "info": "Con los diseños de miniaturas."
+      "default": "bottom",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_v_width",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de las miniaturas a los costados",
+      "default": 20,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' and section.settings.m_thumbs_position != 'bottom' and section.settings.m_thumbs_fixed == false }}"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_count",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "label": "Miniaturas visibles",
+      "default": 3,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_gap",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre miniaturas",
+      "default": 10,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
     },
     {
       "type": "checkbox",
-      "id": "main_arrows",
-      "label": "Flechas a los costados de la imagen grande",
-      "default": false
+      "id": "m_thumbs_fixed",
+      "label": "Elegir el tamaño de las miniaturas",
+      "default": false,
+      "info": "Apagado, se reparten el ancho según cuántas se ven.",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
     },
     {
-      "type": "checkbox",
-      "id": "thumbs_v_hide_arrows",
-      "label": "Ocultar las flechas de las miniaturas",
-      "default": false
+      "type": "range",
+      "id": "m_thumbs_size",
+      "min": 40,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Tamaño de las miniaturas",
+      "default": 64,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' and section.settings.m_thumbs_fixed }}"
     },
     {
-      "type": "color_scheme",
-      "id": "gallery_arrows_scheme",
-      "label": "Combinación de las flechas",
-      "default": "scheme-1"
+      "type": "range",
+      "id": "m_thumbs_radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Redondeo de las miniaturas",
+      "default": 10,
+      "info": "0 = esquinas rectas. 50 % con miniaturas cuadradas = círculo.",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
     },
     {
-      "type": "checkbox",
-      "id": "gallery_arrows_bare",
-      "label": "Flechas transparentes",
-      "default": false
+      "type": "select",
+      "id": "m_thumbs_align",
+      "label": "Alineación de las miniaturas",
+      "options": [
+        {
+          "value": "start",
+          "label": "Al principio (izquierda o arriba)"
+        },
+        {
+          "value": "center",
+          "label": "Centradas"
+        },
+        {
+          "value": "end",
+          "label": "Al final (derecha o abajo)"
+        }
+      ],
+      "default": "start",
+      "info": "Se nota cuando sobra lugar: pocas miniaturas o tamaño fijo. A los costados, respecto del alto de la imagen.",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
     },
     {
-      "type": "color",
-      "id": "gallery_dots_color",
-      "label": "Color de los puntos",
-      "info": "Vacío: el color del texto."
+      "type": "select",
+      "id": "m_thumbs_ratio",
+      "label": "Proporción de las miniaturas",
+      "options": [
+        {
+          "value": "square",
+          "label": "Cuadradas"
+        },
+        {
+          "value": "original",
+          "label": "Original"
+        }
+      ],
+      "default": "square",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_scroll",
+      "label": "Al mover las miniaturas",
+      "options": [
+        {
+          "value": "one",
+          "label": "De a una, con encaje"
+        },
+        {
+          "value": "free",
+          "label": "Deslizamiento libre"
+        }
+      ],
+      "default": "one",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
+    },
+    {
+      "type": "select",
+      "id": "m_thumbs_auto",
+      "label": "Movimiento automático",
+      "options": [
+        {
+          "value": "off",
+          "label": "Apagado"
+        },
+        {
+          "value": "continuous",
+          "label": "Continuo"
+        },
+        {
+          "value": "step",
+          "label": "De a una"
+        }
+      ],
+      "default": "off",
+      "info": "Se frena cuando el cliente toca las miniaturas, y con \"reducir movimiento\".",
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' }}"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_auto_speed",
+      "min": 10,
+      "max": 120,
+      "step": 10,
+      "unit": "px",
+      "label": "Velocidad del continuo (por segundo)",
+      "default": 30,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' and section.settings.m_thumbs_auto == 'continuous' }}"
+    },
+    {
+      "type": "range",
+      "id": "m_thumbs_auto_interval",
+      "min": 1,
+      "max": 8,
+      "step": 0.5,
+      "unit": "s",
+      "label": "Pausa entre pasos (de a una)",
+      "default": 2.5,
+      "visible_if": "{{ section.settings.mobile_thumbnails == 'show' and section.settings.m_thumbs_auto == 'step' }}"
     },
     {
       "type": "header",
@@ -8376,19 +8439,22 @@
       "type": "color_scheme",
       "id": "m_arrows_scheme",
       "label": "Combinación de las flechas",
-      "default": "scheme-1"
+      "default": "scheme-1",
+      "visible_if": "{{ section.settings.m_arrows != 'hidden' }}"
     },
     {
       "type": "checkbox",
       "id": "m_arrows_bare",
       "label": "Flechas transparentes",
-      "default": false
+      "default": false,
+      "visible_if": "{{ section.settings.m_arrows != 'hidden' }}"
     },
     {
       "type": "color",
       "id": "m_dots_color",
       "label": "Color de los puntos",
-      "info": "Vacío: el color del texto."
+      "info": "Vacío: el color del texto.",
+      "visible_if": "{{ section.settings.m_pagination contains 'dots' }}"
     },
     {
       "type": "header",
@@ -8422,7 +8488,8 @@
           "label": "Abajo a la derecha"
         }
       ],
-      "default": "top-right"
+      "default": "top-right",
+      "visible_if": "{{ section.settings.trust_badge != blank }}"
     },
     {
       "type": "select",
@@ -8442,7 +8509,8 @@
           "label": "Grande"
         }
       ],
-      "default": "medium"
+      "default": "medium",
+      "visible_if": "{{ section.settings.trust_badge != blank }}"
     },
     {
       "type": "header",
@@ -8496,7 +8564,8 @@
     {
       "type": "color",
       "id": "video_timeline_color",
-      "label": "Color de la línea de tiempo"
+      "label": "Color de la línea de tiempo",
+      "visible_if": "{{ section.settings.video_timeline }}"
     },
     {
       "type": "header",
