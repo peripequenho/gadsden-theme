@@ -15,7 +15,7 @@
     {%- if s.notice != blank -%}
       <div class="gad-lg__notice">{%- render 'gad-icon', name: s.notice_icon, filled: true -%}<div class="rte">{{ s.notice }}</div></div>
     {%- endif -%}
-    {%- if s.data_line != blank -%}<p class="gad-lg__line">{{ s.data_line }}</p>{%- endif -%}
+    {%- if s.data_line != blank and s.line_below != true -%}<p class="gad-lg__line">{{ s.data_line }}</p>{%- endif -%}
     {%- if section.blocks.size > 0 -%}
       <details class="gad-lg__more"{% if s.open %} open{% endif %}>
         <summary>{{ s.details_label | escape }}{%- render 'gad-icon', name: 'expand_more' -%}</summary>
@@ -37,6 +37,7 @@
         </dl>
       </details>
     {%- endif -%}
+    {%- if s.data_line != blank and s.line_below -%}<p class="gad-lg__line gad-lg__line--below">{{ s.data_line }}</p>{%- endif -%}
   </div>
 </div>
 
@@ -169,6 +170,12 @@
       "type": "checkbox",
       "id": "line_upper",
       "label": "Línea de datos en mayúsculas",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "line_below",
+      "label": "Línea de datos debajo del desplegable",
       "default": false
     },
     {

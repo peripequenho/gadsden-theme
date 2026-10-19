@@ -28,7 +28,7 @@
 - Aviso legal: título del desplegable en el acento y en mayúsculas; línea de datos en mayúsculas.
 - Cinta: reseñas con el texto recortado a 1–3 renglones.
 - Estilo de esta página: **ancho de la página** propio y **títulos más chicos en mobile**. Pasos y pósters: vista previa del siguiente en mobile. Sellos: el video "del ancho de la página" va a todo el ancho en mobile.
-- Estilo de esta página (detalle anterior): **ancho de la página** propio. Pósters: **alto fijo** en desktop. Muro de reseñas: el promedio sigue la alineación del encabezado.
+- Pósters: **alto fijo** en desktop. Muro de reseñas: el promedio sigue la alineación del encabezado. Aviso legal: línea de datos debajo del desplegable (opcional).
 - Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios, y el muro de reseñas, el formulario de contacto, las ofertas y regalos por cantidad, las historias y el seguimiento de pedido no respetaban el ancho de la página (ahora son bloque).
 
 ## 1.0.1
