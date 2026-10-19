@@ -43,7 +43,7 @@
       </div>
     {%- endif -%}
 
-    <gad-reviews-wall class="page-width{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} gad-rw--ratio{% endif %}" data-batch="{{ s.batch }}"{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} style="--rw-ratio: {{ s.photo_ratio }};"{% endif %}>
+    <gad-reviews-wall class="page-width{% if s.featured_title_font %} gad-rw--featured-title{% endif %}{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} gad-rw--ratio{% endif %}" data-batch="{{ s.batch }}"{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} style="--rw-ratio: {{ s.photo_ratio }};"{% endif %}>
       <div class="gad-rw__wall">
         {%- for block in section.blocks -%}
           {%- assign b = block.settings -%}
@@ -279,6 +279,13 @@
     .gad-rw--hm-center .gad-rw__summary {
       justify-content: center;
     }
+  }
+  .gad-rw--featured-title .gad-rw__card--featured .gad-rw__text {
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.5rem;
+    line-height: 1.3;
+    text-transform: uppercase;
   }
 {% endstylesheet %}
 
@@ -521,6 +528,12 @@
       "id": "featured_text",
       "label": "Texto de las destacadas",
       "default": "#121212"
+    },
+    {
+      "type": "checkbox",
+      "id": "featured_title_font",
+      "label": "Texto de las destacadas con la letra de los títulos",
+      "default": false
     },
     {
       "type": "color_scheme",

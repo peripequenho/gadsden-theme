@@ -13,7 +13,7 @@
 >
   <div class="page-width page-width--narrow">
     {%- if s.notice != blank -%}
-      <div class="gad-lg__notice">{%- render 'gad-icon', name: s.notice_icon, filled: true -%}<div class="rte">{{ s.notice }}</div></div>
+      <div class="gad-lg__notice">{%- if s.notice_icon_line -%}<span class="gad-lg__icon-line">{%- render 'gad-icon', name: s.notice_icon, filled: false -%}</span>{%- else -%}{%- render 'gad-icon', name: s.notice_icon, filled: true -%}{%- endif -%}<div class="rte">{{ s.notice }}</div></div>
     {%- endif -%}
     {%- if s.data_line != blank and s.line_below != true -%}<p class="gad-lg__line">{{ s.data_line }}</p>{%- endif -%}
     {%- if section.blocks.size > 0 -%}
@@ -127,6 +127,12 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
+  .gad-lg__icon-line {
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 2rem;
+    --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -147,6 +153,12 @@
       "label": "Ícono del aviso",
       "default": "info",
       "info": "Nombre en inglés de Material Symbols."
+    },
+    {
+      "type": "checkbox",
+      "id": "notice_icon_line",
+      "label": "Ícono de línea, en el color del acento",
+      "default": false
     },
     {
       "type": "inline_richtext",

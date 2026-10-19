@@ -1,35 +1,41 @@
 # Cambios
 
-## Sin publicar
+## 1.1.0
 
-- **Volanta** (texto chico arriba del título, con color propio opcional) en todas las secciones Gadsden con título: muros y cintas de reseñas, pasos, pósters, sellos, capítulos, carrusel 3D, cuestionario, tabla comparativa, íconos con contenido (también en su bloque Título) y el resto. Vacía, nada cambia.
-- Formulario de contacto: botón de enviar a todo el ancho.
-- Contenido desplegable: texto al pie, debajo de las filas.
-- Muro de reseñas: colores propios (fondo y texto) para las destacadas.
-- Hero con palabra que rota: color del resaltado de la promesa.
-- Tabla comparativa: posición *Texto arriba, centrado* (título, texto y botón arriba de la tabla también en desktop), encabezado de la columna de características y tilde **parcial** por celda, con su color.
-- Cuestionario: opciones en dos líneas (lo que va después de " — " baja a una línea más chica) y resumen de las respuestas en el resultado (no se guarda ni se envía). Corregido: "Volver" ya no aparece en la primera pregunta.
-- Nota: estilo **Diario** (portal de noticias: letra de lectura con serifa, volanta en el color del botón, líneas finas en lugar de cajas y sombras; los colores siguen siendo los de la combinación) y chips de **temas** al pie.
-- Íconos con contenido: bloque **Video o imagen** (con proporción, ancho máximo y redondeo) que va con el título y el texto, y **pulso** alrededor de los íconos (quieto con "reducir movimiento").
-- Lista de colecciones: estilo **Título sobre la imagen** (posición, velo con color y opacidad, color y tamaño del título por pantalla, flecha, redondeo), **carrusel** compartido (bucle, pase automático, por pantalla, de a cuántos, vista previa, flechas y puntos por pantalla), ancho completo sin márgenes en desktop e **imagen y título propios** por colección (también con el estilo del tema).
-- Estilo de esta página: fuente del texto y etiqueta de oferta de la ficha (fondo, texto, inclinación y mayúsculas).
-- Hero con palabra que rota: **tamaño de la promesa** "como el título", con resaltado de marcador; sin título cargado, la promesa pasa a ser el título.
-- Íconos con contenido: pulso también **por ícono** (además del de toda la sección).
-- Estilo de esta página: **detalles de las secciones** de Gadsden en esa página: volanta con la fuente de los títulos o como etiqueta en las secciones claras, palabras resaltadas con marcador en las secciones claras, texto con el color pleno, borde en tarjetas, fotos y cajas (grosor y opacidad para secciones claras y oscuras), esquinas rectas, trama de puntos y línea entre secciones. La inclinación y la cursiva de los títulos ya no se aplican a los títulos chicos (desplegables, pasos).
+Ajustes nuevos, todos apagados o con el valor de antes por defecto: una tienda que actualiza no cambia sola.
+
+### En todas las secciones con título
+- **Volanta** (texto chico arriba del título) con color propio opcional.
 - **Alineación del encabezado** (izquierda o centro, y aparte en mobile) en las secciones que lo centraban siempre.
-- Contenido desplegable: filas **en caja con borde**, con fondo propio y la fila abierta con otro color.
-- Tarjetas desplegables: frase con la letra de los títulos, tamaño por pantalla, al medio de la tarjeta y flecha chica del color del acento.
-- Íconos con contenido: **video o imagen al costado** de los ítems, ítems **en caja con número** e ítem **destacado** (toda la fila, fondo del acento, ícono al costado).
-- Sellos: **en caja** con la palabra grande a la izquierda, palabras en color alternado, último sello con marcador, video o imagen del ancho de la página con borde y remate como **franja**.
-- Pasos con cronómetro: colores propios del panel, cronómetro como **etiqueta** con los números en el acento (alineado con el encabezado) y **nota en caja** con ícono debajo de los pasos.
-- Pósters: **primero más ancho** en desktop, títulos en el color del acento, datos como **filas**, desplegable en caja y sello como **franja**.
-- Capítulos: proporción propia en desktop, **etapas a la derecha en lista**, etapas en caja con número (la activa invertida) y texto antes del número sobre el video ("Etapa 1").
-- Muro de reseñas: proporción fija de las fotos y botón "ver más" lleno y con la cantidad que falta (`{cantidad}`).
-- Aviso legal: título del desplegable en el acento y en mayúsculas; línea de datos en mayúsculas.
-- Cinta: reseñas con el texto recortado a 1–3 renglones.
-- Estilo de esta página: **ancho de la página** propio y **títulos más chicos en mobile**. Pasos y pósters: vista previa del siguiente en mobile. Sellos: el video "del ancho de la página" va a todo el ancho en mobile.
-- Pósters: **alto fijo** en desktop. Muro de reseñas: el promedio sigue la alineación del encabezado. Aviso legal: línea de datos debajo del desplegable (opcional).
-- Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios, y el muro de reseñas, el formulario de contacto, las ofertas y regalos por cantidad, las historias y el seguimiento de pedido no respetaban el ancho de la página (ahora son bloque).
+
+### Estilo de esta página (para landings)
+- Fuente del texto, etiqueta de oferta de la ficha (fondo, texto, inclinación, mayúsculas), ancho de la página propio y títulos más chicos en mobile.
+- **Detalles de las secciones** de esa página: volanta con la letra de los títulos o como etiqueta en las secciones claras, palabras resaltadas con marcador en las claras, texto con el color pleno, borde en tarjetas, fotos y cajas (grosor y opacidad para claras y oscuras), esquinas rectas, trama de puntos y línea entre secciones. "Clara" u "oscura" sale del fondo de cada sección.
+- La inclinación y la cursiva de los títulos ya no se aplican a los títulos chicos (desplegables, pasos).
+
+### Secciones de Dawn
+- Lista de colecciones: estilo **título sobre la imagen** (posición, velo con color y opacidad, color y tamaño del título por pantalla, flecha, redondeo), **carrusel**, ancho completo sin márgenes e **imagen y título propios** por colección.
+- Formulario de contacto: botón de enviar a todo el ancho.
+- Contenido desplegable: texto al pie y filas **en caja con borde** (fondo propio, fila abierta con otro color).
+
+### Widgets
+- Tabla comparativa: texto **arriba y centrado**, encabezado de la columna de características y tilde **parcial**.
+- Cuestionario: opciones en dos líneas y **resumen de las respuestas** en el resultado (no se guarda ni se envía).
+- Nota: estilo **Diario** y **temas** al pie.
+- Íconos con contenido: bloque **video o imagen** (también al costado de los ítems y a sangre en mobile), **pulso** en los íconos (de la sección o por ícono), ítems **en caja con número** e ítem **destacado**.
+- Tarjetas desplegables: frase con la letra de los títulos, tamaño por pantalla, al medio y flecha chica del acento.
+- Sellos: **en caja** con la palabra grande, colores alternados, último con marcador, video del ancho de la página y remate como **franja**.
+- Pasos con cronómetro: colores propios del panel, cronómetro como **etiqueta**, duración sin borde, **nota en caja** y vista previa del siguiente en mobile.
+- Pósters: **primero más ancho**, **alto fijo** en desktop, títulos en el acento, datos como **filas**, desplegable en caja, sello como **franja** y vista previa en mobile.
+- Capítulos: proporción propia en desktop, **etapas a la derecha en lista**, etapas numeradas (la activa invertida), "Etapa 1" sobre el video y video a sangre en mobile.
+- Muro de reseñas: colores propios y letra de los títulos para las destacadas, proporción fija de las fotos, botón "ver más" lleno con la **cantidad** (`{cantidad}`) y promedio alineado con el encabezado.
+- Aviso legal: título del desplegable en el acento y mayúsculas, línea de datos en mayúsculas (también debajo del desplegable) e ícono de línea.
+- Hero con palabra que rota: color del resaltado de la promesa y promesa **del tamaño del título**.
+- Cinta: reseñas recortadas a 1–3 renglones.
+
+### Corregido
+- Tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios; el muro de reseñas, el formulario de contacto, las ofertas y regalos por cantidad, las historias y el seguimiento de pedido no respetaban el ancho de la página.
+- Cuestionario: "Volver" aparecía en la primera pregunta.
 
 ## 1.0.1
 

@@ -598,6 +598,16 @@
   .gad-icc__item-text p {
     line-height: 1.5;
   }
+  @media screen and (max-width: 749px) {
+    #MainContent .gad-icc__media.gad-icc__media--bleed-m {
+      width: auto;
+      max-width: none;
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      border: 0;
+      border-radius: 0;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -1384,6 +1394,13 @@
           "unit": "px",
           "label": "Redondeo",
           "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "bleed_m",
+          "label": "A sangre en mobile",
+          "default": false,
+          "info": "De borde a borde de la pantalla, sin redondeo ni borde."
         }
       ]
     },

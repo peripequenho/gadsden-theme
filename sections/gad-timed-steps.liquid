@@ -6,7 +6,7 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <gad-timed-steps
-  class="gad-ts gad-ts--timer-{{ s.timer_style | default: 'pill' }} gad-ts--h-{{ s.heading_align | default: 'center' }} gad-ts--hm-{{ s.heading_align_m | default: 'same' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-ts gad-ts--time-{{ s.time_style | default: 'stamp' }} gad-ts--timer-{{ s.timer_style | default: 'pill' }} gad-ts--h-{{ s.heading_align | default: 'center' }} gad-ts--hm-{{ s.heading_align_m | default: 'same' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
   data-total="{{ s.timer_total }}"
   {% render 'gad-section-attrs', s: s %}
@@ -218,6 +218,11 @@
   .gad-ts__note .rte > :last-child {
     margin-bottom: 0;
   }
+  .gad-ts--time-plain .gad-ts__time {
+    padding: 0;
+    border: 0;
+    transform: none;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -377,6 +382,22 @@
         {
           "value": "tag",
           "label": "Etiqueta con los números en el acento"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "time_style",
+      "label": "Duración de cada paso",
+      "default": "stamp",
+      "options": [
+        {
+          "value": "stamp",
+          "label": "Sello con borde"
+        },
+        {
+          "value": "plain",
+          "label": "Texto en negrita"
         }
       ]
     },
