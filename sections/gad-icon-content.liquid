@@ -8,9 +8,23 @@
 {%- assign s = section.settings -%}
 {%- assign is_cols = false -%}
 {%- if s.layout == 'columns' -%}{%- assign is_cols = true -%}{%- endif -%}
+{%- liquid
+  assign media_side = false
+  if s.media_side and is_cols == false
+    assign media_side = true
+  endif
+-%}
+{%- capture side_media -%}
+  {%- if media_side -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'media' -%}{%- render 'gad-icc-media', block: block -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
 {%- capture content -%}
   {%- for block in section.blocks -%}
     {%- assign b = block.settings -%}
+    {%- if media_side and block.type == 'media' -%}{%- continue -%}{%- endif -%}
     {%- case block.type -%}
       {%- when 'heading' -%}
         {%- if b.caption != blank -%}
@@ -24,21 +38,7 @@
           </h2>
         {%- endif -%}
       {%- when 'media' -%}
-        {%- if b.video != blank or b.image != blank -%}
-          <div class="gad-icc__media gad-icc__media--{{ b.ratio }}" style="--icc-w: {{ b.width }}%; --icc-r: {{ b.radius }}px;" {{ block.shopify_attributes }}>
-            {%- if b.video != blank -%}
-              {%- liquid
-                assign fill = true
-                if b.ratio == 'adapt'
-                  assign fill = false
-                endif
-              -%}
-              {%- render 'gad-video', video: b.video, poster: b.image, autoplay: b.autoplay, loop: true, tap: true, cover: fill -%}
-            {%- else -%}
-              {{ b.image | image_url: width: 1600 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 990px) 60vw, 100vw', widths: '400, 800, 1200, 1600' }}
-            {%- endif -%}
-          </div>
-        {%- endif -%}
+        {%- render 'gad-icc-media', block: block -%}
       {%- when 'text' -%}
         {%- if b.text != blank -%}<div class="gad-icc__text rte" {{ block.shopify_attributes }}>{{ b.text }}</div>{%- endif -%}
       {%- when 'button' -%}
@@ -52,7 +52,7 @@
 {%- endcapture -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-ic{% if s.icon_pulse %} gad-ic--pulse{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-ic{% if s.icon_pulse %} gad-ic--pulse{% endif %}{% if s.item_style == 'box' %} gad-ic--box{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ic-d: {{ s.columns_d }}; --ic-m: {{ s.columns_m }}; --ic-size: {{ s.icon_size }}px;{% if s.icon_custom_color != blank %} --gad-icon-color: {{ s.icon_custom_color }};{% endif %}"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -88,16 +88,19 @@
           {{- content -}}
         </div>
       {%- endif -%}
+      {%- if media_side and side_media != blank -%}<div class="gad-ic__side"><div class="gad-ic__side-media">{{ side_media }}</div>{%- endif -%}
       <div class="gad-ic__grid gad-ic__grid--{{ s.align }}">
         {%- for block in section.blocks -%}
           {%- if block.type == 'item' -%}
             {%- assign b = block.settings -%}
-            <div class="gad-ic__item" {{ block.shopify_attributes }}>
+            <div class="gad-ic__item{% if b.featured %} gad-ic__item--featured{% endif %}{% if s.item_style == 'box' %} gad-ic__item--box{% endif %}" {{ block.shopify_attributes }}>
               <span class="gad-ic__icon{% if b.pulse %} gad-ic__icon--pulse{% endif %}{% if s.icon_custom_color == blank %} gad-accent-{{ s.icon_color }}{% endif %}">
                 {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: s.icon_size -%}
               </span>
-              {%- if b.title != blank -%}<h3 class="gad-ic__title h4">{{ b.title }}</h3>{%- endif -%}
+              {%- if b.featured -%}<div class="gad-ic__copy">{%- endif -%}
+              {%- if b.title != blank -%}<h3 class="gad-ic__title h4{% if s.item_style == 'box' %} gad-title-font{% endif %}">{{ b.title }}</h3>{%- endif -%}
               {%- if b.text != blank -%}<div class="gad-ic__text rte">{{ b.text }}</div>{%- endif -%}
+              {%- if b.featured -%}</div>{%- endif -%}
               {%- if b.video != blank -%}
                 <div class="gad-ic__media">{%- render 'gad-video', video: b.video, poster: b.image, autoplay: true, loop: true, tap: true -%}</div>
               {%- elsif b.image != blank -%}
@@ -113,6 +116,7 @@
           {%- endif -%}
         {%- endfor -%}
       </div>
+      {%- if media_side and side_media != blank -%}</div>{%- endif -%}
     {%- endif -%}
   </div>
 </div>
@@ -134,6 +138,120 @@
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+  }
+
+  /* medio al costado de los ítems */
+  .gad-ic__side-media {
+    margin-bottom: 2.4rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .gad-ic__side {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 2.4rem;
+      align-items: stretch;
+    }
+
+    .gad-ic__side-media {
+      margin-bottom: 0;
+    }
+
+    .gad-ic__side-media .gad-icc__media {
+      height: 100%;
+      aspect-ratio: auto;
+    }
+
+    .gad-ic__side-media .gad-icc__media > img,
+    .gad-ic__side-media .gad-icc__media .gad-video {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  /* ítems en caja con número */
+  .gad-ic--box .gad-ic__grid {
+    gap: 1rem;
+    counter-reset: gad-ic;
+  }
+
+  .gad-ic__item--box {
+    position: relative;
+    padding: 2.8rem 1.4rem 2rem;
+    border: var(--gad-skin-border, 0.1rem solid rgba(var(--color-foreground), 0.25));
+    border-radius: 0.4rem;
+  }
+
+  .gad-ic__item--box:not(.gad-ic__item--featured) {
+    counter-increment: gad-ic;
+  }
+
+  .gad-ic__item--box:not(.gad-ic__item--featured)::after {
+    content: counter(gad-ic);
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 2.4rem;
+    padding: 0.3rem 0.6rem;
+    border-right: inherit;
+    border-bottom: inherit;
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .gad-ic--box .gad-ic__icon {
+    width: auto;
+    height: auto;
+    background: none;
+  }
+
+  .gad-ic__item--box .gad-ic__title {
+    font-size: 1.5rem;
+  }
+
+  .gad-ic__item--box .gad-ic__text {
+    font-size: 1.35rem;
+  }
+
+  /* ítem destacado: toda la fila, fondo del acento, ícono al costado */
+  .gad-ic__item.gad-ic__item--featured {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.6rem;
+    padding: 1.4rem 1.8rem;
+    border-color: transparent;
+    background: rgb(var(--color-accent, var(--color-button)));
+    text-align: left;
+    /* el texto toma el color del fondo de la sección (también para el "texto pleno" del estilo de página) */
+    --color-foreground: var(--color-background);
+    color: rgb(var(--color-foreground));
+    --gad-icon-color: rgb(var(--color-foreground));
+  }
+
+  .gad-ic__item--featured .gad-ic__icon {
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    background: none;
+    --gad-icon-color: rgb(var(--color-background));
+  }
+
+  .gad-ic__item--featured .gad-ic__icon .gad-icon {
+    font-size: calc(var(--ic-size, 56px) * 0.7);
+  }
+
+  .gad-ic__item--featured .gad-ic__title,
+  .gad-ic__item--featured .gad-ic__text {
+    color: inherit;
+  }
+
+  .gad-ic__copy {
+    display: grid;
+    gap: 0.2rem;
   }
 
   .gad-ic__grid--center .gad-ic__item {
@@ -593,6 +711,29 @@
     },
     {
       "type": "checkbox",
+      "id": "media_side",
+      "label": "Video o imagen al costado de los ítems",
+      "default": false,
+      "info": "Con la disposición en grilla y un bloque \"Video o imagen\". En desktop va a la izquierda, del alto de los ítems; en mobile, arriba."
+    },
+    {
+      "type": "select",
+      "id": "item_style",
+      "label": "Estilo de los ítems",
+      "default": "plain",
+      "options": [
+        {
+          "value": "plain",
+          "label": "Simple"
+        },
+        {
+          "value": "box",
+          "label": "En caja con número"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
       "id": "content_first_d",
       "label": "Contenido primero en desktop",
       "default": false
@@ -1049,6 +1190,13 @@
           "label": "Pulso alrededor de este ícono",
           "default": false,
           "info": "Con \"Pulso alrededor de los íconos\" de la sección prendido, lo tienen todos."
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Destacado",
+          "default": false,
+          "info": "Ocupa toda la fila, con el fondo del acento y el ícono al costado. No lleva número."
         },
         {
           "type": "inline_richtext",

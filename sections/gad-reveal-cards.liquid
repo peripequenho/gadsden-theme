@@ -5,8 +5,8 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <gad-reveal-cards
-  class="gad-rc gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rc-cols: {{ s.columns_d }};"
+  class="gad-rc gad-rc--phrase-{{ s.phrase_position | default: 'bottom' }} gad-rc--chev-{{ s.chev_style | default: 'circle' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rc-cols: {{ s.columns_d }}; --rc-fs-d: {{ s.phrase_size_d | default: 17 }}px; --rc-fs-m: {{ s.phrase_size_m | default: 17 }}px;"
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
@@ -21,7 +21,7 @@
             {%- else -%}
               {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-rc__img gad-rc__ph' }}
             {%- endif -%}
-            <span class="gad-rc__phrase">{{ b.phrase }}</span>
+            <span class="gad-rc__phrase{% if s.phrase_font == 'heading' %} gad-title-font{% endif %}">{{ b.phrase }}</span>
             <span class="gad-rc__chev">{%- render 'gad-icon', name: 'expand_more' -%}</span>
           </button>
           <div class="gad-rc__more" id="GadRc-{{ block.id }}">
@@ -115,9 +115,34 @@
   }
 
   .gad-rc__phrase {
-    font-size: 1.7rem;
+    font-size: var(--rc-fs-m, 1.7rem);
     font-weight: 700;
-    line-height: 1.25;
+    line-height: 1.15;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-rc__phrase {
+      font-size: var(--rc-fs-d, 1.7rem);
+    }
+  }
+
+  .gad-rc--phrase-center .gad-rc__toggle {
+    align-items: center;
+  }
+
+  .gad-rc--chev-plain .gad-rc__chev {
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: auto;
+    margin-top: -1.1rem;
+    background: none;
+    font-size: 2rem;
+    --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
+  }
+
+  .gad-rc--chev-plain .gad-rc__toggle[aria-expanded='true'] .gad-rc__chev {
+    transform: rotate(180deg);
   }
 
   .gad-rc__chev {
@@ -354,6 +379,74 @@
       "label": "Columnas en desktop",
       "default": 2,
       "info": "En mobile van apiladas."
+    },
+    {
+      "type": "select",
+      "id": "phrase_font",
+      "label": "Letra de la frase",
+      "default": "body",
+      "options": [
+        {
+          "value": "body",
+          "label": "La del texto"
+        },
+        {
+          "value": "heading",
+          "label": "La de los títulos"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "phrase_size_d",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la frase en desktop",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "phrase_size_m",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la frase en mobile",
+      "default": 17
+    },
+    {
+      "type": "select",
+      "id": "phrase_position",
+      "label": "Posición de la frase",
+      "default": "bottom",
+      "options": [
+        {
+          "value": "bottom",
+          "label": "Abajo"
+        },
+        {
+          "value": "center",
+          "label": "Al medio"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "chev_style",
+      "label": "Flecha",
+      "default": "circle",
+      "options": [
+        {
+          "value": "circle",
+          "label": "En círculo"
+        },
+        {
+          "value": "plain",
+          "label": "Chica, del color del acento"
+        }
+      ]
     },
     {
       "type": "text",

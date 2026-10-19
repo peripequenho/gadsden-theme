@@ -86,10 +86,10 @@
               </div>
             </div>
           {% endif %}
-          <div class="grid__item">
+          <div class="grid__item"{% if s.row_style == 'box' %} style="--acc-bw: {{ s.box_border }}px;{% if s.box_bg != blank %} --acc-bg: {{ s.box_bg }};{% endif %}{% if s.open_bg != blank %} --acc-open-bg: {{ s.open_bg }};{% endif %}{% if s.open_text != blank %} --acc-open-text: {{ s.open_text }};{% endif %}"{% endif %}>
             {%- for block in section.blocks -%}
               <div
-                class="accordion gad-acc gad-acc--{{ s.title_size }} gad-acc--{{ s.toggle_icon }}{% unless s.top_border %} gad-acc--no-border{% endunless %}{% if section.settings.layout == 'row' %} content-container {{ box_scheme }}{% endif %}"
+                class="accordion gad-acc gad-acc--{{ s.title_size }} gad-acc--{{ s.toggle_icon }}{% if s.row_style == 'box' %} gad-acc--box{% endif %}{% unless s.top_border %} gad-acc--no-border{% endunless %}{% if section.settings.layout == 'row' %} content-container {{ box_scheme }}{% endif %}"
                 {{ block.shopify_attributes }}
               >
                 <details
@@ -414,6 +414,51 @@
       "id": "top_border",
       "label": "Borde arriba de cada fila",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "row_style",
+      "label": "Estilo de las filas",
+      "default": "lines",
+      "options": [
+        {
+          "value": "lines",
+          "label": "Con líneas"
+        },
+        {
+          "value": "box",
+          "label": "En caja con borde"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "box_border",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Borde de la caja",
+      "default": 2,
+      "info": "Del color del texto."
+    },
+    {
+      "type": "color",
+      "id": "box_bg",
+      "label": "Fondo de la caja",
+      "info": "Vacío: el de la sección."
+    },
+    {
+      "type": "color",
+      "id": "open_bg",
+      "label": "Fondo de la fila abierta",
+      "info": "Sólo en caja. Vacío: sin fondo."
+    },
+    {
+      "type": "color",
+      "id": "open_text",
+      "label": "Texto de la fila abierta",
+      "info": "Vacío: el del texto."
     },
     {
       "type": "richtext",

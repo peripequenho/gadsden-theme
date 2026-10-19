@@ -76,6 +76,13 @@
   margin: 0 0 1rem;
 }
 
+/* Texto con la letra de los títulos (frases de tarjetas, palabras de sellos, ítems en caja). */
+.gad-title-font {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+}
+
 .gad-heading__text {
   margin-top: 1.2rem;
 }
@@ -1850,6 +1857,34 @@ gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active)
 
 .gad-acc.gad-acc--no-border {
   border-top: 0;
+}
+
+.gad-acc.gad-acc--box {
+  margin-top: 0;
+  border: var(--acc-bw, 2px) solid rgb(var(--color-foreground));
+  background: var(--acc-bg, transparent);
+}
+
+.gad-acc.gad-acc--box + .gad-acc--box {
+  border-top: 0;
+}
+
+.gad-acc--box summary {
+  padding: 1.6rem 2rem;
+}
+
+.gad-acc--box details[open] > summary {
+  background: var(--acc-open-bg, transparent);
+  color: var(--acc-open-text, rgb(var(--color-foreground)));
+}
+
+.gad-acc--box details[open] > summary .accordion__title {
+  color: inherit;
+}
+
+.gad-acc--box .accordion__content {
+  margin: 1.6rem 0;
+  padding: 0 2rem;
 }
 
 .gad-acc__footer {

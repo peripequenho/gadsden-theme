@@ -42,12 +42,12 @@
     }
   {%- endif -%}
   {%- if s.title_case != 'none' -%}
-    #MainContent :is(h1, h2, h3, .h0, .h1, .h2, .gad-heading__title) {
+    #MainContent :is(h1, h2, h3, .h0, .h1, .h2, .gad-heading__title, .gad-title-font) {
       text-transform: {{ s.title_case }};
     }
   {%- endif -%}
   {%- if s.title_skew != 0 or s.title_italic -%}
-    #MainContent :is(h1, h2, .h0, .h1, .gad-heading__title):not(.h3, .h4, .h5) {
+    #MainContent :is(h1, h2, .h0, .h1, .gad-heading__title, .gad-title-font):not(.h3, .h4, .h5) {
       {%- if s.title_italic -%}font-style: italic;{%- endif -%}
       {%- if s.title_skew != 0 -%}transform: skewX({{ s.title_skew }}deg); transform-origin: left center;{%- endif -%}
     }

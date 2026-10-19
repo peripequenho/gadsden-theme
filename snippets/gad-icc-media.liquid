@@ -1,0 +1,23 @@
+{%- comment -%}
+  Bloque "Video o imagen" de Íconos con contenido (S21): arriba de la grilla, en la columna de contenido
+  o al costado de los ítems.
+
+  Accepts:
+  - block: {Object} el bloque de tipo media
+{%- endcomment -%}
+{%- assign b = block.settings -%}
+{%- if b.video != blank or b.image != blank -%}
+  <div class="gad-icc__media gad-icc__media--{{ b.ratio }}" style="--icc-w: {{ b.width }}%; --icc-r: {{ b.radius }}px;" {{ block.shopify_attributes }}>
+    {%- if b.video != blank -%}
+      {%- liquid
+        assign fill = true
+        if b.ratio == 'adapt'
+          assign fill = false
+        endif
+      -%}
+      {%- render 'gad-video', video: b.video, poster: b.image, autoplay: b.autoplay, loop: true, tap: true, cover: fill -%}
+    {%- else -%}
+      {{ b.image | image_url: width: 1600 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 990px) 60vw, 100vw', widths: '400, 800, 1200, 1600' }}
+    {%- endif -%}
+  </div>
+{%- endif -%}

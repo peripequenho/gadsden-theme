@@ -6,11 +6,12 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <gad-stamps
-  class="gad-st2 gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-st2 gad-st2--{{ s.stamp_style | default: 'badge' }} gad-st2--words-{{ s.word_color | default: 'accent' }}{% if s.last_marker %} gad-st2--last-marker{% endif %}{% if s.media_width == 'page' %} gad-st2--media-page{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --st-h: {{ s.media_height }}vh; --st-rot: {{ s.angle }}deg;"
   data-delay="{{ s.delay }}"
   {% render 'gad-section-attrs', s: s %}
 >
+  {%- if s.media_width == 'page' -%}<div class="page-width">{%- endif -%}
   {%- if s.video != blank or s.image != blank -%}
     <div class="gad-st2__media">
       {%- if s.video != blank -%}
@@ -22,19 +23,20 @@
   {%- elsif request.design_mode -%}
     <div class="gad-st2__media gad-st2__media--empty">{{ 'gadsden.stamps.media' | t }}</div>
   {%- endif -%}
+  {%- if s.media_width == 'page' -%}</div>{%- endif -%}
   <div class="page-width">
     {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
     {%- if section.blocks.size > 0 -%}
       <div class="gad-st2__row">
         {%- for block in section.blocks -%}
           <div class="gad-st2__stamp" {{ block.shopify_attributes }}>
-            <b>{{ block.settings.word | escape }}</b>
+            <b{% if s.stamp_style == 'box' %} class="gad-title-font"{% endif %}>{{ block.settings.word | escape }}</b>
             {%- if block.settings.text != blank -%}<span>{{ block.settings.text }}</span>{%- endif -%}
           </div>
         {%- endfor -%}
       </div>
     {%- endif -%}
-    {%- if s.closing != blank -%}<p class="gad-st2__closing">{{ s.closing }}</p>{%- endif -%}
+    {%- if s.closing != blank -%}<p class="gad-st2__closing{% if s.closing_style == 'band' %} gad-st2__closing--band{% endif %}">{{ s.closing }}</p>{%- endif -%}
   </div>
 </gad-stamps>
 
@@ -114,6 +116,78 @@
     font-weight: 700;
     text-align: center;
   }
+
+  /* video o imagen del ancho de la página, con borde */
+  .gad-st2--media-page .gad-st2__media {
+    border: var(--gad-skin-border, 0.2rem solid rgba(var(--color-accent, var(--color-button)), 0.45));
+    border-radius: var(--media-radius, 0);
+  }
+
+  /* sellos en caja: palabra grande a la izquierda, sin inclinación */
+  .gad-st2--box .gad-st2__stamp {
+    --st-rot: 0deg;
+  }
+
+  .gad-st2--box .gad-st2__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .gad-st2--box .gad-st2__stamp {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 1.2rem;
+    max-width: none;
+    padding: 1.6rem 1.4rem;
+    border: var(--gad-skin-border, 0.1rem solid rgba(var(--color-foreground), 0.25));
+    border-radius: 0.4rem;
+    text-align: left;
+  }
+
+  .gad-st2--box .gad-st2__stamp b {
+    font-size: 3.4rem;
+    letter-spacing: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .gad-st2--box .gad-st2__row {
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    }
+
+    .gad-st2--box .gad-st2__stamp {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: start;
+    }
+
+    .gad-st2--box .gad-st2__stamp b {
+      font-size: 4.4rem;
+    }
+  }
+
+  .gad-st2--words-alternate .gad-st2__stamp:nth-child(even) b {
+    color: rgb(var(--color-foreground));
+  }
+
+  .gad-st2--last-marker .gad-st2__stamp:last-child b {
+    padding: 0 0.15em;
+    background: rgb(var(--color-accent, var(--color-button)));
+    color: rgb(var(--color-background));
+  }
+
+  /* remate como franja */
+  .gad-st2__closing.gad-st2__closing--band {
+    padding: 1.4rem 1.8rem;
+    background: rgb(var(--color-accent, var(--color-button)));
+    color: rgb(var(--color-background));
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.6rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -163,6 +237,22 @@
       "label": "Alto del video",
       "default": 50,
       "info": "En porcentaje del alto de la pantalla."
+    },
+    {
+      "type": "select",
+      "id": "media_width",
+      "label": "Ancho del video o imagen",
+      "default": "full",
+      "options": [
+        {
+          "value": "full",
+          "label": "Toda la pantalla"
+        },
+        {
+          "value": "page",
+          "label": "El de la página, con borde"
+        }
+      ]
     },
     {
       "type": "text",
@@ -270,6 +360,61 @@
       "unit": "ms",
       "label": "Pausa entre sellos",
       "default": 350
+    },
+    {
+      "type": "select",
+      "id": "stamp_style",
+      "label": "Estilo de los sellos",
+      "default": "badge",
+      "options": [
+        {
+          "value": "badge",
+          "label": "Sello inclinado"
+        },
+        {
+          "value": "box",
+          "label": "Caja con la palabra a la izquierda"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "word_color",
+      "label": "Color de las palabras",
+      "default": "accent",
+      "options": [
+        {
+          "value": "accent",
+          "label": "Acento"
+        },
+        {
+          "value": "alternate",
+          "label": "Acento y texto, alternados"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "last_marker",
+      "label": "Último sello con marcador",
+      "default": false,
+      "info": "La palabra del último sello con el fondo del acento."
+    },
+    {
+      "type": "select",
+      "id": "closing_style",
+      "label": "Estilo de la frase de remate",
+      "default": "text",
+      "options": [
+        {
+          "value": "text",
+          "label": "Texto"
+        },
+        {
+          "value": "band",
+          "label": "Franja del color del acento"
+        }
+      ]
     },
     {
       "type": "inline_richtext",

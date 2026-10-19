@@ -17,6 +17,10 @@
 - Íconos con contenido: pulso también **por ícono** (además del de toda la sección).
 - Estilo de esta página: **detalles de las secciones** de Gadsden en esa página: volanta con la fuente de los títulos o como etiqueta en las secciones claras, palabras resaltadas con marcador en las secciones claras, texto con el color pleno, borde en tarjetas, fotos y cajas (grosor y opacidad para secciones claras y oscuras), esquinas rectas, trama de puntos y línea entre secciones. La inclinación y la cursiva de los títulos ya no se aplican a los títulos chicos (desplegables, pasos).
 - **Alineación del encabezado** (izquierda o centro, y aparte en mobile) en las secciones que lo centraban siempre.
+- Contenido desplegable: filas **en caja con borde**, con fondo propio y la fila abierta con otro color.
+- Tarjetas desplegables: frase con la letra de los títulos, tamaño por pantalla, al medio de la tarjeta y flecha chica del color del acento.
+- Íconos con contenido: **video o imagen al costado** de los ítems, ítems **en caja con número** e ítem **destacado** (toda la fila, fondo del acento, ícono al costado).
+- Sellos: **en caja** con la palabra grande a la izquierda, palabras en color alternado, último sello con marcador, video o imagen del ancho de la página con borde y remate como **franja**.
 - Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios (ahora son bloque).
 
 ## 1.0.1
