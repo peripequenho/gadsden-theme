@@ -1,6 +1,6 @@
 # Cambios
 
-## Sin publicar
+## 1.0.1
 
 - Apoyo por Cafecito: grupo *Gadsden · Apoyá el proyecto* en Configuración del tema y link de soporte en Información del tema. Sólo lo ve quien administra la tienda; en el storefront no cambia nada. Y una serpiente escondida en `layout/theme.liquid`.
 - Nuevo estilo de fábrica (preset Clásico): Poppins e Inter, botones con borde de 2 px y redondeo de 6, tarjetas y cajas con sombra, texto centrado en las tarjetas, íconos finos, redes cuadradas, títulos de página centrados, precio de oferta primero y combinaciones de color neutras.
