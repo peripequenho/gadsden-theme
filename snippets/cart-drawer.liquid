@@ -61,7 +61,7 @@
 </style>
 
 <cart-drawer
-  class="drawer {{ drawer_class }}{% if cart == empty %} is-empty{% endif %}"
+  class="drawer gad-cart--saving-{{ ib.savings_position | default: 'title' }} {{ drawer_class }}{% if cart == empty %} is-empty{% endif %}"
   {% if request.design_mode and s.test_mode %}
     data-gad-test-mode
   {% endif %}
@@ -314,20 +314,14 @@
                             </div>
                           {%- endif -%}
 
-                          {%- liquid
-                            assign saving_text = ''
-                            if items_block and ib.savings and line_saving > 0
-                              if no_cents
-                                assign saving_money = line_saving | money_without_trailing_zeros
-                              else
-                                assign saving_money = line_saving | money
-                              endif
-                              assign saving_text = ib.savings_text | replace: '{monto}', saving_money
-                            endif
-                          -%}
-                          {%- if saving_text != '' and ib.savings_position != 'price' -%}
-                            <p class="gad-ci__saving">{{ saving_text }}</p>
-                          {%- endif -%}
+                          {%- capture saving_html -%}
+                            {%- if items_block and ib.savings and line_saving > 0 -%}
+                              {%- capture saving_money -%}{%- render 'gad-money', amount: line_saving, no_cents: no_cents -%}{%- endcapture -%}
+                              {%- assign saving_text = ib.savings_text | replace: '{monto}', saving_money -%}
+                              <p class="gad-ci__saving gad-ci__saving--title">{{ saving_text }}</p>
+                            {%- endif -%}
+                          {%- endcapture -%}
+                          {{- saving_html -}}
 
                           {%- if item.product.has_only_default_variant == false
                             or item.properties.size != 0
@@ -424,9 +418,7 @@
                                 measurement: item.unit_price_measurement
                               %}
                             {%- endif -%}
-                            {%- if saving_text != '' and ib.savings_position == 'price' -%}
-                              <p class="gad-ci__saving gad-ci__saving--price">{{ saving_text }}</p>
-                            {%- endif -%}
+                            {{- saving_html | replace: 'gad-ci__saving--title', 'gad-ci__saving--price' -}}
                           </div>
                         </td>
                         {%- liquid
@@ -477,7 +469,7 @@
                                     value="{{ item.quantity }}"
                                     {% # theme-check-disable %}
                                     data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
-                                    min="{% if settings.cart_qty_min == 'product' %}{{ item.variant.quantity_rule.min }}{% else %}0{% endif %}"
+                                    min="{{ settings.cart_qty_min | default: 'zero' | replace: 'product', item.variant.quantity_rule.min | replace: 'zero', '0' }}"
                                     data-min="{{ item.variant.quantity_rule.min }}"
                                     {% if item.variant.quantity_rule.max != null %}
                                       max="{{ item.variant.quantity_rule.max }}"

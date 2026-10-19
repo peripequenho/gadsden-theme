@@ -927,7 +927,12 @@ cart-drawer.is-empty .drawer__footer {
   }
 }
 
-/* ---------- Ahorro de cada producto debajo del precio ---------- */
+/* ---------- Ahorro de cada producto: debajo del nombre o del precio (bloque Productos) ---------- */
+.gad-cart--saving-title .gad-ci__saving--price,
+.gad-cart--saving-price .gad-ci__saving--title {
+  display: none;
+}
+
 .gad-ci__saving--price {
   margin: 0.4rem 0 0;
   text-align: right;

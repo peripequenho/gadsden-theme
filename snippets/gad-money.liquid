@@ -1,0 +1,11 @@
+{%- comment -%}
+  Monto con el formato de la tienda; con no_cents oculta los centavos cuando son cero.
+
+  Accepts:
+  - amount: {Number} monto en centavos
+  - no_cents: {Boolean}
+
+  Usage:
+  {% render 'gad-money', amount: line_saving, no_cents: true %}
+{%- endcomment -%}
+{%- if no_cents -%}{{ amount | money_without_trailing_zeros }}{%- else -%}{{ amount | money }}{%- endif -%}

@@ -273,7 +273,7 @@
                                 value="{{ item.quantity }}"
                                 {% # theme-check-disable %}
                                 data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
-                                min="{% if settings.cart_qty_min == 'product' %}{{ item.variant.quantity_rule.min }}{% else %}0{% endif %}"
+                                min="{{ settings.cart_qty_min | default: 'zero' | replace: 'product', item.variant.quantity_rule.min | replace: 'zero', '0' }}"
                                 data-min="{{ item.variant.quantity_rule.min }}"
                                 {% if item.variant.quantity_rule.max != null %}
                                   max="{{ item.variant.quantity_rule.max }}"
