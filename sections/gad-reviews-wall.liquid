@@ -7,7 +7,7 @@
 {%- if section.blocks.size > 0 -%}
   {%- render 'gad-colors', s: s, key: section.id -%}
   <div
-    class="gad-rw gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+    class="gad-rw gad-rw--h-{{ s.heading_align | default: 'center' }} gad-rw--hm-{{ s.heading_align_m | default: 'same' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
     style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rw-cols: {{ s.columns_d }}; --rw-star: {{ s.star_color }};"
     {% render 'gad-section-attrs', s: s %}
   >
@@ -266,6 +266,19 @@
   .gad-rw--ratio .gad-rw__photo {
     aspect-ratio: var(--rw-ratio);
     object-fit: cover;
+  }
+  .gad-rw--h-left .gad-rw__summary {
+    justify-content: flex-start;
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-rw--hm-left .gad-rw__summary {
+      justify-content: flex-start;
+    }
+
+    .gad-rw--hm-center .gad-rw__summary {
+      justify-content: center;
+    }
   }
 {% endstylesheet %}
 

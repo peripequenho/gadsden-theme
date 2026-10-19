@@ -98,7 +98,7 @@
                 {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: s.icon_size -%}
               </span>
               {%- if b.featured -%}<div class="gad-ic__copy">{%- endif -%}
-              {%- if b.title != blank -%}<h3 class="gad-ic__title h4{% if s.item_style == 'box' %} gad-title-font{% endif %}">{{ b.title }}</h3>{%- endif -%}
+              {%- if b.title != blank -%}<h3 class="gad-ic__title h4">{{ b.title }}</h3>{%- endif -%}
               {%- if b.text != blank -%}<div class="gad-ic__text rte">{{ b.text }}</div>{%- endif -%}
               {%- if b.featured -%}</div>{%- endif -%}
               {%- if b.video != blank -%}

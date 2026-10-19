@@ -143,6 +143,11 @@
       background-size: 0.8rem 0.8rem;
     }
   {%- endif -%}
+  {%- if s.page_width > 0 -%}
+    :root {
+      --page-width: {{ s.page_width | divided_by: 10 }}rem;
+    }
+  {%- endif -%}
   {%- if s.section_line > 0 -%}
     #MainContent > .shopify-section > :is(.gad-pad, [class*='color-scheme-'], .gad-cc) {
       border-bottom: {{ s.section_line }}px solid rgb(var(--color-foreground));
@@ -525,6 +530,17 @@
       "label": "Línea entre secciones",
       "default": 0,
       "info": "Del color del texto en las secciones claras y del acento en las oscuras."
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "min": 0,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "label": "Ancho de la página",
+      "default": 0,
+      "info": "0: el de Configuración del tema."
     }
   ],
   "presets": [

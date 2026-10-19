@@ -6,8 +6,8 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-po gad-po--chips-{{ s.chips_style | default: 'pills' }}{% if s.first_wide %} gad-po--first-wide{% endif %}{% if s.title_accent %} gad-po--title-accent{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --po-ratio: {{ s.ratio }}; --po-ov: {{ s.overlay | divided_by: 100.0 }};"
+  class="gad-po{% if s.height_d > 0 %} gad-po--fixed-h{% endif %} gad-po--chips-{{ s.chips_style | default: 'pills' }}{% if s.first_wide %} gad-po--first-wide{% endif %}{% if s.title_accent %} gad-po--title-accent{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --po-ratio: {{ s.ratio }}; --po-ov: {{ s.overlay | divided_by: 100.0 }};{% if s.height_d > 0 %} --po-h: {{ s.height_d }}px;{% endif %}"
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
@@ -250,6 +250,12 @@
     font-size: 1.5rem;
     letter-spacing: 0.04em;
   }
+  @media screen and (min-width: 990px) {
+    .gad-po--fixed-h .gad-po__card {
+      height: var(--po-h);
+      aspect-ratio: auto;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -364,6 +370,17 @@
         }
       ],
       "default": "3 / 4"
+    },
+    {
+      "type": "range",
+      "id": "height_d",
+      "min": 0,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "Alto fijo en desktop",
+      "default": 0,
+      "info": "0: según la proporción. Con alto fijo, el ancho sale de las columnas."
     },
     {
       "type": "range",

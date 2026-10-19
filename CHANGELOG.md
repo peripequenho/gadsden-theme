@@ -27,6 +27,7 @@
 - Muro de reseñas: proporción fija de las fotos y botón "ver más" lleno y con la cantidad que falta (`{cantidad}`).
 - Aviso legal: título del desplegable en el acento y en mayúsculas; línea de datos en mayúsculas.
 - Cinta: reseñas con el texto recortado a 1–3 renglones.
+- Estilo de esta página: **ancho de la página** propio. Pósters: **alto fijo** en desktop. Muro de reseñas: el promedio sigue la alineación del encabezado.
 - Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios (ahora son bloque).
 
 ## 1.0.1
