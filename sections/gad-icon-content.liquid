@@ -23,6 +23,22 @@
             {{- b.title -}}
           </h2>
         {%- endif -%}
+      {%- when 'media' -%}
+        {%- if b.video != blank or b.image != blank -%}
+          <div class="gad-icc__media gad-icc__media--{{ b.ratio }}" style="--icc-w: {{ b.width }}%; --icc-r: {{ b.radius }}px;" {{ block.shopify_attributes }}>
+            {%- if b.video != blank -%}
+              {%- liquid
+                assign fill = true
+                if b.ratio == 'adapt'
+                  assign fill = false
+                endif
+              -%}
+              {%- render 'gad-video', video: b.video, poster: b.image, autoplay: b.autoplay, loop: true, tap: true, cover: fill -%}
+            {%- else -%}
+              {{ b.image | image_url: width: 1600 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 990px) 60vw, 100vw', widths: '400, 800, 1200, 1600' }}
+            {%- endif -%}
+          </div>
+        {%- endif -%}
       {%- when 'text' -%}
         {%- if b.text != blank -%}<div class="gad-icc__text rte" {{ block.shopify_attributes }}>{{ b.text }}</div>{%- endif -%}
       {%- when 'button' -%}
@@ -36,7 +52,7 @@
 {%- endcapture -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-ic gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-ic{% if s.icon_pulse %} gad-ic--pulse{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ic-d: {{ s.columns_d }}; --ic-m: {{ s.columns_m }}; --ic-size: {{ s.icon_size }}px;{% if s.icon_custom_color != blank %} --gad-icon-color: {{ s.icon_custom_color }};{% endif %}"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -132,6 +148,102 @@
     height: calc(var(--ic-size, 56px) * 1.6);
     border-radius: 50%;
     background: rgba(var(--color-foreground), 0.06);
+  }
+
+  /* bloque Video o imagen */
+  .gad-icc__media {
+    position: relative;
+    width: 100%;
+    max-width: var(--icc-w, 100%);
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    border-radius: var(--icc-r, 0);
+  }
+
+  .gad-icc__content > .gad-icc__media + *,
+  .gad-icc__content > * + .gad-icc__media {
+    margin-top: 2rem;
+  }
+
+  .gad-icc__media--16-9 {
+    aspect-ratio: 16 / 9;
+  }
+
+  .gad-icc__media--4-3 {
+    aspect-ratio: 4 / 3;
+  }
+
+  .gad-icc__media--1-1 {
+    aspect-ratio: 1 / 1;
+  }
+
+  .gad-icc__media--4-5 {
+    aspect-ratio: 4 / 5;
+  }
+
+  .gad-icc__media > img,
+  .gad-icc__media .gad-video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .gad-icc__media:not(.gad-icc__media--adapt) > img,
+  .gad-icc__media:not(.gad-icc__media--adapt) .gad-video {
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* pulso: dos ondas que salen del ícono en su color */
+  .gad-ic--pulse .gad-ic__icon,
+  .gad-ic--pulse .gad-icc__item-icon {
+    position: relative;
+  }
+
+  .gad-ic--pulse .gad-ic__icon::before,
+  .gad-ic--pulse .gad-ic__icon::after,
+  .gad-ic--pulse .gad-icc__item-icon::before,
+  .gad-ic--pulse .gad-icc__item-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 0.2rem solid currentColor;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: gad-ic-pulse 2.4s ease-out infinite;
+  }
+
+  .gad-ic--pulse .gad-ic__icon::after,
+  .gad-ic--pulse .gad-icc__item-icon::after {
+    animation-delay: 1.2s;
+  }
+
+  @keyframes gad-ic-pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(1);
+    }
+
+    100% {
+      opacity: 0;
+      transform: scale(1.45);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gad-ic--pulse .gad-ic__icon::before,
+    .gad-ic--pulse .gad-icc__item-icon::before {
+      animation: none;
+      opacity: 0.35;
+      transform: scale(1.15);
+    }
+
+    .gad-ic--pulse .gad-ic__icon::after,
+    .gad-ic--pulse .gad-icc__item-icon::after {
+      animation: none;
+    }
   }
 
   .gad-ic__icon .gad-icon--image img {
@@ -555,6 +667,13 @@
       "id": "icon_custom_color",
       "label": "Color propio de los íconos",
       "info": "Pisa al color elegido arriba."
+    },
+    {
+      "type": "checkbox",
+      "id": "icon_pulse",
+      "label": "Pulso alrededor de los íconos",
+      "default": false,
+      "info": "Ondas que salen del ícono. Con \"reducir movimiento\" quedan quietas."
     },
     {
       "type": "header",
@@ -991,6 +1110,82 @@
           "id": "text",
           "label": "Texto",
           "default": "<p>Un texto que acompaña a la lista.</p>"
+        }
+      ]
+    },
+    {
+      "type": "media",
+      "name": "Video o imagen",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Va con el título y el texto: arriba de la grilla, o en la columna de contenido con \"dos columnas\"."
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen",
+          "info": "Con video, es la miniatura."
+        },
+        {
+          "type": "checkbox",
+          "id": "autoplay",
+          "label": "Reproducir solo, sin sonido y en bucle",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "ratio",
+          "label": "Proporción",
+          "default": "adapt",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "La del archivo"
+            },
+            {
+              "value": "16-9",
+              "label": "16:9"
+            },
+            {
+              "value": "4-3",
+              "label": "4:3"
+            },
+            {
+              "value": "1-1",
+              "label": "1:1"
+            },
+            {
+              "value": "4-5",
+              "label": "4:5"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Ancho máximo",
+          "default": 100
+        },
+        {
+          "type": "range",
+          "id": "radius",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Redondeo",
+          "default": 0
         }
       ]
     },

@@ -9,6 +9,8 @@
 - Hero con palabra que rota: color del resaltado de la promesa.
 - Tabla comparativa: posición *Texto arriba, centrado* (título, texto y botón arriba de la tabla también en desktop), encabezado de la columna de características y tilde **parcial** por celda, con su color.
 - Cuestionario: opciones en dos líneas (lo que va después de " — " baja a una línea más chica) y resumen de las respuestas en el resultado (no se guarda ni se envía). Corregido: "Volver" ya no aparece en la primera pregunta.
+- Nota: estilo **Diario** (portal de noticias: letra de lectura con serifa, volanta en el color del botón, líneas finas en lugar de cajas y sombras; los colores siguen siendo los de la combinación) y chips de **temas** al pie.
+- Íconos con contenido: bloque **Video o imagen** (con proporción, ancho máximo y redondeo) que va con el título y el texto, y **pulso** alrededor de los íconos (quieto con "reducir movimiento").
 
 ## 1.0.1
 

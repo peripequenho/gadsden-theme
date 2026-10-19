@@ -7,7 +7,7 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <gad-article
-  class="gad-ar gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-ar{% if s.look == 'news' %} gad-ar--news{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -189,6 +189,18 @@
       {%- endcase -%}
     {%- endfor -%}
 
+    {%- assign topics = s.topics | split: ',' -%}
+    {%- if s.topics != blank -%}
+      <nav class="gad-ar__topics"{% if s.topics_title != blank %} aria-label="{{ s.topics_title | escape }}"{% endif %}>
+        {%- if s.topics_title != blank -%}<p class="gad-ar__topics-title">{{ s.topics_title | escape }}</p>{%- endif -%}
+        <ul class="list-unstyled" role="list">
+          {%- for t in topics -%}
+            {%- assign topic = t | strip -%}
+            {%- if topic != blank -%}<li>{{ topic | escape }}</li>{%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
     {%- if s.legal != blank -%}<div class="gad-ar__legal rte">{{ s.legal }}</div>{%- endif -%}
   </article>
 
@@ -580,6 +592,99 @@
     left: 0;
   }
 
+  /* chips de temas al pie */
+  .gad-ar__topics {
+    margin-top: 4rem;
+    padding-top: 1.6rem;
+    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
+  }
+
+  .gad-ar__topics-title {
+    margin: 0 0 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .gad-ar__topics ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 0;
+  }
+
+  .gad-ar__topics li {
+    padding: 0.4rem 1.2rem;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.2);
+    border-radius: 10rem;
+    font-size: 1.3rem;
+  }
+
+  /* estilo "Diario": portal de noticias; letra de lectura con serifa, líneas finas en lugar de cajas */
+  .gad-ar--news .gad-ar__ribbon {
+    background: rgba(var(--color-foreground), 0.06);
+    color: rgba(var(--color-foreground), 0.7);
+  }
+
+  .gad-ar--news .gad-ar__kicker {
+    color: rgb(var(--color-button));
+    opacity: 1;
+  }
+
+  .gad-ar--news .gad-ar__dek,
+  .gad-ar--news .gad-ar__p,
+  .gad-ar--news .gad-ar__hl,
+  .gad-ar--news .gad-ar__quotes blockquote {
+    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
+  }
+
+  .gad-ar--news .gad-ar__p {
+    font-size: 1.8rem;
+    line-height: 1.68;
+  }
+
+  .gad-ar--news .gad-ar__p a {
+    text-decoration-color: rgb(var(--color-button));
+  }
+
+  .gad-ar--news .gad-ar__hl {
+    padding: 1.6rem 0;
+    border-left: 0;
+    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .gad-ar--news .gad-ar__box,
+  .gad-ar--news .gad-ar__index,
+  .gad-ar--news .gad-ar__quotes,
+  .gad-ar--news .gad-ar__vs-col {
+    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .gad-ar--news .gad-ar__index,
+  .gad-ar--news .gad-ar__quotes,
+  .gad-ar--news .gad-ar__vs-col {
+    background: none;
+  }
+
+  .gad-ar--news .gad-ar__bridge {
+    border: 0;
+    border-top: 0.3rem solid rgb(var(--color-foreground));
+    border-radius: 0;
+  }
+
+  .gad-ar--news .gad-ar__fig img,
+  .gad-ar--news .gad-ar__strip img,
+  .gad-ar--news .gad-ar__box-img img {
+    border-radius: 0;
+  }
+
   .gad-ar__legal {
     margin-top: 4rem;
     font-size: 1.2rem;
@@ -726,9 +831,38 @@
       "default": "5 min de lectura"
     },
     {
+      "type": "select",
+      "id": "look",
+      "label": "Estilo de la nota",
+      "default": "scheme",
+      "options": [
+        {
+          "value": "scheme",
+          "label": "Combinación de colores"
+        },
+        {
+          "value": "news",
+          "label": "Diario"
+        }
+      ],
+      "info": "Diario: cuerpo en letra de lectura con serifa, volanta en el color del botón, líneas finas en lugar de cajas y sombras. Los colores siguen siendo los de la combinación."
+    },
+    {
       "type": "richtext",
       "id": "legal",
       "label": "Aclaración al final"
+    },
+    {
+      "type": "text",
+      "id": "topics_title",
+      "label": "Título de los temas",
+      "info": "Va al final de la nota, arriba del texto legal."
+    },
+    {
+      "type": "text",
+      "id": "topics",
+      "label": "Temas",
+      "info": "Separados por comas. Vacío: no se muestran."
     },
     {
       "type": "header",
