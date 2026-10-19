@@ -47,7 +47,8 @@
     }
   {%- endif -%}
   {%- if s.title_skew != 0 or s.title_italic -%}
-    #MainContent :is(h1, h2, .h0, .h1, .gad-heading__title, .gad-title-font):not(.h3, .h4, .h5) {
+    #MainContent :is(h1, h2, .h0, .h1, .gad-heading__title):not(.h3, .h4, .h5),
+    #MainContent .gad-title-font {
       {%- if s.title_italic -%}font-style: italic;{%- endif -%}
       {%- if s.title_skew != 0 -%}transform: skewX({{ s.title_skew }}deg); transform-origin: left center;{%- endif -%}
     }
@@ -129,7 +130,7 @@
     }
   {%- endif -%}
   {%- if s.square -%}
-    #MainContent :is(.gad-rc__card, .gad-rc__toggle, .gad-ts__step, .gad-ts__photo, .gad-rw__card, .gad-rw__photo, .gad-po__card, .gad-ch__stage, .gad-ch__tab, .gad-st2__media, .gad-icc__media, .gad-ic__media, .gad-ic__item--box, .gad-cmp-layout__table) {
+    #MainContent :is(.gad-rc__card, .gad-rc__toggle, .gad-ts__step, .gad-ts__photo, .gad-rw__card, .gad-rw__photo, .gad-po__card, .gad-ch__stage, .gad-ch__tab, .gad-st2__media, .gad-icc__media, .gad-ic__media, .gad-ic__item--box, .gad-cmp-layout__table, .gad-ts__num, .gad-ts__note, .gad-po__list, .gad-rw__more .button) {
       border-radius: 0;
     }
     #MainContent :is(.gad-rc__card, .gad-ts__step, .gad-rw__card, .gad-po__card, .gad-ch__stage, .gad-st2__media) :is(img, video) {

@@ -6,7 +6,7 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-po gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-po gad-po--chips-{{ s.chips_style | default: 'pills' }}{% if s.first_wide %} gad-po--first-wide{% endif %}{% if s.title_accent %} gad-po--title-accent{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --po-ratio: {{ s.ratio }}; --po-ov: {{ s.overlay | divided_by: 100.0 }};"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -23,7 +23,7 @@
           {%- endif -%}
           <div class="gad-po__label">
             {%- if b.kicker != blank -%}<span class="gad-po__kicker">{{ b.kicker | escape }}</span>{%- endif -%}
-            {%- if b.title != blank -%}<h3 class="gad-po__title h3">{{ b.title }}</h3>{%- endif -%}
+            {%- if b.title != blank -%}<h3 class="gad-po__title h3{% if s.title_accent %} gad-title-font{% endif %}">{{ b.title }}</h3>{%- endif -%}
             {%- if b.text != blank -%}<p class="gad-po__text">{{ b.text }}</p>{%- endif -%}
             {%- if b.chips != blank -%}
               <ul class="gad-po__chips list-unstyled" role="list">
@@ -42,16 +42,22 @@
       {%- endfor -%}
     {%- endcapture -%}
     {%- if section.blocks.size > 0 -%}
-      {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, force_d_on: false, force_m_on: true, d_per_view: s.columns_d, m_per_view: 1, gap_d: 20, gap_m: 12 -%}
+      {%- liquid
+        assign po_cols = s.columns_d
+        if s.first_wide
+          assign po_cols = s.columns_d | plus: 1
+        endif
+      -%}
+      {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, force_d_on: false, force_m_on: true, d_per_view: po_cols, m_per_view: 1, gap_d: 20, gap_m: 12 -%}
     {%- endif -%}
     {%- if s.list_title != blank and s.list_content != blank -%}
-      <details class="gad-po__list">
+      <details class="gad-po__list{% if s.list_style == 'box' %} gad-po__list--box{% endif %}">
         <summary>{{ s.list_title | escape }}{%- render 'gad-icon', name: 'expand_more' -%}</summary>
         <div class="rte">{{ s.list_content }}</div>
       </details>
     {%- endif -%}
     {%- if s.seal_text != blank -%}
-      <p class="gad-po__seal"><span>{{ s.seal_text | escape }}</span>{%- if s.seal_value != blank -%}<b>{{ s.seal_value | escape }}</b>{%- endif -%}</p>
+      <p class="gad-po__seal{% if s.seal_style == 'band' %} gad-po__seal--band{% endif %}"><span>{{ s.seal_text | escape }}</span>{%- if s.seal_value != blank -%}<b>{{ s.seal_value | escape }}</b>{%- endif -%}</p>
     {%- endif -%}
   </div>
 </div>
@@ -177,6 +183,72 @@
     font-size: 1.3rem;
     letter-spacing: 0.15rem;
     text-transform: uppercase;
+  }
+  .gad-po.gad-po--title-accent .gad-po__title {
+    color: rgb(var(--color-accent, var(--color-button)));
+  }
+
+  /* primer póster más ancho (desktop sin carrusel): ocupa el lugar de dos */
+  @media screen and (min-width: 750px) {
+    :where(html[data-gad-bp='750']) .gad-po--first-wide gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track > :first-child {
+      flex-basis: calc((100% - var(--gap) * (var(--pv) - 1)) / var(--pv) * 2 + var(--gap));
+      aspect-ratio: auto;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    :where(html:not([data-gad-bp='750'])) .gad-po--first-wide gad-carousel:not(.gad-carousel--d-on) .gad-carousel__track > :first-child {
+      flex-basis: calc((100% - var(--gap) * (var(--pv) - 1)) / var(--pv) * 2 + var(--gap));
+      aspect-ratio: auto;
+    }
+  }
+
+  /* datos como filas */
+  .gad-po--chips-rows .gad-po__chips {
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .gad-po--chips-rows .gad-po__chips li {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .gad-po--chips-rows .gad-po__chips b {
+    color: rgb(var(--color-accent, var(--color-button)));
+  }
+
+  /* desplegable en caja */
+  .gad-po__list.gad-po__list--box {
+    max-width: none;
+    padding: 0 1.6rem;
+    border: var(--gad-skin-border, 0.2rem solid rgba(var(--color-foreground), 0.25));
+  }
+
+  .gad-po__list--box summary {
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* sello como franja */
+  .gad-po__seal.gad-po__seal--band {
+    justify-content: space-between;
+    margin-top: 1.2rem;
+    padding: 1.2rem 1.6rem;
+    background: rgb(var(--color-accent, var(--color-button)));
+    color: rgb(var(--color-background));
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.5rem;
+    letter-spacing: 0.04em;
   }
 {% endstylesheet %}
 
@@ -304,6 +376,35 @@
       "info": "En mobile se deslizan de a una."
     },
     {
+      "type": "checkbox",
+      "id": "first_wide",
+      "label": "Primer póster más ancho en desktop",
+      "default": false,
+      "info": "Ocupa el lugar de dos."
+    },
+    {
+      "type": "checkbox",
+      "id": "title_accent",
+      "label": "Títulos en el color del acento",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "chips_style",
+      "label": "Estilo de los datos",
+      "default": "pills",
+      "options": [
+        {
+          "value": "pills",
+          "label": "Chapitas"
+        },
+        {
+          "value": "rows",
+          "label": "Filas: nombre a la izquierda, dato a la derecha"
+        }
+      ]
+    },
+    {
       "type": "range",
       "id": "overlay",
       "min": 0,
@@ -345,6 +446,22 @@
       "label": "Contenido del desplegable"
     },
     {
+      "type": "select",
+      "id": "list_style",
+      "label": "Estilo del desplegable",
+      "default": "lines",
+      "options": [
+        {
+          "value": "lines",
+          "label": "Con líneas"
+        },
+        {
+          "value": "box",
+          "label": "En caja con borde"
+        }
+      ]
+    },
+    {
       "type": "text",
       "id": "seal_text",
       "label": "Sello de cierre",
@@ -354,6 +471,22 @@
       "type": "text",
       "id": "seal_value",
       "label": "Dato del sello"
+    },
+    {
+      "type": "select",
+      "id": "seal_style",
+      "label": "Estilo del sello",
+      "default": "text",
+      "options": [
+        {
+          "value": "text",
+          "label": "Texto"
+        },
+        {
+          "value": "band",
+          "label": "Franja del color del acento"
+        }
+      ]
     },
     {
       "type": "color_scheme",

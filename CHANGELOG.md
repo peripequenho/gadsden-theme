@@ -21,6 +21,12 @@
 - Tarjetas desplegables: frase con la letra de los títulos, tamaño por pantalla, al medio de la tarjeta y flecha chica del color del acento.
 - Íconos con contenido: **video o imagen al costado** de los ítems, ítems **en caja con número** e ítem **destacado** (toda la fila, fondo del acento, ícono al costado).
 - Sellos: **en caja** con la palabra grande a la izquierda, palabras en color alternado, último sello con marcador, video o imagen del ancho de la página con borde y remate como **franja**.
+- Pasos con cronómetro: colores propios del panel, cronómetro como **etiqueta** con los números en el acento (alineado con el encabezado) y **nota en caja** con ícono debajo de los pasos.
+- Pósters: **primero más ancho** en desktop, títulos en el color del acento, datos como **filas**, desplegable en caja y sello como **franja**.
+- Capítulos: proporción propia en desktop, **etapas a la derecha en lista**, etapas en caja con número (la activa invertida) y texto antes del número sobre el video ("Etapa 1").
+- Muro de reseñas: proporción fija de las fotos y botón "ver más" lleno y con la cantidad que falta (`{cantidad}`).
+- Aviso legal: título del desplegable en el acento y en mayúsculas; línea de datos en mayúsculas.
+- Cinta: reseñas con el texto recortado a 1–3 renglones.
 - Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios (ahora son bloque).
 
 ## 1.0.1

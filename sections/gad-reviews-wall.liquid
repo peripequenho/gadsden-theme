@@ -43,7 +43,7 @@
       </div>
     {%- endif -%}
 
-    <gad-reviews-wall class="page-width" data-batch="{{ s.batch }}">
+    <gad-reviews-wall class="page-width{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} gad-rw--ratio{% endif %}" data-batch="{{ s.batch }}"{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} style="--rw-ratio: {{ s.photo_ratio }};"{% endif %}>
       <div class="gad-rw__wall">
         {%- for block in section.blocks -%}
           {%- assign b = block.settings -%}
@@ -79,7 +79,11 @@
       </div>
       {%- if section.blocks.size > s.batch -%}
         <div class="gad-rw__more">
-          <button type="button" class="button button--secondary" data-gad-rw-btn>{{ s.more_label | escape }}</button>
+          {%- liquid
+            assign rw_left = section.blocks.size | minus: s.batch | append: ''
+            assign rw_label = s.more_label | replace: '{cantidad}', rw_left
+          -%}
+          <button type="button" class="button{% if s.more_style == 'solid' %} gad-title-font{% else %} button--secondary{% endif %}" data-gad-rw-btn data-label="{{ s.more_label | escape }}">{{ rw_label | escape }}</button>
         </div>
       {%- endif -%}
     </gad-reviews-wall>
@@ -259,6 +263,10 @@
     font-size: 1.3rem;
     text-align: center;
   }
+  .gad-rw--ratio .gad-rw__photo {
+    aspect-ratio: var(--rw-ratio);
+    object-fit: cover;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -270,7 +278,8 @@
       btn.addEventListener('click', () => {
         const hidden = [...this.querySelectorAll('[data-gad-rw-more][hidden]')];
         hidden.slice(0, batch).forEach((el) => (el.hidden = false));
-        if (hidden.length <= batch) btn.parentElement.remove();
+        if (hidden.length <= batch) return btn.parentElement.remove();
+        btn.textContent = (btn.dataset.label || btn.textContent).replace('{cantidad}', hidden.length - batch);
       });
     }
   }
@@ -423,10 +432,51 @@
       "default": 9
     },
     {
+      "type": "select",
+      "id": "photo_ratio",
+      "label": "Proporción de las fotos",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "La de cada foto"
+        },
+        {
+          "value": "1 / 1",
+          "label": "1:1"
+        },
+        {
+          "value": "4 / 5",
+          "label": "4:5"
+        },
+        {
+          "value": "3 / 4",
+          "label": "3:4"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "more_style",
+      "label": "Botón \"ver más\"",
+      "default": "outline",
+      "options": [
+        {
+          "value": "outline",
+          "label": "Con borde"
+        },
+        {
+          "value": "solid",
+          "label": "Lleno"
+        }
+      ]
+    },
+    {
       "type": "text",
       "id": "more_label",
       "label": "Texto del botón para ver más",
-      "default": "Ver más reseñas"
+      "default": "Ver más reseñas",
+      "info": "Usá {cantidad} para mostrar cuántas reseñas quedan."
     },
     {
       "type": "color_scheme",

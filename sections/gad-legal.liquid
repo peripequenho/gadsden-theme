@@ -7,7 +7,7 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-lg gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-lg{% if s.label_accent %} gad-lg--label-accent{% endif %}{% if s.line_upper %} gad-lg--line-upper{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -110,6 +110,22 @@
   .gad-lg__row--missing dd {
     color: rgb(200, 40, 40);
   }
+  .gad-lg--label-accent .gad-lg__more summary {
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.2rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .gad-lg--line-upper .gad-lg__line {
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -142,6 +158,18 @@
       "id": "details_label",
       "label": "Título del desplegable",
       "default": "Información completa"
+    },
+    {
+      "type": "checkbox",
+      "id": "label_accent",
+      "label": "Título del desplegable en el acento y en mayúsculas",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "line_upper",
+      "label": "Línea de datos en mayúsculas",
+      "default": false
     },
     {
       "type": "checkbox",

@@ -7,8 +7,8 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-ch gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ch-ratio: {{ s.ratio }};"
+  class="gad-ch gad-ch--{{ s.board_layout | default: 'below' }} gad-ch--tabs-{{ s.tab_style | default: 'card' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --ch-ratio: {{ s.ratio }};{% if s.ratio_d != blank and s.ratio_d != 'same' %} --ch-ratio-d: {{ s.ratio_d }};{% endif %}"
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
@@ -27,7 +27,7 @@
                 {{ 'lifestyle-2' | placeholder_svg_tag: 'gad-ch__ph' }}
               {%- endif -%}
               <div class="gad-ch__caption">
-                <span class="gad-ch__n">{{ b.number | default: forloop.index | escape }}</span>
+                <span class="gad-ch__n{% if s.stage_label != blank %} gad-ch__n--label{% endif %}">{% if s.stage_label != blank %}{{ s.stage_label | escape }} {% endif %}{{ b.number | default: forloop.index | escape }}</span>
                 <h3 class="gad-ch__title h3">{{ b.title }}</h3>
                 {%- if b.text != blank -%}<p class="gad-ch__text">{{ b.text }}</p>{%- endif -%}
               </div>
@@ -173,6 +173,89 @@
     background: rgb(var(--color-button));
     transform: scaleX(0);
     transform-origin: left;
+  }
+  @media screen and (min-width: 990px) {
+    .gad-ch__stage {
+      aspect-ratio: var(--ch-ratio-d, var(--ch-ratio, 4 / 5));
+    }
+
+    /* etapas a la derecha, en lista */
+    .gad-ch--side .gad-ch__board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 1.6rem;
+      align-items: start;
+      max-width: none;
+    }
+
+    .gad-ch--side .gad-ch__stage {
+      max-height: none;
+      margin: 0;
+    }
+
+    .gad-ch--side .gad-ch__tabs {
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      gap: 0.8rem;
+      margin-top: 0;
+      overflow: visible;
+    }
+
+    .gad-ch--side .gad-ch__tab {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.2rem 1.4rem;
+    }
+  }
+
+  /* etapas en caja con número; la activa invertida */
+  .gad-ch--tabs-numbered .gad-ch__tab {
+    border: var(--gad-skin-border, 0.2rem solid rgb(var(--color-foreground)));
+    border-radius: 0.4rem;
+    background: transparent;
+  }
+
+  .gad-ch--tabs-numbered .gad-ch__tab.is-active {
+    border-color: rgb(var(--color-foreground));
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+  }
+
+  .gad-ch--tabs-numbered .gad-ch__tab-n {
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-size: 1.5rem;
+    font-weight: 700;
+    opacity: 1;
+  }
+
+  .gad-ch--tabs-numbered .gad-ch__tab-t {
+    font-family: var(--font-heading-family);
+    font-weight: var(--font-heading-weight);
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .gad-ch--tabs-numbered .gad-ch__fill {
+    background: rgb(var(--color-accent, var(--color-button)));
+  }
+
+  @media screen and (max-width: 989px) {
+    .gad-ch--tabs-numbered .gad-ch__tabs {
+      grid-auto-columns: minmax(0, 1fr);
+    }
+
+    .gad-ch--tabs-numbered .gad-ch__tab {
+      justify-items: center;
+      padding: 1rem 0.6rem;
+      text-align: center;
+    }
+  }
+
+  .gad-ch__n.gad-ch__n--label {
+    color: rgb(var(--color-accent, var(--color-button)));
+    opacity: 1;
   }
 {% endstylesheet %}
 
@@ -378,6 +461,72 @@
         }
       ],
       "default": "4 / 5"
+    },
+    {
+      "type": "select",
+      "id": "ratio_d",
+      "label": "Proporción en desktop",
+      "default": "same",
+      "options": [
+        {
+          "value": "same",
+          "label": "La misma"
+        },
+        {
+          "value": "1 / 1",
+          "label": "1:1"
+        },
+        {
+          "value": "7 / 6",
+          "label": "7:6"
+        },
+        {
+          "value": "4 / 3",
+          "label": "4:3"
+        },
+        {
+          "value": "16 / 9",
+          "label": "16:9"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "board_layout",
+      "label": "Etapas en desktop",
+      "default": "below",
+      "options": [
+        {
+          "value": "below",
+          "label": "Debajo del video"
+        },
+        {
+          "value": "side",
+          "label": "A la derecha, en lista"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "tab_style",
+      "label": "Estilo de las etapas",
+      "default": "card",
+      "options": [
+        {
+          "value": "card",
+          "label": "Fichas"
+        },
+        {
+          "value": "numbered",
+          "label": "Cajas con número; la activa invertida"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "stage_label",
+      "label": "Texto antes del número en el video",
+      "info": "Por ejemplo \"Etapa\": queda \"Etapa 1\", en el color del acento."
     },
     {
       "type": "range",

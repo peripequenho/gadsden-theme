@@ -6,7 +6,7 @@
 {%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <gad-timed-steps
-  class="gad-ts gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-ts gad-ts--timer-{{ s.timer_style | default: 'pill' }} gad-ts--h-{{ s.heading_align | default: 'center' }} gad-ts--hm-{{ s.heading_align_m | default: 'same' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
   data-total="{{ s.timer_total }}"
   {% render 'gad-section-attrs', s: s %}
@@ -14,7 +14,7 @@
   <div class="page-width">
     {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
     {%- if s.timer_total > 0 -%}
-      <div class="gad-ts__timer color-{{ s.panel_scheme }}" role="img" aria-label="{{ s.timer_label | escape }} {{ s.timer_total }} s">
+      <div class="gad-ts__timer{% if s.timer_style == 'tag' %} gad-title-font{% else %} color-{{ s.panel_scheme }}{% endif %}" role="img" aria-label="{{ s.timer_label | escape }} {{ s.timer_total }} s">
         {%- if s.timer_label != blank -%}<span class="gad-ts__timer-label">{{ s.timer_label | escape }}</span>{%- endif -%}
         <b><span data-gad-ts-digits>{{ s.timer_total }},0</span> s</b>
       </div>
@@ -31,7 +31,7 @@
               <span class="gad-ts__ph">{%- render 'gad-icon', name: b.icon, filled: true -%}</span>
             {%- endif -%}
           </div>
-          <div class="gad-ts__panel color-{{ s.panel_scheme }}">
+          <div class="gad-ts__panel{% unless s.panel_custom %} color-{{ s.panel_scheme }}{% endunless %}"{% if s.panel_custom %} style="--color-background: {{ s.panel_bg.red }},{{ s.panel_bg.green }},{{ s.panel_bg.blue }}; --color-foreground: {{ s.panel_text.red }},{{ s.panel_text.green }},{{ s.panel_text.blue }};"{% endif %}>
             <div class="gad-ts__head">
               <h3 class="gad-ts__title h4">{{ b.title }}</h3>
               {%- if b.time != blank -%}<span class="gad-ts__time" data-gad-ts-stamp>{{ b.time | escape }}</span>{%- endif -%}
@@ -44,6 +44,12 @@
     {%- if section.blocks.size > 0 -%}
       {%- assign cols = section.blocks.size | at_most: 4 -%}
       {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, force_d_on: false, force_m_on: true, d_per_view: cols, m_per_view: 1, gap_d: 20, gap_m: 12 -%}
+    {%- endif -%}
+    {%- if s.note != blank -%}
+      <div class="gad-ts__note">
+        {%- if s.note_icon != blank -%}{%- render 'gad-icon', name: s.note_icon -%}{%- endif -%}
+        <div class="rte">{{ s.note }}</div>
+      </div>
     {%- endif -%}
   </div>
 </gad-timed-steps>
@@ -159,6 +165,58 @@
   .gad-ts__text {
     margin: 0;
     font-size: 1.4rem;
+  }
+  /* cronómetro como etiqueta */
+  .gad-ts--timer-tag .gad-ts__timer {
+    padding: 0.8rem 1.8rem;
+    border-radius: 0;
+    background: rgb(var(--color-foreground));
+    color: rgb(var(--color-background));
+  }
+
+  .gad-ts--timer-tag .gad-ts__timer b {
+    color: rgb(var(--color-accent, var(--color-button)));
+    font-size: 2.8rem;
+  }
+
+  .gad-ts--h-left .gad-ts__timer {
+    margin-left: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .gad-ts--hm-left .gad-ts__timer {
+      margin-left: 0;
+    }
+
+    .gad-ts--hm-center .gad-ts__timer {
+      margin-left: auto;
+    }
+  }
+
+  /* nota en caja debajo de los pasos */
+  .gad-ts__note {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    max-width: 52rem;
+    margin: 2.8rem auto 0;
+    padding: 1.4rem 1.8rem;
+    border: var(--gad-skin-border, 0.2rem solid rgb(var(--color-foreground)));
+    border-radius: 0.6rem;
+    font-weight: 700;
+  }
+
+  .gad-ts__note .gad-icon {
+    flex: 0 0 auto;
+    font-size: 2.8rem;
+  }
+
+  .gad-ts__note .rte > :first-child {
+    margin-top: 0;
+  }
+
+  .gad-ts__note .rte > :last-child {
+    margin-bottom: 0;
   }
 {% endstylesheet %}
 
@@ -307,10 +365,56 @@
       "default": "Reloj en mano"
     },
     {
+      "type": "select",
+      "id": "timer_style",
+      "label": "Estilo del cronómetro",
+      "default": "pill",
+      "options": [
+        {
+          "value": "pill",
+          "label": "Píldora"
+        },
+        {
+          "value": "tag",
+          "label": "Etiqueta con los números en el acento"
+        }
+      ]
+    },
+    {
       "type": "color_scheme",
       "id": "panel_scheme",
       "label": "Combinación de los paneles",
       "default": "scheme-3"
+    },
+    {
+      "type": "checkbox",
+      "id": "panel_custom",
+      "label": "Colores propios del panel",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "panel_bg",
+      "label": "Fondo del panel",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "panel_text",
+      "label": "Texto del panel",
+      "default": "#121212"
+    },
+    {
+      "type": "richtext",
+      "id": "note",
+      "label": "Nota debajo de los pasos",
+      "info": "En una caja con borde. Vacía: no se muestra."
+    },
+    {
+      "type": "text",
+      "id": "note_icon",
+      "label": "Ícono de la nota",
+      "info": "Nombre de un ícono de Material Symbols. Vacío: sin ícono."
     },
     {
       "type": "paragraph",

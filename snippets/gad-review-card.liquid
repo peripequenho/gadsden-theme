@@ -6,7 +6,8 @@
 
   Accepts:
   - b: {Object} settings con el estilo. Ids: rv_color_scheme, rv_custom_bg, rv_bg, rv_radius, rv_border,
-       rv_border_color, rv_avatar_align, rv_avatar_radius, rv_star_color, rv_star_offset, rv_check_bg, rv_check_color
+       rv_border_color, rv_avatar_align, rv_avatar_radius, rv_star_color, rv_star_offset, rv_check_bg, rv_check_color,
+       rv_lines (renglones del texto; 0 = todo)
   - author: {String} nombre del autor (texto corto con formato; acepta metacampos)
   - text: {String} texto de la reseña
   - image: {Object} foto del autor (opcional)
@@ -50,8 +51,8 @@
   </span>
 {%- endcapture -%}
 <div
-  class="gad-review gad-review--{{ b.rv_avatar_align | default: 'top' }} color-{{ b.rv_color_scheme | default: 'scheme-1' }}{% if class %} {{ class }}{% endif %}"
-  style="--rv-radius: {{ b.rv_radius | default: 12 }}px; --rv-avatar-radius: {{ b.rv_avatar_radius | default: 40 }}px;{% if b.rv_custom_bg %} --rv-bg: {{ b.rv_bg }};{% endif %}{% if b.rv_border > 0 %} --rv-border: {{ b.rv_border }}px solid {{ b.rv_border_color }};{% endif %}"
+  class="gad-review gad-review--{{ b.rv_avatar_align | default: 'top' }}{% if b.rv_lines > 0 %} gad-review--clamp{% endif %} color-{{ b.rv_color_scheme | default: 'scheme-1' }}{% if class %} {{ class }}{% endif %}"
+  style="--rv-radius: {{ b.rv_radius | default: 12 }}px; --rv-avatar-radius: {{ b.rv_avatar_radius | default: 40 }}px;{% if b.rv_lines > 0 %} --rv-lines: {{ b.rv_lines }};{% endif %}{% if b.rv_custom_bg %} --rv-bg: {{ b.rv_bg }};{% endif %}{% if b.rv_border > 0 %} --rv-border: {{ b.rv_border }}px solid {{ b.rv_border_color }};{% endif %}"
 >
   {%- if image != blank -%}
     {{ image | image_url: width: 120 | image_tag: class: 'gad-review__avatar', loading: 'lazy', alt: '' }}
