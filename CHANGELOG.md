@@ -3,6 +3,7 @@
 ## Sin publicar
 
 - Apoyo por Cafecito: grupo *Gadsden · Apoyá el proyecto* en Configuración del tema y link de soporte en Información del tema. Sólo lo ve quien administra la tienda; en el storefront no cambia nada. Y una serpiente escondida en `layout/theme.liquid`.
+- Nuevo estilo de fábrica (preset Clásico): Poppins e Inter, botones con borde de 2 px y redondeo de 6, tarjetas y cajas con sombra, texto centrado en las tarjetas, íconos finos, redes cuadradas, títulos de página centrados, precio de oferta primero y combinaciones de color neutras.
 - Tarjetas con "precio de oferta primero": los productos sin oferta mostraban el precio dos veces.
 - Nombre de la tienda sin logo: ya no se corta a mitad de palabra y en mobile se achica si no entra.
 

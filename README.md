@@ -8,7 +8,7 @@ Trae dos estilos base, que se eligen en *Configuración del tema > Gadsden · Es
 - **Clásico** (por defecto): la tipografía y los botones de la línea clásica de Dawn, con el texto al 90 % del color.
 - **Ecom**: títulos compactos, botones y precios en negrita, campos y cantidades redondeados, botón de compra lleno con el precio.
 
-`config/settings_data.json` trae además dos estilos de theme con las fuentes y los redondeos de cada uno ("Clásico" y "Ecom"); las combinaciones de color son las mismas.
+`config/settings_data.json` trae además dos estilos de theme listos: **Clásico** (el de fábrica: Poppins en títulos e Inter en textos, botones con borde de 2 px y redondeo de 6, tarjetas y cajas con sombra suave y redondeo, texto centrado en las tarjetas, íconos de trazo fino y combinaciones de color neutras en blanco, grises y casi negro) y **Ecom** (Poppins, redondeos de 8 y 12, combinaciones con botón verde).
 
 ## Qué agrega a Dawn
 
