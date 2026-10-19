@@ -952,10 +952,16 @@ gad-video:not(.is-muted) .gad-video__icon-sound {
 
 /* Secciones que son elementos propios: como bloque, para que su fondo (colores propios) pinte detrás del contenido. */
 gad-article,
+gad-contact-form,
 gad-merge,
+gad-qty-gifts,
+gad-quantity-offers,
 gad-quiz,
 gad-reveal-cards,
-gad-timed-steps {
+gad-reviews-wall,
+gad-stories,
+gad-timed-steps,
+gad-track-order {
   display: block;
 }
 
