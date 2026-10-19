@@ -12,7 +12,7 @@
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="{% if s.full_width %}gad-full-width{% else %}page-width{% endif %}">
-    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
     <div class="gad-cols__grid gad-cols__grid--{{ s.valign }}">
       {%- liquid
         assign open = false
@@ -206,6 +206,43 @@
       "id": "heading_accent",
       "label": "Color de las palabras resaltadas",
       "info": "Vacío: el acento de la combinación de colores."
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Alineación del encabezado",
+      "default": "center",
+      "options": [
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
+      ],
+      "info": "Volanta, título y texto de arriba."
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación del encabezado en mobile",
+      "default": "same",
+      "options": [
+        {
+          "value": "same",
+          "label": "Igual que en desktop"
+        },
+        {
+          "value": "left",
+          "label": "Izquierda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
+      ]
     },
     {
       "type": "richtext",

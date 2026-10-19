@@ -1,7 +1,9 @@
 {%- comment -%}
   Estilo de esta página (L19): sección invisible que cambia el aspecto sólo de la página donde está:
   colores de la combinación 1, fuente y forma de los títulos, fuente del texto, botón de compra, etiqueta de oferta, borde de las fotos de la
-  ficha y colores de la barra de anuncios. Borrarla vuelve todo atrás.
+  ficha, colores de la barra de anuncios y detalles de las secciones de Gadsden (volanta, resaltado, texto, bordes,
+  esquinas, trama y línea entre secciones; "clara" u "oscura" sale de la clase gad-dark de gad-scheme).
+  Borrarla vuelve todo atrás.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
 {%- style -%}
@@ -39,9 +41,13 @@
       --font-heading-weight: {{ s.title_font.weight }};
     }
   {%- endif -%}
-  {%- if s.title_case != 'none' or s.title_skew != 0 or s.title_italic -%}
+  {%- if s.title_case != 'none' -%}
     #MainContent :is(h1, h2, h3, .h0, .h1, .h2, .gad-heading__title) {
-      {%- if s.title_case != 'none' -%}text-transform: {{ s.title_case }};{%- endif -%}
+      text-transform: {{ s.title_case }};
+    }
+  {%- endif -%}
+  {%- if s.title_skew != 0 or s.title_italic -%}
+    #MainContent :is(h1, h2, .h0, .h1, .gad-heading__title):not(.h3, .h4, .h5) {
       {%- if s.title_italic -%}font-style: italic;{%- endif -%}
       {%- if s.title_skew != 0 -%}transform: skewX({{ s.title_skew }}deg); transform-origin: left center;{%- endif -%}
     }
@@ -77,6 +83,71 @@
       --color-foreground: {{ s.bar_text.red }},{{ s.bar_text.green }},{{ s.bar_text.blue }};
       --gradient-background: {{ s.bar_bg }};
       color: {{ s.bar_text }};
+    }
+  {%- endif -%}
+  {%- if s.caption_style != 'theme' -%}
+    #MainContent .gad-heading__caption {
+      font-family: var(--font-heading-family);
+      font-style: var(--font-heading-style);
+      font-weight: var(--font-heading-weight);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  {%- endif -%}
+  {%- if s.caption_style == 'tag' -%}
+    #MainContent .gad-heading__caption:not([style]):not(.gad-dark .gad-heading__caption) {
+      display: inline-block;
+      padding: 0.5rem 1.1rem;
+      background: rgb(var(--color-foreground));
+      color: rgb(var(--color-background));
+      {%- if s.title_skew != 0 -%}transform: skewX({{ s.title_skew }}deg);{%- endif -%}
+    }
+  {%- endif -%}
+  {%- if s.hl_style == 'marker' -%}
+    #MainContent .gad-hl :is(strong, b):not(.gad-dark .gad-hl :is(strong, b)) {
+      padding: 0 0.15em;
+      background: var(--gad-hl, rgb(var(--color-accent, var(--color-button))));
+      color: rgb(var(--color-foreground));
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+  {%- endif -%}
+  {%- if s.text_full -%}
+    #MainContent :is([class*='color-scheme-'], .gad-cc, .gad-tint, .rte, .gad-heading__text) {
+      color: rgb(var(--color-foreground));
+    }
+  {%- endif -%}
+  {%- if s.border_on -%}
+    #MainContent {
+      --gad-skin-border: {{ s.border_width }}px solid rgba(var(--color-foreground), {{ s.border_opacity | divided_by: 100.0 }});
+    }
+    #MainContent .gad-dark {
+      --gad-skin-border: {{ s.border_width }}px solid rgba(var(--color-foreground), {{ s.border_opacity_dark | divided_by: 100.0 }});
+    }
+    #MainContent :is(.gad-rc__card, .gad-ts__step, .gad-rw__card, .gad-po__card, .gad-ch__stage, .gad-st2__media, .gad-icc__media, .gad-ic__item--box) {
+      border: var(--gad-skin-border);
+    }
+  {%- endif -%}
+  {%- if s.square -%}
+    #MainContent :is(.gad-rc__card, .gad-rc__toggle, .gad-ts__step, .gad-ts__photo, .gad-rw__card, .gad-rw__photo, .gad-po__card, .gad-ch__stage, .gad-ch__tab, .gad-st2__media, .gad-icc__media, .gad-ic__media, .gad-ic__item--box, .gad-cmp-layout__table) {
+      border-radius: 0;
+    }
+    #MainContent :is(.gad-rc__card, .gad-ts__step, .gad-rw__card, .gad-po__card, .gad-ch__stage, .gad-st2__media) :is(img, video) {
+      border-radius: 0;
+    }
+  {%- endif -%}
+  {%- if s.texture > 0 -%}
+    #MainContent :is(.gad-pad, .collapsible-content__wrapper) {
+      background-image: radial-gradient(rgba(var(--color-foreground), {{ s.texture | divided_by: 100.0 }}) 1px, transparent 1.4px);
+      background-size: 0.8rem 0.8rem;
+    }
+  {%- endif -%}
+  {%- if s.section_line > 0 -%}
+    #MainContent > .shopify-section > :is(.gad-pad, [class*='color-scheme-'], .gad-cc) {
+      border-bottom: {{ s.section_line }}px solid rgb(var(--color-foreground));
+    }
+    #MainContent > .shopify-section > .gad-dark {
+      border-bottom-color: rgb(var(--color-accent, var(--color-button)));
     }
   {%- endif -%}
 {%- endstyle -%}
@@ -336,6 +407,123 @@
       "id": "bar_text",
       "label": "Texto",
       "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Detalles de las secciones"
+    },
+    {
+      "type": "paragraph",
+      "content": "Valen para las secciones de Gadsden de esta página. \"Clara\" u \"oscura\" sale del fondo de cada sección."
+    },
+    {
+      "type": "select",
+      "id": "caption_style",
+      "label": "Volanta",
+      "default": "theme",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Como en el tema"
+        },
+        {
+          "value": "heading",
+          "label": "Con la fuente de los títulos"
+        },
+        {
+          "value": "tag",
+          "label": "Etiqueta en las secciones claras"
+        }
+      ],
+      "info": "Etiqueta: fondo del color del texto, inclinada como los títulos. En las oscuras queda como texto."
+    },
+    {
+      "type": "select",
+      "id": "hl_style",
+      "label": "Palabras resaltadas de los títulos",
+      "default": "color",
+      "options": [
+        {
+          "value": "color",
+          "label": "En color"
+        },
+        {
+          "value": "marker",
+          "label": "Con marcador en las secciones claras"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "text_full",
+      "label": "Texto con el color pleno",
+      "default": false,
+      "info": "El tema pinta el texto un poco más suave que los títulos."
+    },
+    {
+      "type": "checkbox",
+      "id": "border_on",
+      "label": "Borde en tarjetas, fotos y cajas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del borde en las secciones claras",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "border_opacity_dark",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del borde en las oscuras",
+      "default": 25
+    },
+    {
+      "type": "checkbox",
+      "id": "square",
+      "label": "Esquinas rectas",
+      "default": false,
+      "info": "Tarjetas, fotos, videos y cajas sin redondeo."
+    },
+    {
+      "type": "range",
+      "id": "texture",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "%",
+      "label": "Trama de puntos en el fondo",
+      "default": 0,
+      "info": "Reemplaza el degradé o la imagen de fondo de las secciones."
+    },
+    {
+      "type": "range",
+      "id": "section_line",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "Línea entre secciones",
+      "default": 0,
+      "info": "Del color del texto en las secciones claras y del acento en las oscuras."
     }
   ],
   "presets": [

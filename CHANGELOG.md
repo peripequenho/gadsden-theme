@@ -15,6 +15,8 @@
 - Estilo de esta página: fuente del texto y etiqueta de oferta de la ficha (fondo, texto, inclinación y mayúsculas).
 - Hero con palabra que rota: **tamaño de la promesa** "como el título", con resaltado de marcador; sin título cargado, la promesa pasa a ser el título.
 - Íconos con contenido: pulso también **por ícono** (además del de toda la sección).
+- Estilo de esta página: **detalles de las secciones** de Gadsden en esa página: volanta con la fuente de los títulos o como etiqueta en las secciones claras, palabras resaltadas con marcador en las secciones claras, texto con el color pleno, borde en tarjetas, fotos y cajas (grosor y opacidad para secciones claras y oscuras), esquinas rectas, trama de puntos y línea entre secciones. La inclinación y la cursiva de los títulos ya no se aplican a los títulos chicos (desplegables, pasos).
+- **Alineación del encabezado** (izquierda o centro, y aparte en mobile) en las secciones que lo centraban siempre.
 - Corregido: tarjetas desplegables, nota, cuestionario, pasos con cronómetro y unión de secciones no pintaban su fondo detrás del contenido con colores propios (ahora son bloque).
 
 ## 1.0.1

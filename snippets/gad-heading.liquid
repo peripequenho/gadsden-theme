@@ -10,6 +10,7 @@
   - accent: {Color} color de resaltado (opcional)
   - text: {String} texto con formato debajo del título (opcional)
   - align: {String} 'left', 'center' o 'right' (opcional)
+  - align_m: {String} alineación en mobile: 'left', 'center' o 'same' (opcional)
   - tag: {String} etiqueta del título (opcional, 'h2' por defecto)
   - class: {String} clases extra para el contenedor (opcional)
 
@@ -18,7 +19,7 @@
 {%- endcomment -%}
 {%- if title != blank or text != blank or caption != blank -%}
   {%- assign heading_tag = tag | default: 'h2' -%}
-  <div class="gad-heading{% if align %} gad-heading--{{ align }}{% endif %}{% if class %} {{ class }}{% endif %}">
+  <div class="gad-heading{% if align %} gad-heading--{{ align }}{% endif %}{% if align_m != blank and align_m != 'same' %} gad-heading--m-{{ align_m }}{% endif %}{% if class %} {{ class }}{% endif %}">
     {%- if caption != blank -%}
       <p class="gad-heading__caption caption-with-letter-spacing caption-with-letter-spacing--medium"{% if caption_color != blank %} style="color: {{ caption_color }};"{% endif %}>
         {{- caption | escape -}}
