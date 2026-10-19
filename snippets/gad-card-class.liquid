@@ -12,7 +12,7 @@
 {%- endcomment -%}
 {%- case s.card_style -%}
   {%- when 'scheme' -%}
-    gad-card--box color-{{ s.card_color_scheme | default: 'scheme-1' }} gradient
+    gad-card--box color-{{ s.card_color_scheme | default: 'scheme-1' }} gradient{% if s.card_color_scheme == s.color_scheme and s.custom_colors != true %} gad-card--same{% endif %}
   {%- when 'tint' -%}
     gad-card--box gad-tint
   {%- when 'custom' -%}

@@ -1,12 +1,18 @@
 {%- comment -%}
-  Testimonios estilo red social (S20): tarjetas con forma de publicación (avatar, nombre, usuario,
-  tilde de verificado, foto, texto, reacciones y fecha), en grilla o carrusel (T04).
+  Testimonios sociales (S27). Dos estilos:
+  - Tarjeta: la publicación con autor, foto, texto y estrellas.
+  - Red social: la publicación con autor, fecha, menú, texto, foto de borde a borde, reacciones, cantidad de
+    comentarios, barra de acciones y hasta dos comentarios con su foto, fecha y acciones. Los colores de la
+    publicación, de los comentarios, de los separadores y del borde son ajustes. Los íconos están dibujados
+    de cero (snippet gad-soc-icon); no reproducen logos de ninguna red.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
+{%- assign is_soc = false -%}
+{%- if s.post_style == 'social' -%}{%- assign is_soc = true -%}{%- endif -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
 <div
-  class="gad-sr gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
+  class="gad-sr gad-pad{% if is_soc %} gad-soc-sr{% endif %} {% render 'gad-scheme', s: s, key: section.id %}"
+  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;{% if is_soc %} --soc-bg: {{ s.soc_post_bg }}; --soc-text: {{ s.soc_post_text }}; --soc-comments: {{ s.soc_comments_bg }}; --soc-sep: {{ s.soc_separators }}; --soc-border: {{ s.soc_border_color }}; --soc-border-w: {{ s.soc_border_width }}px;{% endif %}"
   {% render 'gad-section-attrs', s: s %}
 >
   <div class="page-width">
@@ -14,44 +20,132 @@
     {%- capture slides -%}
       {%- for block in section.blocks -%}
         {%- assign b = block.settings -%}
-        <article class="gad-sr__post color-{{ s.card_scheme }}" {{ block.shopify_attributes }}>
-          <header class="gad-sr__head">
-            <span class="gad-sr__avatar">
-              {%- if b.avatar != blank -%}
-                {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}
-              {%- else -%}
-                {{ b.name | slice: 0 | upcase }}
+        {%- if is_soc -%}
+          {%- assign ikey = section.id | append: '-' | append: forloop.index -%}
+          <div class="gad-soc__slide" {{ block.shopify_attributes }}>
+            <article class="gad-soc">
+              <header class="gad-soc__top">
+                <span class="gad-soc__avatar">
+                  {%- if b.avatar != blank -%}
+                    {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', alt: '', width: 42, height: 42 }}
+                  {%- else -%}
+                    {%- render 'gad-soc-icon', name: 'avatar', key: ikey -%}
+                  {%- endif -%}
+                </span>
+                <span class="gad-soc__who">
+                  <span class="gad-soc__author">
+                    {{- b.name | escape -}}
+                    {%- if b.verified -%}
+                      <span class="gad-sr__verified" title="{{ 'gadsden.reviews.verified' | t }}">{%- render 'gad-icon', name: 'verified', filled: true -%}</span>
+                    {%- endif -%}
+                  </span>
+                  {%- if b.date != blank -%}<span class="gad-soc__time">{{ b.date | escape }}</span>{%- endif -%}
+                </span>
+                <span class="gad-soc__options">{%- render 'gad-soc-icon', name: 'dots' -%}</span>
+              </header>
+              {%- if b.text != blank -%}
+                <div class="gad-soc__text">{{ b.text }}</div>
               {%- endif -%}
-            </span>
-            <span class="gad-sr__who">
-              <span class="gad-sr__name">
-                {{- b.name | escape -}}
-                {%- if b.verified -%}
-                  <span class="gad-sr__verified" title="{{ 'gadsden.reviews.verified' | t }}">{%- render 'gad-icon', name: 'verified', filled: true -%}</span>
+              {%- if b.image != blank -%}
+                <div class="gad-soc__photo">
+                  {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 33vw, 90vw', widths: '400, 600, 900' }}
+                </div>
+              {%- endif -%}
+              <div class="gad-soc__reactions">
+                <span class="gad-soc__reaction-icons">
+                  {%- assign reactions = b.reactions | split: ',' -%}
+                  {%- for r in reactions -%}
+                    {%- assign rname = r | strip | downcase -%}
+                    {%- if rname == 'like' or rname == 'love' or rname == 'care' -%}
+                      {%- render 'gad-soc-icon', name: rname, key: ikey -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                </span>
+                <span class="gad-soc__count">{{ b.likes | escape }}</span>
+                <span class="gad-soc__comments-count">{{ b.comments | escape }}</span>
+              </div>
+              <div class="gad-soc__ctas">
+                <span class="gad-soc__cta">{%- render 'gad-soc-icon', name: 'cta-like' %} {{ s.soc_like_label | escape }}</span>
+                <span class="gad-soc__cta">{%- render 'gad-soc-icon', name: 'cta-comment' %} {{ s.soc_comment_label | escape }}</span>
+                <span class="gad-soc__cta">{%- render 'gad-soc-icon', name: 'cta-share' %} {{ s.soc_share_label | escape }}</span>
+              </div>
+              {%- for n in (1..2) -%}
+                {%- capture c_text -%}comment_{{ n }}_text{%- endcapture -%}
+                {%- capture c_name -%}comment_{{ n }}_name{%- endcapture -%}
+                {%- capture c_avatar -%}comment_{{ n }}_avatar{%- endcapture -%}
+                {%- capture c_verified -%}comment_{{ n }}_verified{%- endcapture -%}
+                {%- capture c_time -%}comment_{{ n }}_time{%- endcapture -%}
+                {%- if b[c_text] != blank -%}
+                  <div class="gad-soc__comment gad-soc__comment--{{ n }}">
+                    <span class="gad-soc__comment-avatar">
+                      {%- if b[c_avatar] != blank -%}
+                        {{ b[c_avatar] | image_url: width: 80 | image_tag: loading: 'lazy', alt: '', width: 36, height: 36 }}
+                      {%- else -%}
+                        {%- assign akey = ikey | append: '-c' | append: n -%}
+                        {%- render 'gad-soc-icon', name: 'avatar', key: akey -%}
+                      {%- endif -%}
+                    </span>
+                    <div class="gad-soc__comment-right">
+                      <div class="gad-soc__comment-box">
+                        <p class="gad-soc__author">
+                          {{- b[c_name] | escape -}}
+                          {%- if b[c_verified] -%}
+                            <span class="gad-sr__verified" title="{{ 'gadsden.reviews.verified' | t }}">{%- render 'gad-icon', name: 'verified', filled: true -%}</span>
+                          {%- endif -%}
+                        </p>
+                        <div class="gad-soc__comment-text">{{ b[c_text] }}</div>
+                      </div>
+                      <div class="gad-soc__comment-ctas">
+                        <span>{{ b[c_time] | escape }}</span>
+                        <span>{{ s.soc_like_label | escape }}</span>
+                        <span>{{ s.soc_reply_label | escape }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </article>
+          </div>
+        {%- else -%}
+          <article class="gad-sr__post color-{{ s.card_scheme }}" {{ block.shopify_attributes }}>
+            <header class="gad-sr__head">
+              <span class="gad-sr__avatar">
+                {%- if b.avatar != blank -%}
+                  {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', alt: '', width: 48, height: 48 }}
+                {%- else -%}
+                  {{ b.name | slice: 0 | upcase }}
                 {%- endif -%}
               </span>
-              {%- if b.handle != blank -%}<span class="gad-sr__handle">{{ b.handle | escape }}</span>{%- endif -%}
-            </span>
-            {%- if s.network_icon != blank -%}
-              <span class="gad-sr__net">{%- render 'gad-icon', name: s.network_icon -%}</span>
+              <span class="gad-sr__who">
+                <span class="gad-sr__name">
+                  {{- b.name | escape -}}
+                  {%- if b.verified -%}
+                    <span class="gad-sr__verified" title="{{ 'gadsden.reviews.verified' | t }}">{%- render 'gad-icon', name: 'verified', filled: true -%}</span>
+                  {%- endif -%}
+                </span>
+                {%- if b.handle != blank -%}<span class="gad-sr__handle">{{ b.handle | escape }}</span>{%- endif -%}
+              </span>
+              {%- if s.network_icon != blank -%}
+                <span class="gad-sr__net">{%- render 'gad-icon', name: s.network_icon -%}</span>
+              {%- endif -%}
+            </header>
+            {%- if b.image != blank -%}
+              <div class="gad-sr__photo">
+                {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 33vw, 90vw', widths: '400, 600, 900' }}
+              </div>
             {%- endif -%}
-          </header>
-          {%- if b.image != blank -%}
-            <div class="gad-sr__photo">
-              {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: '', sizes: '(min-width: 990px) 33vw, 90vw', widths: '400, 600, 900' }}
-            </div>
-          {%- endif -%}
-          <div class="gad-sr__text rte">{{ b.text }}</div>
-          <footer class="gad-sr__foot">
-            {%- if b.likes != blank -%}
-              <span class="gad-sr__stat">{%- render 'gad-icon', name: 'favorite', filled: true, class: 'gad-sr__heart' -%}{{ b.likes | escape }}</span>
-            {%- endif -%}
-            {%- if b.comments != blank -%}
-              <span class="gad-sr__stat">{%- render 'gad-icon', name: 'chat_bubble' -%}{{ b.comments | escape }}</span>
-            {%- endif -%}
-            {%- if b.date != blank -%}<span class="gad-sr__date">{{ b.date | escape }}</span>{%- endif -%}
-          </footer>
-        </article>
+            <div class="gad-sr__text rte">{{ b.text }}</div>
+            <footer class="gad-sr__foot">
+              {%- if b.likes != blank -%}
+                <span class="gad-sr__stat">{%- render 'gad-icon', name: 'favorite', filled: true, class: 'gad-sr__heart' -%}{{ b.likes | escape }}</span>
+              {%- endif -%}
+              {%- if b.comments != blank -%}
+                <span class="gad-sr__stat">{%- render 'gad-icon', name: 'chat_bubble' -%}{{ b.comments | escape }}</span>
+              {%- endif -%}
+              {%- if b.date != blank -%}<span class="gad-sr__date">{{ b.date | escape }}</span>{%- endif -%}
+            </footer>
+          </article>
+        {%- endif -%}
       {%- endfor -%}
     {%- endcapture -%}
     {%- if section.blocks.size > 0 -%}
@@ -161,6 +255,205 @@
   .gad-sr__date {
     margin-left: auto;
   }
+
+  /* Estilo red social */
+  .gad-soc-sr .gad-heading {
+    margin-bottom: 3rem;
+  }
+
+  .gad-soc-sr .gad-carousel__track {
+    align-items: flex-start;
+  }
+
+  .gad-soc__slide {
+    padding: 4px 8px 8px;
+  }
+
+  .gad-soc {
+    padding: 1rem 1.5rem;
+    border: var(--soc-border-w) solid var(--soc-border);
+    border-radius: 1rem;
+    background: var(--soc-bg);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+    color: var(--soc-text);
+    text-align: left;
+  }
+
+  .gad-soc p {
+    margin: 0;
+  }
+
+  .gad-soc__top {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+
+  .gad-soc__avatar,
+  .gad-soc__comment-avatar {
+    display: block;
+    flex: none;
+    width: 4rem;
+    height: 4rem;
+    overflow: hidden;
+    border-radius: 50%;
+  }
+
+  .gad-soc__comment-avatar {
+    width: 3.4rem;
+    height: 3.4rem;
+    margin-right: 0.8rem;
+  }
+
+  .gad-soc__avatar img,
+  .gad-soc__avatar svg,
+  .gad-soc__comment-avatar img,
+  .gad-soc__comment-avatar svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gad-soc__who {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 0 1rem;
+  }
+
+  .gad-soc__author {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: var(--font-body-weight-bold, 700);
+    line-height: 1.25;
+  }
+
+  .gad-soc__top .gad-soc__author {
+    font-size: 1.5rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .gad-soc__top .gad-soc__author {
+      font-size: 1.6rem;
+    }
+  }
+
+  .gad-soc__time {
+    display: block;
+    font-size: 1.3rem;
+    line-height: 1.25;
+  }
+
+  .gad-soc__options {
+    flex-shrink: 0;
+  }
+
+  .gad-soc__dots {
+    width: 14px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .gad-soc__text {
+    margin-bottom: 1rem;
+  }
+
+  .gad-soc__text p {
+    line-height: 1.33;
+  }
+
+  .gad-soc__photo {
+    margin: 0 -1.5rem 1rem;
+  }
+
+  .gad-soc__photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .gad-soc__reactions {
+    display: flex;
+    line-height: 1.25;
+  }
+
+  .gad-soc__reaction-icons {
+    display: flex;
+  }
+
+  .gad-soc__reaction {
+    width: 17px;
+    height: 17px;
+  }
+
+  .gad-soc__count {
+    flex-grow: 1;
+    padding-left: 0.3em;
+  }
+
+  .gad-soc__comments-count {
+    flex-shrink: 0;
+    padding-left: 0.3em;
+  }
+
+  .gad-soc__ctas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    overflow: hidden;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--soc-sep);
+  }
+
+  .gad-soc__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+  }
+
+  .gad-soc__cta-icon {
+    width: 1.8rem;
+    height: 20px;
+    margin-right: 0.4rem;
+  }
+
+  .gad-soc__comment {
+    display: flex;
+    padding-top: 1.5rem;
+  }
+
+  .gad-soc__comment--1 {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--soc-sep);
+  }
+
+  .gad-soc__comment-box {
+    padding: 0.5rem 0.8rem;
+    border-radius: 1rem;
+    background: var(--soc-comments);
+  }
+
+  .gad-soc__comment-text p {
+    line-height: 1.25;
+  }
+
+  .gad-soc__comment-ctas {
+    font-size: 1rem;
+  }
+
+  .gad-soc__comment--1 .gad-soc__comment-ctas {
+    margin-top: 0.3rem;
+  }
+
+  .gad-soc__comment--2 .gad-soc__comment-ctas {
+    line-height: 1.25;
+  }
+
+  .gad-soc__comment-ctas span + span {
+    margin-left: 0.6rem;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -208,23 +501,108 @@
       "label": "Texto"
     },
     {
+      "type": "select",
+      "id": "post_style",
+      "label": "Estilo de las publicaciones",
+      "options": [
+        {
+          "value": "card",
+          "label": "Tarjeta"
+        },
+        {
+          "value": "social",
+          "label": "Red social, con reacciones y comentarios"
+        }
+      ],
+      "default": "card"
+    },
+    {
       "type": "text",
       "id": "network_icon",
       "label": "Ícono de la red",
       "default": "photo_camera",
-      "info": "Nombre en inglés de Material Symbols. Vacío: sin ícono."
+      "info": "Nombre en inglés de Material Symbols. Vacío: sin ícono. Sólo en el estilo Tarjeta."
     },
     {
       "type": "color_scheme",
       "id": "card_scheme",
       "label": "Combinación de las publicaciones",
-      "default": "scheme-1"
+      "default": "scheme-1",
+      "info": "Sólo en el estilo Tarjeta."
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "Combinación de colores",
       "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Estilo red social"
+    },
+    {
+      "type": "color",
+      "id": "soc_post_bg",
+      "label": "Fondo de la publicación",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "soc_post_text",
+      "label": "Texto de la publicación",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "soc_comments_bg",
+      "label": "Fondo de los comentarios",
+      "default": "#E8ECF7"
+    },
+    {
+      "type": "color",
+      "id": "soc_separators",
+      "label": "Separadores",
+      "default": "#1377C9"
+    },
+    {
+      "type": "color",
+      "id": "soc_border_color",
+      "label": "Borde de la publicación",
+      "default": "#737171"
+    },
+    {
+      "type": "range",
+      "id": "soc_border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 1
+    },
+    {
+      "type": "text",
+      "id": "soc_like_label",
+      "label": "Texto de \"Me gusta\"",
+      "default": "Me gusta"
+    },
+    {
+      "type": "text",
+      "id": "soc_comment_label",
+      "label": "Texto de \"Comentar\"",
+      "default": "Comentar"
+    },
+    {
+      "type": "text",
+      "id": "soc_share_label",
+      "label": "Texto de \"Enviar\"",
+      "default": "Enviar"
+    },
+    {
+      "type": "text",
+      "id": "soc_reply_label",
+      "label": "Texto de \"Responder\"",
+      "default": "Responder"
     },
     {
       "type": "header",
@@ -745,7 +1123,8 @@
           "type": "text",
           "id": "handle",
           "label": "Usuario",
-          "default": "@cliente"
+          "default": "@cliente",
+          "info": "Sólo en el estilo Tarjeta."
         },
         {
           "type": "checkbox",
@@ -767,20 +1146,90 @@
         {
           "type": "text",
           "id": "likes",
-          "label": "Me gusta",
+          "label": "Me gusta (cantidad)",
           "default": "128"
         },
         {
           "type": "text",
           "id": "comments",
-          "label": "Comentarios",
-          "default": "12"
+          "label": "Comentarios (texto)",
+          "default": "12",
+          "info": "En el estilo red social se muestra tal cual, por ejemplo \"6 Comentarios\"."
         },
         {
           "type": "text",
           "id": "date",
           "label": "Fecha",
           "default": "Hace 2 días"
+        },
+        {
+          "type": "text",
+          "id": "reactions",
+          "label": "Reacciones",
+          "default": "like, love, care",
+          "info": "Estilo red social. Separadas por coma, en el orden en que se ven: like, love, care."
+        },
+        {
+          "type": "header",
+          "content": "Comentario 1 (estilo red social)"
+        },
+        {
+          "type": "image_picker",
+          "id": "comment_1_avatar",
+          "label": "Foto de perfil"
+        },
+        {
+          "type": "text",
+          "id": "comment_1_name",
+          "label": "Nombre"
+        },
+        {
+          "type": "checkbox",
+          "id": "comment_1_verified",
+          "label": "Tilde de verificado",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "comment_1_time",
+          "label": "Fecha"
+        },
+        {
+          "type": "richtext",
+          "id": "comment_1_text",
+          "label": "Texto",
+          "info": "Vacío: el comentario no se muestra."
+        },
+        {
+          "type": "header",
+          "content": "Comentario 2 (estilo red social)"
+        },
+        {
+          "type": "image_picker",
+          "id": "comment_2_avatar",
+          "label": "Foto de perfil"
+        },
+        {
+          "type": "text",
+          "id": "comment_2_name",
+          "label": "Nombre"
+        },
+        {
+          "type": "checkbox",
+          "id": "comment_2_verified",
+          "label": "Tilde de verificado",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "comment_2_time",
+          "label": "Fecha"
+        },
+        {
+          "type": "richtext",
+          "id": "comment_2_text",
+          "label": "Texto",
+          "info": "Vacío: el comentario no se muestra."
         }
       ]
     }

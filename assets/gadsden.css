@@ -2764,6 +2764,58 @@ html.gad-pt-center .title-wrapper-with-link:has(> .title--primary) {
   padding-top: 0;
 }
 
+/* ---------- Tarjetas con la misma combinación que la sección: sin borde ni sombra ---------- */
+.gad-card--box.gad-card--same {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* ---------- Filas desplegables: el ícono acompaña el tamaño del título ---------- */
+.gad-acc--sm summary .svg-wrapper {
+  width: 2rem;
+  height: 2rem;
+}
+
+.gad-acc--md summary .svg-wrapper {
+  width: 2.24rem;
+  height: 2.24rem;
+}
+
+.gad-acc--lg summary .svg-wrapper {
+  width: 2.66rem;
+  height: 2.66rem;
+}
+
+/* ---------- Carruseles: la sombra de las tarjetas no se recorta abajo (sólo a los costados) ---------- */
+.gad-carousel__viewport {
+  overflow: clip visible;
+}
+
+/* ---------- Flechas a los costados sin puntos: una sola fila (sin la segunda vacía) ---------- */
+@media screen and (max-width: 749px) {
+  gad-carousel.gad-carousel--m-arrows-sides.gad-carousel--m-dots-hidden {
+    grid-template-areas: 'stage stage stage stage stage';
+  }
+}
+
+@media screen and (min-width: 750px) and (max-width: 989px) {
+  :where(html:not([data-gad-bp='750'])) gad-carousel.gad-carousel--m-arrows-sides.gad-carousel--m-dots-hidden {
+    grid-template-areas: 'stage stage stage stage stage';
+  }
+}
+
+@media screen and (min-width: 750px) {
+  :where(html[data-gad-bp='750']) gad-carousel.gad-carousel--d-arrows-sides.gad-carousel--d-dots-hidden {
+    grid-template-areas: 'stage stage stage stage stage';
+  }
+}
+
+@media screen and (min-width: 990px) {
+  :where(html:not([data-gad-bp='750'])) gad-carousel.gad-carousel--d-arrows-sides.gad-carousel--d-dots-hidden {
+    grid-template-areas: 'stage stage stage stage stage';
+  }
+}
+
 /* ---------- Estilo base "Clásico" (ajuste global base_style, por defecto) ----------
    Tipografía y botones de la línea clásica de Dawn: texto al 90 % del color, títulos y botones con su
    interletrado, márgenes de los textos enriquecidos sólo fuera del primer y último párrafo. */

@@ -20,7 +20,7 @@
 >
   <div class="page-width gad-ba-layout{% if has_text %} gad-ba-layout--text gad-ba-layout--media-{{ s.position }}{% endif %}">
     {%- if has_text -%}
-      <div class="gad-ba-layout__text gad-ba--a-{{ s.align }} gad-ba--m-a-{{ s.m_align }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 1;"{% endif %}>
+      <div class="gad-ba-layout__text{% if s.text_box %} gad-ba-layout__text--box{% endif %} gad-ba--a-{{ s.align }} gad-ba--m-a-{{ s.m_align }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 1;"{% endif %}>
         {%- render 'gad-heading', title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
         {%- if s.button_label != blank or s.atc_label != blank -%}
           <div class="gad-buttons">
@@ -44,9 +44,9 @@
 
     <div class="gad-ba-layout__media{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
       <gad-before-after
-        class="gad-ba gad-ba--{{ s.handle_style }}{% if s.elastic %} gad-ba--elastic{% endif %}"
+        class="gad-ba gad-ba--{{ s.handle_style }}{% if s.handle_style == 'triangles' %} gad-ba--circle{% endif %}{% if s.elastic %} gad-ba--elastic{% endif %}{% if s.labels_style == 'corner' %} gad-ba--labels-corner{% endif %}{% if s.before_fit == 'part' %} gad-ba--before-part{% endif %}"
         data-start="{{ s.start }}"
-        style="--pos: {{ s.start }}%; --ratio: {{ ratio }}; --line: rgb(var(--color-{{ s.line_color }}));"
+        style="--pos: {{ s.start }}%; --ratio: {{ ratio }}; --line: {% if s.line_custom != blank %}{{ s.line_custom }}{% else %}rgb(var(--color-{{ s.line_color }})){% endif %};{% if s.max_width > 0 %} max-width: {{ s.max_width }}px; margin-inline: auto;{% endif %}"
       >
         <div class="gad-ba__img gad-ba__img--before">
           {%- if s.before_image != blank -%}
@@ -303,6 +303,73 @@
     outline: 0.2rem solid rgb(var(--color-foreground));
     outline-offset: 0.3rem;
   }
+
+  .gad-ba-layout__text--box {
+    padding: 2.4rem;
+    border-radius: var(--text-boxes-radius);
+    background: rgb(var(--color-background));
+    box-shadow: var(--text-boxes-shadow-horizontal-offset) var(--text-boxes-shadow-vertical-offset) var(--text-boxes-shadow-blur-radius) rgba(var(--color-shadow), var(--text-boxes-shadow-opacity));
+  }
+
+  .gad-ba--labels-corner .gad-ba__label {
+    top: 0;
+    border-radius: 0;
+  }
+
+  .gad-ba--labels-corner .gad-ba__label--before {
+    left: 0;
+  }
+
+  .gad-ba--labels-corner .gad-ba__label--after {
+    right: 0;
+  }
+
+  .gad-ba--triangles .gad-ba__handle {
+    width: 4.2rem;
+    height: 4.2rem;
+    background: color-mix(in srgb, var(--line) 15%, transparent);
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2);
+    backdrop-filter: none;
+  }
+
+  .gad-ba--triangles .gad-ba__line {
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.2);
+  }
+
+  .gad-ba--triangles .gad-ba__handle .gad-ba__arrow {
+    display: none;
+  }
+
+  .gad-ba--triangles .gad-ba__handle::before,
+  .gad-ba--triangles .gad-ba__handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 0.7rem;
+    height: 1.2rem;
+    background: var(--line);
+    transform: translate(-50%, -50%);
+  }
+
+  .gad-ba--triangles .gad-ba__handle::before {
+    left: 28%;
+    clip-path: polygon(100% 0, 0 50%, 100% 100%);
+  }
+
+  .gad-ba--triangles .gad-ba__handle::after {
+    left: 72%;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+
+  .gad-ba--before-part .gad-ba__img--before {
+    right: auto;
+    width: var(--pos);
+    overflow: hidden;
+  }
+
+  .gad-ba--before-part .gad-ba__img--before img {
+    object-position: left center;
+  }
 {% endstylesheet %}
 
 {% javascript %}
@@ -475,6 +542,13 @@
       "label": "Texto"
     },
     {
+      "type": "checkbox",
+      "id": "text_box",
+      "label": "Texto en una caja",
+      "default": false,
+      "info": "Con la sombra y el redondeo de Configuración del tema > Cajas de texto."
+    },
+    {
       "type": "text",
       "id": "button_label",
       "label": "Texto del botón",
@@ -645,6 +719,33 @@
       "default": "second"
     },
     {
+      "type": "select",
+      "id": "before_fit",
+      "label": "Imagen \"antes\"",
+      "options": [
+        {
+          "value": "reveal",
+          "label": "Entera, se descubre al mover la línea"
+        },
+        {
+          "value": "part",
+          "label": "Ajustada a su parte"
+        }
+      ],
+      "default": "reveal"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo de las imágenes",
+      "min": 0,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 0,
+      "info": "0: sin límite."
+    },
+    {
       "type": "image_picker",
       "id": "before_image",
       "label": "Imagen \"antes\"",
@@ -675,6 +776,22 @@
     },
     {
       "type": "select",
+      "id": "labels_style",
+      "label": "Estilo de las etiquetas",
+      "options": [
+        {
+          "value": "pill",
+          "label": "Redondeadas, separadas del borde"
+        },
+        {
+          "value": "corner",
+          "label": "En las esquinas, rectas"
+        }
+      ],
+      "default": "pill"
+    },
+    {
+      "type": "select",
       "id": "line_color",
       "label": "Color de la línea",
       "options": [
@@ -698,6 +815,12 @@
       "default": "background"
     },
     {
+      "type": "color",
+      "id": "line_custom",
+      "label": "Color propio de la línea",
+      "info": "Vacío: el de arriba."
+    },
+    {
       "type": "select",
       "id": "handle_style",
       "label": "Estilo de las flechas",
@@ -709,6 +832,10 @@
         {
           "value": "circle",
           "label": "En círculo"
+        },
+        {
+          "value": "triangles",
+          "label": "Círculo con triángulos"
         }
       ],
       "default": "circle"

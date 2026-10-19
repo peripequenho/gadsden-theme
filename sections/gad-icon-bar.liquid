@@ -16,7 +16,7 @@
 {%- endif -%}
 
 <div
-  class="gad-icon-bar gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
+  class="gad-icon-bar gad-pad{% if s.card_shadow %} gad-icon-bar--shadow{% endif %}{% if s.card_equal_height == false %} gad-icon-bar--natural{% endif %}{% if s.stack_narrow == false %} gad-icon-bar--no-stack{% endif %} {% render 'gad-scheme', s: s, key: section.id %}"
   style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --icon-px: {{ icon_px }}px;"
   {% render 'gad-section-attrs', s: s %}
 >
@@ -87,7 +87,7 @@
 
   /* Caja angosta (dos por fila en mobile): el ícono va arriba del texto para que no se pisen. */
   @container (max-width: 24rem) {
-    .gad-icon-bar__item .gad-icon-bar__card--horizontal {
+    .gad-icon-bar:not(.gad-icon-bar--no-stack) .gad-icon-bar__item .gad-icon-bar__card--horizontal {
       flex-direction: column;
       text-align: center;
     }
@@ -144,6 +144,18 @@
 
   .gad-icon-bar__text p {
     margin: 0;
+  }
+
+  .gad-icon-bar--shadow .gad-icon-bar__card.gad-card--box:not(.gad-card--same) {
+    box-shadow: var(--text-boxes-shadow-horizontal-offset) var(--text-boxes-shadow-vertical-offset) var(--text-boxes-shadow-blur-radius) rgba(var(--color-shadow), var(--text-boxes-shadow-opacity));
+  }
+
+  .gad-icon-bar--natural .gad-icon-bar__item {
+    align-self: flex-start;
+  }
+
+  .gad-icon-bar--natural .gad-icon-bar__card {
+    flex: 0 1 auto;
   }
 {% endstylesheet %}
 
@@ -350,6 +362,26 @@
       ],
       "default": "none",
       "info": "Velo claro: un fondo apenas más oscuro que el de la sección."
+    },
+    {
+      "type": "checkbox",
+      "id": "card_shadow",
+      "label": "Sombra de las tarjetas",
+      "default": false,
+      "info": "Usa la sombra de Configuración del tema > Cajas de texto."
+    },
+    {
+      "type": "checkbox",
+      "id": "card_equal_height",
+      "label": "Tarjetas del mismo alto",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_narrow",
+      "label": "En tarjetas angostas, el ícono arriba del texto",
+      "default": true,
+      "info": "Con la disposición horizontal, cuando la tarjeta mide menos de 240 px."
     },
     {
       "type": "color_scheme",

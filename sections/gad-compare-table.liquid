@@ -97,7 +97,7 @@
     {%- endif -%}
 
     <div class="gad-cmp-layout__table{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
-      <table class="gad-cmp gad-cmp--{{ s.table_style }} gad-cmp--n{{ n }}{% if s.inverted %} gad-cmp--inverted{% endif %}{% if check_filled %} gad-cmp--check-filled{% endif %}{% if cross_filled %} gad-cmp--cross-filled{% endif %}">
+      <table class="gad-cmp gad-cmp--{{ s.table_style }}{% if s.own_tab %} gad-cmp--own-tab{% endif %} gad-cmp--n{{ n }}{% if s.inverted %} gad-cmp--inverted{% endif %}{% if check_filled %} gad-cmp--check-filled{% endif %}{% if cross_filled %} gad-cmp--cross-filled{% endif %}">
         <thead>
           <tr>
             <th class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__corner gad-cmp__first {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}" scope="col">
@@ -512,6 +512,23 @@
       height: 3.2rem;
     }
   }
+
+  .gad-cmp--own-tab tbody tr:last-child .gad-cmp__own {
+    position: relative;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .gad-cmp--own-tab tbody tr:last-child .gad-cmp__own::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 1.2rem;
+    background: inherit;
+    border-radius: 0 0 var(--cmp-radius) var(--cmp-radius);
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -752,6 +769,13 @@
       ],
       "default": "classic",
       "info": "El minimalista muestra siempre un solo competidor."
+    },
+    {
+      "type": "checkbox",
+      "id": "own_tab",
+      "label": "Columna propia que sobresale abajo",
+      "default": false,
+      "info": "Con el estilo clásico: la columna destacada termina un poco más abajo que la tabla."
     },
     {
       "type": "range",

@@ -29,7 +29,7 @@
       {%- for block in section.blocks -%}
         {%- assign b = block.settings -%}
         <div class="gad-testimonials__item" {{ block.shopify_attributes }}>
-          <figure class="gad-testimonials__card gad-testimonials--align-{{ s.text_align }} {% render 'gad-card-class', s: s, key: card_key %}">
+          <figure class="gad-testimonials__card{% if s.image_bleed %} gad-testimonials__card--bleed{% endif %} gad-testimonials--align-{{ s.text_align }} {% render 'gad-card-class', s: s, key: card_key %}">
             {%- if s.show_quotes -%}
               <span class="gad-testimonials__quote" aria-hidden="true">&ldquo;</span>
             {%- endif -%}
@@ -222,6 +222,17 @@
     border-radius: 50%;
     object-fit: cover;
   }
+
+  .gad-testimonials__card--bleed {
+    overflow: hidden;
+  }
+
+  .gad-testimonials__card--bleed.gad-card--box .gad-testimonials__media--full {
+    width: calc(100% + 4.8rem);
+    max-width: none;
+    margin: -2.8rem -2.4rem 0;
+    border-radius: 0;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -386,6 +397,13 @@
         }
       ],
       "default": "adapt"
+    },
+    {
+      "type": "checkbox",
+      "id": "image_bleed",
+      "label": "Imagen al ras arriba de la tarjeta",
+      "default": false,
+      "info": "Con imagen a todo el ancho: va pegada a los bordes de la tarjeta, con sus esquinas."
     },
     {
       "type": "select",

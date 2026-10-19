@@ -29,7 +29,7 @@
       </div>
     {%- endif -%}
 
-    <div class="gad-results__panel gad-results--a-{{ s.results_align }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
+    <div class="gad-results__panel{% if s.panel_width == 'fit' %} gad-results__panel--fit{% endif %}{% if s.results_title_box %} gad-results__panel--title-box{% endif %} gad-results--a-{{ s.results_align }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
       {%- if s.results_title != blank or s.results_text != blank -%}
         {%- render 'gad-heading', title: s.results_title, size: s.results_title_size, accent: s.results_title_accent, text: s.results_text, tag: 'h3', class: 'gad-results__head' -%}
       {%- endif -%}
@@ -215,6 +215,20 @@
     .gad-results__layout--results-first .gad-results__panel {
       order: -1;
     }
+  }
+
+  .gad-results__panel--fit {
+    justify-self: center;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .gad-results__panel--title-box .gad-results__head .gad-heading__title {
+    display: inline-block;
+    padding: 1.2rem 2rem;
+    border-radius: var(--text-boxes-radius);
+    background: rgb(var(--color-background));
+    box-shadow: var(--text-boxes-shadow-horizontal-offset) var(--text-boxes-shadow-vertical-offset) var(--text-boxes-shadow-blur-radius) rgba(var(--color-shadow), var(--text-boxes-shadow-opacity));
   }
 {% endstylesheet %}
 
@@ -458,6 +472,10 @@
       "label": "Tamaño del título",
       "options": [
         {
+          "value": "h3",
+          "label": "Muy chico"
+        },
+        {
           "value": "h2",
           "label": "Chico"
         },
@@ -476,6 +494,29 @@
       "type": "color",
       "id": "results_title_accent",
       "label": "Color de las palabras resaltadas"
+    },
+    {
+      "type": "checkbox",
+      "id": "results_title_box",
+      "label": "Título en una caja",
+      "default": false,
+      "info": "Con el fondo, la sombra y el redondeo de las cajas de texto."
+    },
+    {
+      "type": "select",
+      "id": "panel_width",
+      "label": "Ancho del panel de resultados",
+      "options": [
+        {
+          "value": "full",
+          "label": "Toda la columna"
+        },
+        {
+          "value": "fit",
+          "label": "El de su contenido, centrado"
+        }
+      ],
+      "default": "full"
     },
     {
       "type": "richtext",

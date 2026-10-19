@@ -32,18 +32,18 @@
           assign slide_empty = true
         endif
       -%}
-      {%- if slide_empty and request.design_mode == false -%}
+      {%- if slide_empty and request.design_mode == false and s.show_empty != true -%}
         {%- continue -%}
       {%- endif -%}
       <div class="gad-media-slider__slide" {{ block.shopify_attributes }}>
-        <div class="gad-media-slider__media">
+        <div class="gad-media-slider__media{% if slide_empty and s.show_empty %} gad-media-slider__media--empty{% endif %}">
           {%- if block.type == 'image_slide' -%}
             {%- if b.link != blank -%}<a href="{{ b.link }}" class="gad-media-slider__link">{%- endif -%}
             {%- if b.image != blank -%}
               {%- assign img_alt = b.image.alt | default: '' -%}
               {{ b.image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 33vw, 80vw', widths: '375, 550, 750, 1100, 1500' }}
             {%- else -%}
-              {{ 'image' | placeholder_svg_tag: 'gad-media-slider__placeholder' }}
+              {%- if s.show_empty -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg gad-media-slider__placeholder gad-media-slider__placeholder--empty' }}{%- else -%}{{ 'image' | placeholder_svg_tag: 'gad-media-slider__placeholder' }}{%- endif -%}
             {%- endif -%}
             {%- if b.link != blank -%}</a>{%- endif -%}
           {%- else -%}
@@ -63,7 +63,7 @@
                 width: 1100
               -%}
             {%- else -%}
-              {{ 'image' | placeholder_svg_tag: 'gad-media-slider__placeholder' }}
+              {%- if s.show_empty -%}{{ 'image' | placeholder_svg_tag: 'placeholder-svg gad-media-slider__placeholder gad-media-slider__placeholder--empty' }}{%- else -%}{{ 'image' | placeholder_svg_tag: 'gad-media-slider__placeholder' }}{%- endif -%}
             {%- endif -%}
           {%- endif -%}
         </div>
@@ -175,6 +175,20 @@
       border-radius: var(--radius-d);
     }
   }
+
+  /* Diapositiva vacía visible: el marcador de Shopify sin el fondo ni el redondeo del contenedor. */
+  .gad-media-slider__media--empty {
+    border-radius: 0;
+    background: none;
+  }
+
+  .gad-media-slider__placeholder--empty.placeholder-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color: rgba(var(--color-foreground), 0.04);
+    fill: rgba(var(--color-foreground), 0.55);
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -183,6 +197,13 @@
   "tag": "section",
   "class": "section gad-section",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_empty",
+      "label": "Mostrar las diapositivas vacías",
+      "default": false,
+      "info": "Las que no tienen imagen ni video se ven con el marcador gris de Shopify. Apagado, sólo se ven en el editor."
+    },
     {
       "type": "inline_richtext",
       "id": "heading",
