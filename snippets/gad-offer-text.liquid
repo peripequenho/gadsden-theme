@@ -1,0 +1,20 @@
+{%- comment -%}
+  Texto de una opción de las ofertas por cantidad con los comodines reemplazados.
+
+  Accepts:
+  - text: {String} texto con o sin comodines
+  - qty: {Number} cantidad de la opción
+  - price, compare, saved, each: {Number} montos en centavos
+  - pct: {String} porcentaje de ahorro ya formateado ("25%")
+{%- endcomment -%}
+{%- liquid
+  assign out = text | replace: '{cantidad}', qty | replace: '{porcentaje}', pct
+  if out contains '{'
+    assign m_price = price | money
+    assign m_compare = compare | money
+    assign m_saved = saved | money
+    assign m_each = each | money
+    assign out = out | replace: '{precio_anterior}', m_compare | replace: '{precio_unidad}', m_each | replace: '{precio}', m_price | replace: '{ahorro}', m_saved
+  endif
+  echo out
+-%}

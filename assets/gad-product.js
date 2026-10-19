@@ -548,3 +548,62 @@ if (!customElements.get('gad-sticky-bar')) customElements.define('gad-sticky-bar
   if (window.customElements) customElements.whenDefined('slider-component').then(() => requestAnimationFrame(run));
   document.addEventListener('shopify:section:load', run);
 })();
+
+/* ---------- Ofertas por cantidad: variante de cada unidad ----------
+   Al enviar el formulario de compra, si la opción elegida tiene listas por unidad, se agregan las unidades
+   agrupadas por variante (items[n][id] / items[n][quantity]) en lugar de id + quantity, y después el formulario
+   vuelve a quedar como estaba. form.id no sirve: el formulario tiene un campo "id" que tapa la propiedad. */
+(() => {
+  const unitIds = (box) => {
+    const item = box.querySelector('.gad-offers__item.is-selected');
+    const units = item ? item.querySelectorAll('.gad-offers__unit') : [];
+    if (!units.length) return null;
+    const data = box.querySelector('[data-gad-offer-variants]');
+    const variants = data ? JSON.parse(data.textContent) : [];
+    return Array.from(units).map((unit) => {
+      const values = Array.from(unit.querySelectorAll('.gad-offers__variant')).map((s) => s.value);
+      const v = variants.find((x) => values.every((val, i) => x.options[i] === val));
+      return v ? v.id : null;
+    });
+  };
+  // Las listas están dentro del <label> de la opción: un clic en ellas no tiene que cambiar de opción.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest && e.target.closest('.gad-offers__units')) e.preventDefault();
+  });
+  document.addEventListener(
+    'submit',
+    (e) => {
+      const form = e.target;
+      const formId = form.getAttribute && form.getAttribute('id');
+      if (!formId || !form.matches('form[data-type="add-to-cart-form"]')) return;
+      const box = document.querySelector(`gad-quantity-offers[data-form="${formId}"]`);
+      if (!box) return;
+      const ids = unitIds(box);
+      if (!ids || ids.some((id) => !id)) return;
+      const counts = new Map();
+      ids.forEach((id) => counts.set(id, (counts.get(id) || 0) + 1));
+      const off = Array.from(document.querySelectorAll(`[form="${formId}"][name="quantity"], #${formId} [name="quantity"], #${formId} [name="id"]`));
+      off.forEach((el) => (el.disabled = true));
+      const added = [];
+      let n = 0;
+      counts.forEach((qty, id) => {
+        [['id', id], ['quantity', qty]].forEach(([key, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = `items[${n}][${key}]`;
+          input.value = value;
+          input.setAttribute('form', formId);
+          box.appendChild(input);
+          added.push(input);
+        });
+        n += 1;
+      });
+      // El formulario arma el FormData en el mismo tick; después se deja como estaba.
+      setTimeout(() => {
+        added.forEach((el) => el.remove());
+        off.forEach((el) => (el.disabled = false));
+      }, 0);
+    },
+    true
+  );
+})();

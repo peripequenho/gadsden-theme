@@ -671,9 +671,9 @@ html.gad-modal-open {
 }
 
 .gad-offers__item.is-selected {
-  border-color: rgb(var(--color-button));
-  background: rgba(var(--color-button), 0.05);
-  box-shadow: inset 0 0 0 0.1rem rgb(var(--color-button));
+  border-color: rgb(var(--gad-offer-acc, var(--color-button)));
+  background: rgba(var(--gad-offer-acc, var(--color-button)), 0.05);
+  box-shadow: inset 0 0 0 0.1rem rgb(var(--gad-offer-acc, var(--color-button)));
 }
 
 .gad-offers__input {
@@ -696,8 +696,8 @@ html.gad-modal-open {
 }
 
 .gad-offers__item.is-selected .gad-offers__radio {
-  border-color: rgb(var(--color-button));
-  box-shadow: inset 0 0 0 0.3rem rgb(var(--color-background)), inset 0 0 0 1rem rgb(var(--color-button));
+  border-color: rgb(var(--gad-offer-acc, var(--color-button)));
+  box-shadow: inset 0 0 0 0.3rem rgb(var(--color-background)), inset 0 0 0 1rem rgb(var(--gad-offer-acc, var(--color-button)));
 }
 
 .gad-offers__img {
@@ -743,7 +743,7 @@ html.gad-modal-open {
 }
 
 .gad-offers__saving {
-  color: rgb(var(--color-button));
+  color: rgb(var(--gad-offer-acc, var(--color-button)));
   font-size: 1.2rem;
   font-weight: 700;
 }
@@ -775,6 +775,79 @@ html.gad-modal-open {
 
 .gad-offers--list .gad-offers__img {
   display: none;
+}
+
+/* Pastilla de beneficio, insignia inclinada y listas por unidad */
+.gad-offers__label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+}
+
+.gad-offers__pill {
+  padding: 0.2rem 0.8rem;
+  border: 0.1rem solid rgb(var(--gad-offer-acc, var(--color-button)));
+  border-radius: 10rem;
+  color: rgb(var(--gad-offer-acc, var(--color-button)));
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.gad-offers__pill--solid {
+  background: rgb(var(--gad-offer-acc, var(--color-button)));
+  color: rgb(var(--color-button-text));
+}
+
+.gad-offers__item--badge-corner {
+  overflow: hidden;
+}
+
+.gad-offers__item--badge-corner .gad-offers__badge {
+  top: 1.6rem;
+  right: -3.2rem;
+  width: 12rem;
+  padding: 0.3rem 0;
+  border-radius: 0;
+  text-align: center;
+  transform: rotate(35deg);
+}
+
+.gad-offers__units {
+  display: none;
+  grid-column: 1 / -1;
+  gap: 0.6rem;
+}
+
+.gad-offers__item.is-selected .gad-offers__units {
+  display: grid;
+}
+
+.gad-offers__units-label {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.gad-offers__unit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gad-offers__unit-number {
+  min-width: 2.4rem;
+  font-weight: 700;
+}
+
+.gad-offers__select {
+  flex: 1 1 10rem;
+}
+
+.gad-offers__select .select__select {
+  height: 3.6rem;
+  font-size: 1.3rem;
 }
 
 /* ---------- PX1 galería ---------- */

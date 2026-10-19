@@ -2965,6 +2965,33 @@
           "info": "Podés usar {ahorro} y {porcentaje}."
         },
         {
+          "type": "color",
+          "id": "accent",
+          "label": "Color de acento",
+          "info": "Borde y punto de la opción elegida, ahorro y pastillas llenas. Vacío: el color del botón."
+        },
+        {
+          "type": "checkbox",
+          "id": "unit_variants",
+          "label": "Elegir la variante de cada unidad",
+          "default": false,
+          "info": "En la opción elegida aparece una lista por unidad (#1, #2…) y cada unidad se agrega al carrito con su variante."
+        },
+        {
+          "type": "checkbox",
+          "id": "unit_variants_single",
+          "label": "También con una unidad",
+          "default": false,
+          "visible_if": "{{ block.settings.unit_variants }}"
+        },
+        {
+          "type": "text",
+          "id": "pickers_label",
+          "label": "Título de las listas por unidad",
+          "default": "Elegí las variantes",
+          "visible_if": "{{ block.settings.unit_variants }}"
+        },
+        {
           "type": "header",
           "content": "Opción 1"
         },
@@ -3000,7 +3027,8 @@
           "id": "offer_1_label",
           "label": "Nombre",
           "default": "1 unidad",
-          "visible_if": "{{ block.settings.offer_1_on }}"
+          "visible_if": "{{ block.settings.offer_1_on }}",
+          "info": "Comodines: {precio}, {precio_anterior}, {ahorro}, {porcentaje}, {precio_unidad}, {cantidad}."
         },
         {
           "type": "text",
@@ -3019,6 +3047,69 @@
           "id": "offer_1_benefits",
           "label": "Beneficios",
           "info": "Uno por renglón.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "number",
+          "id": "offer_1_fixed",
+          "label": "Descuento fijo",
+          "default": 0,
+          "info": "En la moneda de la tienda, además del porcentaje.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_1_price_text",
+          "label": "Precio (opcional)",
+          "info": "Vacío: el calculado. Comodines: {precio}, {precio_anterior}, {ahorro}, {porcentaje}, {precio_unidad}, {cantidad}.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_1_compare_text",
+          "label": "Precio anterior (opcional)",
+          "info": "Vacío: el calculado.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_1_benefit",
+          "label": "Pastilla de beneficio",
+          "info": "Al lado del nombre. Acepta comodines.",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_1_benefit_style",
+          "label": "Estilo de la pastilla",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Contorno"
+            },
+            {
+              "value": "solid",
+              "label": "Llena"
+            }
+          ],
+          "default": "outline",
+          "visible_if": "{{ block.settings.offer_1_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_1_badge_style",
+          "label": "Estilo de la insignia",
+          "options": [
+            {
+              "value": "top",
+              "label": "Arriba, sobre el borde"
+            },
+            {
+              "value": "corner",
+              "label": "Inclinada en la esquina"
+            }
+          ],
+          "default": "top",
           "visible_if": "{{ block.settings.offer_1_on }}"
         },
         {
@@ -3079,6 +3170,69 @@
           "visible_if": "{{ block.settings.offer_2_on }}"
         },
         {
+          "type": "number",
+          "id": "offer_2_fixed",
+          "label": "Descuento fijo",
+          "default": 0,
+          "info": "En la moneda de la tienda, además del porcentaje.",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_2_price_text",
+          "label": "Precio (opcional)",
+          "info": "Vacío: el calculado. Comodines: {precio}, {precio_anterior}, {ahorro}, {porcentaje}, {precio_unidad}, {cantidad}.",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_2_compare_text",
+          "label": "Precio anterior (opcional)",
+          "info": "Vacío: el calculado.",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_2_benefit",
+          "label": "Pastilla de beneficio",
+          "info": "Al lado del nombre. Acepta comodines.",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_2_benefit_style",
+          "label": "Estilo de la pastilla",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Contorno"
+            },
+            {
+              "value": "solid",
+              "label": "Llena"
+            }
+          ],
+          "default": "outline",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_2_badge_style",
+          "label": "Estilo de la insignia",
+          "options": [
+            {
+              "value": "top",
+              "label": "Arriba, sobre el borde"
+            },
+            {
+              "value": "corner",
+              "label": "Inclinada en la esquina"
+            }
+          ],
+          "default": "top",
+          "visible_if": "{{ block.settings.offer_2_on }}"
+        },
+        {
           "type": "header",
           "content": "Opción 3"
         },
@@ -3135,6 +3289,69 @@
           "visible_if": "{{ block.settings.offer_3_on }}"
         },
         {
+          "type": "number",
+          "id": "offer_3_fixed",
+          "label": "Descuento fijo",
+          "default": 0,
+          "info": "En la moneda de la tienda, además del porcentaje.",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_3_price_text",
+          "label": "Precio (opcional)",
+          "info": "Vacío: el calculado. Comodines: {precio}, {precio_anterior}, {ahorro}, {porcentaje}, {precio_unidad}, {cantidad}.",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_3_compare_text",
+          "label": "Precio anterior (opcional)",
+          "info": "Vacío: el calculado.",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_3_benefit",
+          "label": "Pastilla de beneficio",
+          "info": "Al lado del nombre. Acepta comodines.",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_3_benefit_style",
+          "label": "Estilo de la pastilla",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Contorno"
+            },
+            {
+              "value": "solid",
+              "label": "Llena"
+            }
+          ],
+          "default": "outline",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_3_badge_style",
+          "label": "Estilo de la insignia",
+          "options": [
+            {
+              "value": "top",
+              "label": "Arriba, sobre el borde"
+            },
+            {
+              "value": "corner",
+              "label": "Inclinada en la esquina"
+            }
+          ],
+          "default": "top",
+          "visible_if": "{{ block.settings.offer_3_on }}"
+        },
+        {
           "type": "header",
           "content": "Opción 4"
         },
@@ -3188,6 +3405,69 @@
           "type": "textarea",
           "id": "offer_4_benefits",
           "label": "Beneficios",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "number",
+          "id": "offer_4_fixed",
+          "label": "Descuento fijo",
+          "default": 0,
+          "info": "En la moneda de la tienda, además del porcentaje.",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_4_price_text",
+          "label": "Precio (opcional)",
+          "info": "Vacío: el calculado. Comodines: {precio}, {precio_anterior}, {ahorro}, {porcentaje}, {precio_unidad}, {cantidad}.",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_4_compare_text",
+          "label": "Precio anterior (opcional)",
+          "info": "Vacío: el calculado.",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "text",
+          "id": "offer_4_benefit",
+          "label": "Pastilla de beneficio",
+          "info": "Al lado del nombre. Acepta comodines.",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_4_benefit_style",
+          "label": "Estilo de la pastilla",
+          "options": [
+            {
+              "value": "outline",
+              "label": "Contorno"
+            },
+            {
+              "value": "solid",
+              "label": "Llena"
+            }
+          ],
+          "default": "outline",
+          "visible_if": "{{ block.settings.offer_4_on }}"
+        },
+        {
+          "type": "select",
+          "id": "offer_4_badge_style",
+          "label": "Estilo de la insignia",
+          "options": [
+            {
+              "value": "top",
+              "label": "Arriba, sobre el borde"
+            },
+            {
+              "value": "corner",
+              "label": "Inclinada en la esquina"
+            }
+          ],
+          "default": "top",
           "visible_if": "{{ block.settings.offer_4_on }}"
         },
         {
