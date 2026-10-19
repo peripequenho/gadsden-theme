@@ -78,8 +78,8 @@
   if gs.m_edge
     assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--m-edge'
   endif
-  if section.settings.enable_sticky_info
-    assign gad_gallery_class = gad_gallery_class | append: ' product__column-sticky'
+  if section.settings.d_viewer_height == 'tallest'
+    assign gad_gallery_class = gad_gallery_class | append: ' gad-gallery--d-tallest'
   endif
 -%}
 <media-gallery
@@ -162,7 +162,10 @@
           if product.selected_or_first_available_variant.featured_media == nil and forloop.index == 1
             assign gad_active = true
           endif
-          if gad_variant_first == false and media.id == gad_variant_media_id
+          if gad_variant_first == false and media.id == gad_variant_media_id and section.settings.first_media_on_load != true
+            assign gad_active = true
+          endif
+          if gad_variant_first == false and section.settings.first_media_on_load and forloop.index == 1
             assign gad_active = true
           endif
         -%}

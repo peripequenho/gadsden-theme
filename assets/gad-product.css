@@ -409,7 +409,8 @@ html.gad-reduce gad-sticky-bar {
   }
 }
 
-.gad-sticky-spacer {
+/* Dawn oculta los div vacíos (div:empty); el espaciador lo es a propósito y tiene que verse. */
+body > div.gad-sticky-spacer {
   display: block;
 }
 
@@ -1787,4 +1788,61 @@ html.gad-modal-open {
   .gad-gallery:not(.gad-gallery--m-pag-dots_over) .gad-gallery__dot.is-active {
     background: rgb(var(--gad-dot-color-m, var(--color-foreground)));
   }
+}
+
+/* ---------- Galería mobile de borde a borde: sin corrimiento de la primera imagen ni aire extra ---------- */
+@media screen and (max-width: 749px) {
+  .gad-gallery--m-edge .product__media-list {
+    align-items: flex-start;
+    margin-bottom: 0;
+  }
+
+  .gad-gallery--m-edge .product__media-list > .product__media-item {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .gad-gallery--m-edge .product__media-list > .product__media-item:first-of-type {
+    margin-left: 0;
+  }
+}
+
+/* ---------- Alto de la imagen grande en desktop: el de la más alta (las imágenes comparten la celda) ---------- */
+@media screen and (min-width: 750px) {
+  .gad-gallery--d-tallest .product__media-list {
+    display: grid;
+  }
+
+  .gad-gallery--d-tallest .product__media-list > .product__media-item {
+    display: block;
+    grid-area: 1 / 1;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .gad-gallery--d-tallest .product__media-list > .product__media-item:not(.is-active) {
+    visibility: hidden;
+  }
+}
+
+/* ---------- Reseñas: puntos entre las flechas, sin separación ---------- */
+.gad-p-reviews--nav-compact .gad-carousel__arrow {
+  margin: 0.8rem 0 0;
+}
+
+.gad-p-reviews--nav-compact .gad-carousel__dots {
+  margin-top: 0.8rem;
+  align-self: center;
+}
+
+/* ---------- Video con redondeo ---------- */
+.gad-p-video--round :is(.gad-video, .gad-cols__video, video, iframe) {
+  border-radius: var(--gad-video-radius);
+  overflow: hidden;
+}
+
+/* ---------- Clásico: título del selector en píldoras en semi negrita y pegado ---------- */
+:where(html[data-gad-style='clasico']) .product-form__input--pill .form__label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
 }

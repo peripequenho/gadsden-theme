@@ -15,7 +15,8 @@
     data-zoom-on-hover
   {% endif %}
 >
-  {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+  {{ 'gad-product.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
   {{ 'section-featured-product.css' | asset_url | stylesheet_tag }}
   {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
   {{ 'component-price.css' | asset_url | stylesheet_tag }}
@@ -118,7 +119,12 @@
                     {%- endunless -%}
                   </h2>
                 {%- when 'price' -%}
-                  <div id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
+                  <div
+                    id="price-{{ section.id }}"
+                    role="status"
+                    class="gad-price gad-price--{{ block.settings.order | default: 'price_first' }} gad-price--c-{{ block.settings.price_color | default: 'foreground' }} gad-price--cc-{{ block.settings.compare_color | default: 'foreground' }} gad-price--badge-{{ block.settings.badge | default: 'sale' }}"
+                    {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
+                  >
                     {%- render 'price',
                       product: product,
                       placeholder: placeholder,
@@ -126,13 +132,14 @@
                       show_badges: true,
                       price_class: 'price--large'
                     -%}
+                    {%- unless placeholder -%}{%- render 'gad-price-badge', block: block, product: product -%}{%- endunless -%}
                   </div>
                   {%- if product.quantity_price_breaks_configured? -%}
                     <div class="volume-pricing-note" id="Volume-Note-{{ section.id }}">
                       <span>{{ 'products.product.volume_pricing.note' | t }}</span>
                     </div>
                   {%- endif -%}
-                  {%- if cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
+                  {%- if block.settings.show_tax_note != false and cart.taxes_included or cart.duties_included or shop.shipping_policy.body != blank -%}
                     <div class="product__tax caption rte">
                       {%- if cart.duties_included and cart.taxes_included -%}
                         {{ 'products.product.duties_and_taxes_included' | t }}
@@ -594,7 +601,209 @@
     {
       "type": "price",
       "name": "t:sections.featured-product.blocks.price.name",
-      "limit": 1
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "order",
+          "label": "Orden",
+          "options": [
+            {
+              "value": "price_first",
+              "label": "Precio primero"
+            },
+            {
+              "value": "compare_first",
+              "label": "Precio anterior primero"
+            }
+          ],
+          "default": "price_first"
+        },
+        {
+          "type": "select",
+          "id": "price_color",
+          "label": "Color del precio",
+          "options": [
+            {
+              "value": "foreground",
+              "label": "Texto"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            },
+            {
+              "value": "outline",
+              "label": "Contorno y enlaces"
+            }
+          ],
+          "default": "foreground"
+        },
+        {
+          "type": "select",
+          "id": "compare_color",
+          "label": "Color del precio anterior",
+          "options": [
+            {
+              "value": "foreground",
+              "label": "Texto"
+            },
+            {
+              "value": "accent",
+              "label": "Acento"
+            },
+            {
+              "value": "button",
+              "label": "Botón"
+            },
+            {
+              "value": "outline",
+              "label": "Contorno y enlaces"
+            }
+          ],
+          "default": "foreground"
+        },
+        {
+          "type": "header",
+          "content": "Etiqueta"
+        },
+        {
+          "type": "select",
+          "id": "badge",
+          "label": "Etiqueta junto al precio",
+          "options": [
+            {
+              "value": "none",
+              "label": "Ninguna"
+            },
+            {
+              "value": "sale",
+              "label": "La de oferta (texto global)"
+            },
+            {
+              "value": "custom",
+              "label": "Propia"
+            }
+          ],
+          "default": "sale",
+          "info": "Con la variante agotada aparece la etiqueta de agotado."
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Texto de la etiqueta propia",
+          "default": "{icono1} Ahorrás {porcentaje}",
+          "info": "Podés usar {icono1}, {icono2}, {porcentaje} y {monto}.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "range",
+          "id": "badge_icon_scale",
+          "min": 100,
+          "max": 200,
+          "step": 5,
+          "unit": "%",
+          "label": "Escala de los íconos",
+          "default": 140,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "text",
+          "id": "badge_icon_1",
+          "label": "Ícono 1",
+          "default": "sell",
+          "info": "Nombre en inglés de Material Symbols. Acepta metacampos.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "checkbox",
+          "id": "badge_icon_1_filled",
+          "label": "Relleno",
+          "default": true,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "badge_icon_1_image",
+          "label": "Ícono propio (imagen)",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "text",
+          "id": "badge_icon_2",
+          "label": "Ícono 2",
+          "info": "Nombre en inglés de Material Symbols. Acepta metacampos.",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "checkbox",
+          "id": "badge_icon_2_filled",
+          "label": "Relleno",
+          "default": true,
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "badge_icon_2_image",
+          "label": "Ícono propio (imagen)",
+          "visible_if": "{{ block.settings.badge == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_tax_note",
+          "label": "Mostrar el aviso de impuestos y envío",
+          "default": true,
+          "info": "Por ejemplo \"Los gastos de envío se calculan en la pantalla de pago\". Sale si la tienda tiene política de envío o precios con impuestos."
+        }
+      ]
     },
     {
       "type": "sku",
@@ -690,6 +899,179 @@
           "default": true,
           "label": "t:sections.main-product.blocks.buy_buttons.settings.show_gift_card_recipient.label",
           "info": "t:sections.main-product.blocks.buy_buttons.settings.show_gift_card_recipient.info"
+        },
+        {
+          "type": "header",
+          "content": "Botón principal"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "placeholder": "Agregar al carrito",
+          "info": "Vacío: \"Agregar al carrito\" en el idioma de la tienda."
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Mayúsculas",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "price_in_button",
+          "label": "Mostrar el precio dentro del botón",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "skip_cart",
+          "label": "Ir directo al pago (saltear el carrito)",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "custom_color",
+          "label": "Color propio",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Fondo del botón",
+          "default": "#121212",
+          "visible_if": "{{ block.settings.custom_color }}"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Texto del botón",
+          "default": "#FFFFFF",
+          "visible_if": "{{ block.settings.custom_color }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_before",
+          "label": "Ícono antes del texto"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_after",
+          "label": "Ícono después del texto"
+        },
+        {
+          "type": "range",
+          "id": "icon_scale",
+          "min": 80,
+          "max": 180,
+          "step": 5,
+          "unit": "%",
+          "label": "Escala de los íconos",
+          "default": 120
+        },
+        {
+          "type": "range",
+          "id": "icon_gap",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Separación de los íconos",
+          "default": 10
+        },
+        {
+          "type": "header",
+          "content": "Segundo botón: comprar ahora"
+        },
+        {
+          "type": "checkbox",
+          "id": "second_button",
+          "label": "Mostrar un segundo botón que va directo al pago",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "second_label",
+          "label": "Texto",
+          "placeholder": "Comprar ahora",
+          "visible_if": "{{ block.settings.second_button }}"
+        },
+        {
+          "type": "checkbox",
+          "id": "second_custom_color",
+          "label": "Color propio",
+          "default": false,
+          "visible_if": "{{ block.settings.second_button }}"
+        },
+        {
+          "type": "color",
+          "id": "second_color",
+          "label": "Color del botón",
+          "default": "#121212",
+          "visible_if": "{{ block.settings.second_button and block.settings.second_custom_color }}"
+        },
+        {
+          "type": "color",
+          "id": "second_text_color",
+          "label": "Texto del botón",
+          "default": "#FFFFFF",
+          "visible_if": "{{ block.settings.second_button and block.settings.second_custom_color }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "second_icon_before",
+          "label": "Ícono antes del texto",
+          "visible_if": "{{ block.settings.second_button }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "second_icon_after",
+          "label": "Ícono después del texto",
+          "visible_if": "{{ block.settings.second_button }}"
+        },
+        {
+          "type": "select",
+          "id": "fs_scale",
+          "label": "Tamaño de la letra",
+          "options": [
+            {
+              "value": "70",
+              "label": "70 %"
+            },
+            {
+              "value": "80",
+              "label": "80 %"
+            },
+            {
+              "value": "90",
+              "label": "90 %"
+            },
+            {
+              "value": "100",
+              "label": "Normal"
+            },
+            {
+              "value": "110",
+              "label": "110 %"
+            },
+            {
+              "value": "125",
+              "label": "125 %"
+            },
+            {
+              "value": "150",
+              "label": "150 %"
+            },
+            {
+              "value": "175",
+              "label": "175 %"
+            },
+            {
+              "value": "200",
+              "label": "200 %"
+            }
+          ],
+          "default": "100"
         }
       ]
     },

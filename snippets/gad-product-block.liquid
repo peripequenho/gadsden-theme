@@ -51,7 +51,7 @@
         endif
         assign rv_key = section.id | append: '-' | append: block.id
       -%}
-      <div class="gad-pblock gad-p-reviews" style="{{ margins }}" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
+      <div class="gad-pblock gad-p-reviews{% if b.nav_compact %} gad-p-reviews--nav-compact{% endif %}" style="{{ margins }}" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
         {%- render 'gad-carousel',
           s: b,
           key: rv_key,
@@ -263,7 +263,7 @@
     {%- endif -%}
 
   {%- when 'video', 'payment' -%}
-    <div class="gad-pblock gad-p-align--{{ b.align | default: 'left' }}" style="{{ margins }}">
+    <div class="gad-pblock gad-p-align--{{ b.align | default: 'left' }}{% if b.radius > 0 %} gad-p-video--round{% endif %}" style="{{ margins }}{% if b.radius > 0 %} --gad-video-radius: {{ b.radius }}px;{% endif %}">
       {%- render 'gad-column-block', block: block, section: section -%}
     </div>
 
@@ -338,9 +338,20 @@
         <div class="gad-p-steps__item">
           <span class="gad-p-steps__icon">{%- render 'gad-icon', name: b[k_icon], filled: true -%}</span>
           <span class="gad-p-steps__label">{{ b[k_label] | escape }}</span>
-          <span class="gad-p-steps__date" data-gad-days="{{ days }}"></span>
+          {%- if b.show_dates != false -%}<span class="gad-p-steps__date" data-gad-days="{{ days }}"></span>{%- endif -%}
         </div>
       {%- endfor -%}
+    </div>
+
+  {%- when 'custom_snippet' -%}
+    <div class="gad-pblock gad-p-slot" style="{{ margins }}" {{ block.shopify_attributes }}>
+      {%- case b.slot -%}
+        {%- when '2' -%}{%- render 'gad-slot-2', block: block, product: product, section: section, product_form_id: product_form_id -%}
+        {%- when '3' -%}{%- render 'gad-slot-3', block: block, product: product, section: section, product_form_id: product_form_id -%}
+        {%- when '4' -%}{%- render 'gad-slot-4', block: block, product: product, section: section, product_form_id: product_form_id -%}
+        {%- when '5' -%}{%- render 'gad-slot-5', block: block, product: product, section: section, product_form_id: product_form_id -%}
+        {%- else -%}{%- render 'gad-slot-1', block: block, product: product, section: section, product_form_id: product_form_id -%}
+      {%- endcase -%}
     </div>
 
   {%- when 'jump' -%}

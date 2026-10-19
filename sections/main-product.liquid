@@ -1304,6 +1304,25 @@
           "default": false
         },
         {
+          "type": "checkbox",
+          "id": "d_auto_height",
+          "label": "Alto adaptable en desktop",
+          "default": false,
+          "info": "La caja toma el alto de la reseña visible."
+        },
+        {
+          "type": "checkbox",
+          "id": "m_auto_height",
+          "label": "Alto adaptable en mobile",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "nav_compact",
+          "label": "Puntos entre las flechas, sin separación",
+          "default": false
+        },
+        {
           "type": "header",
           "content": "Márgenes"
         },
@@ -2776,6 +2795,35 @@
           "visible_if": "{{ block.settings.ti_bg }}"
         },
         {
+          "type": "checkbox",
+          "id": "ti_pad_axes",
+          "label": "Relleno distinto arriba y a los costados",
+          "default": false,
+          "visible_if": "{{ block.settings.ti_bg }}"
+        },
+        {
+          "type": "range",
+          "id": "ti_padding_y",
+          "label": "Relleno arriba y abajo",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 8,
+          "visible_if": "{{ block.settings.ti_bg and block.settings.ti_pad_axes }}"
+        },
+        {
+          "type": "range",
+          "id": "ti_padding_x",
+          "label": "Relleno a los costados",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 16,
+          "visible_if": "{{ block.settings.ti_bg and block.settings.ti_pad_axes }}"
+        },
+        {
           "type": "range",
           "id": "ti_border",
           "min": 0,
@@ -3454,6 +3502,16 @@
           "info": "Para lectores de pantalla."
         },
         {
+          "type": "range",
+          "id": "radius",
+          "label": "Redondeo",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
           "type": "header",
           "content": "Márgenes"
         },
@@ -4075,6 +4133,12 @@
           "type": "checkbox",
           "id": "skip_weekends",
           "label": "Contar sólo días hábiles",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_dates",
+          "label": "Mostrar las fechas estimadas",
           "default": true
         },
         {
@@ -6063,6 +6127,61 @@
       ]
     },
     {
+      "type": "custom_snippet",
+      "name": "Fragmento propio",
+      "settings": [
+        {
+          "type": "select",
+          "id": "slot",
+          "label": "Fragmento",
+          "options": [
+            {
+              "value": "1",
+              "label": "Fragmento 1"
+            },
+            {
+              "value": "2",
+              "label": "Fragmento 2"
+            },
+            {
+              "value": "3",
+              "label": "Fragmento 3"
+            },
+            {
+              "value": "4",
+              "label": "Fragmento 4"
+            },
+            {
+              "value": "5",
+              "label": "Fragmento 5"
+            }
+          ],
+          "default": "1",
+          "info": "Muestra el archivo snippets/gad-slot-N.liquid. Recibe block, product, section y product_form_id."
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "Margen arriba",
+          "min": 0,
+          "max": 60,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "Margen abajo",
+          "min": 0,
+          "max": 60,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
       "type": "disclosures",
       "name": "t:sections.disclosures.name",
       "limit": 1,
@@ -7701,6 +7820,23 @@
       "info": "En desktop la galería queda quieta mientras se baja por la información del producto, hasta que termina la sección."
     },
     {
+      "type": "select",
+      "id": "d_viewer_height",
+      "label": "Alto de la imagen grande en desktop",
+      "options": [
+        {
+          "value": "active",
+          "label": "El de la imagen elegida"
+        },
+        {
+          "value": "tallest",
+          "label": "El de la imagen más alta (no salta)"
+        }
+      ],
+      "default": "active",
+      "info": "Con la más alta, las miniaturas no se mueven al cambiar entre imágenes de distinta proporción."
+    },
+    {
       "type": "color_scheme",
       "id": "color_scheme",
       "label": "t:sections.all.colors.label",
@@ -8582,6 +8718,14 @@
       "id": "keep_media_order",
       "label": "No mover la imagen de la variante elegida al principio",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "first_media_on_load",
+      "label": "Al abrir la ficha, mostrar la primera imagen",
+      "default": false,
+      "visible_if": "{{ section.settings.variant_media_first == false }}",
+      "info": "Si no, se ve la imagen de la variante elegida en su lugar de la lista."
     },
     {
       "type": "text",

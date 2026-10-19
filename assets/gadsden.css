@@ -1010,7 +1010,7 @@ gad-video:not(.is-muted) .gad-video__icon-sound {
 }
 
 .gad-ti--bg {
-  padding: var(--ti-pad, 12px);
+  padding: var(--ti-pad-y, var(--ti-pad, 12px)) var(--ti-pad-x, var(--ti-pad, 12px));
   border: var(--ti-border, 0);
   border-radius: var(--ti-radius, 0);
   background: var(--ti-bg, transparent);

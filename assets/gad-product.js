@@ -526,3 +526,25 @@ class GadStickyBar extends HTMLElement {
 }
 
 if (!customElements.get('gad-sticky-bar')) customElements.define('gad-sticky-bar', GadStickyBar);
+
+/* ---------- Miniaturas: si entran todas, las flechas quedan apagadas ---------- */
+(() => {
+  const sync = (slider) => {
+    const list = slider.querySelector('.thumbnail-list');
+    if (!list) return;
+    const fits = list.scrollWidth - list.clientWidth <= 2 && list.scrollHeight - list.clientHeight <= 2;
+    slider.querySelectorAll('.slider-button').forEach((b) => {
+      if (fits) b.setAttribute('disabled', 'disabled');
+    });
+  };
+  const run = () =>
+    document.querySelectorAll('media-gallery .thumbnail-slider').forEach((slider) => {
+      sync(slider);
+      if (!slider._gadFit && 'ResizeObserver' in window) {
+        slider._gadFit = new ResizeObserver(() => sync(slider));
+        slider._gadFit.observe(slider);
+      }
+    });
+  if (window.customElements) customElements.whenDefined('slider-component').then(() => requestAnimationFrame(run));
+  document.addEventListener('shopify:section:load', run);
+})();
