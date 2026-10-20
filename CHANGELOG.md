@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.2.5
+
+### Ficha de producto
+- Precio anterior arriba: la etiqueta va a la altura del precio actual, no entre los dos precios.
+
 ## 1.2.4
 
 ### Ficha de producto
