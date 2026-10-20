@@ -2946,11 +2946,13 @@ html.gad-pt-center .title-wrapper-with-link:has(> .title--primary) {
   font-size: calc(var(--font-heading-scale) * 3.25rem);
 }
 
-:where(html[data-gad-style='clasico']) :is(h1, .h1) {
+:where(html[data-gad-style='clasico']) h1,
+:where(html[data-gad-style='clasico']) .h1 {
   font-size: calc(var(--font-heading-scale) * 2.25rem);
 }
 
-:where(html[data-gad-style='clasico']) :is(h4, .h4) {
+:where(html[data-gad-style='clasico']) h4,
+:where(html[data-gad-style='clasico']) .h4 {
   font-size: calc(var(--font-heading-scale) * 1.45rem);
 }
 
@@ -2963,7 +2965,8 @@ html.gad-pt-center .title-wrapper-with-link:has(> .title--primary) {
     font-size: calc(var(--font-heading-scale) * 4.25rem);
   }
 
-  :where(html[data-gad-style='clasico']) :is(h1, .h1) {
+  :where(html[data-gad-style='clasico']) h1,
+:where(html[data-gad-style='clasico']) .h1 {
     font-size: calc(var(--font-heading-scale) * 3rem);
   }
 }

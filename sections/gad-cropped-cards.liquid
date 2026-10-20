@@ -1,497 +1,117 @@
 {%- comment -%}
-  Tarjetas con imagen recortada (L17): grilla de tarjetas con título y frase arriba a la izquierda y
-  una imagen grande anclada abajo a la derecha, recortada por el borde de la tarjeta.
+  CarboTiras · Beneficios (Gero, 5-oct): 4 cards en grilla 2×2, sin íconos. Cada card tiene el título y una frase
+  arriba a la izquierda, y una imagen grande anclada abajo a la derecha, recortada por el borde de la card
+  (mismo recurso que las imágenes de "Cómo se usan"). Toda la sección entra en el 75% del alto de pantalla.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
-{%- render 'gad-colors', s: s, key: section.id -%}
-<div
-  class="gad-cc gad-pad {% render 'gad-scheme', s: s, key: section.id %}{% if s.fit_screen %} gad-cc--fit{% endif %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --cc-cols: {{ s.columns_d }}; --cc-h: {{ s.card_height }}px; --cc-img: {{ s.image_size }}%;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="page-width">
-    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
-    <div class="gad-cc__grid">
-      {%- for block in section.blocks -%}
-        {%- assign b = block.settings -%}
-        <div class="gad-cc__card color-{{ s.card_scheme }}" {{ block.shopify_attributes }}>
-          <div class="gad-cc__copy">
-            <h3 class="gad-cc__title h4">{{ b.title }}</h3>
-            {%- if b.text != blank -%}<p class="gad-cc__text">{{ b.text }}</p>{%- endif -%}
-          </div>
-          {%- if b.image != blank -%}
-            {{ b.image | image_url: width: 700 | image_tag: loading: 'lazy', alt: '', class: 'gad-cc__img', sizes: '(min-width: 990px) 25vw, 45vw', widths: '300, 500, 700' }}
-          {%- endif -%}
-        </div>
+
+<style>
+  #ct-ben-{{ section.id }} {
+    --ct-img: {{ s.image_size }}px;
+    background: {{ s.background }}; color: {{ s.text_color }};
+    padding: {{ s.padding_top }}px 16px {{ s.padding_bottom }}px;
+  }
+  #ct-ben-{{ section.id }} .ct-ben__wrap { max-width: 560px; margin: 0 auto; }
+  #ct-ben-{{ section.id }} .ct-ben__titulo { margin: 0 0 14px; text-align: center; line-height: 1.15; text-wrap: balance; }
+  #ct-ben-{{ section.id }} .ct-ben__titulo em { font-style: normal; color: #5F5E5A; }
+  #ct-ben-{{ section.id }} .ct-ben__grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  #ct-ben-{{ section.id }} .ct-ben__card {
+    position: relative; overflow: hidden; box-sizing: border-box; margin: 0;
+    height: {{ s.card_height }}px;
+    padding: 14px 14px 0; border-radius: 16px; background: #fff; border: 1px solid #ECEBE7;
+  }
+  #ct-ben-{{ section.id }} .ct-ben__card h3 { position: relative; margin: 0 0 4px; font-size: 15px; line-height: 1.2; }
+  #ct-ben-{{ section.id }} .ct-ben__card p {
+    position: relative; margin: 0; font-size: 12.5px; line-height: 1.35; color: #4a4946;
+    text-shadow: 0 0 4px #fff, 0 0 8px #fff; /* se lee aunque roce la imagen */
+  }
+  /* grande, abajo a la derecha, recortada por la card */
+  #ct-ben-{{ section.id }} .ct-ben__img {
+    position: absolute; right: calc(var(--ct-img) * -.2); bottom: calc(var(--ct-img) * -.22);
+    width: var(--ct-img); height: var(--ct-img); max-width: none; object-fit: contain; mix-blend-mode: multiply;
+    opacity: 0; translate: 16px 16px; transition: opacity .5s ease, translate .6s cubic-bezier(.22, 1, .36, 1);
+  }
+  #ct-ben-{{ section.id }}.is-visible .ct-ben__img { opacity: 1; translate: 0 0; }
+  @media (prefers-reduced-motion: reduce) {
+    #ct-ben-{{ section.id }} .ct-ben__img { translate: 0 0; transition: opacity .5s ease; }
+  }
+
+  /* escritorio: las 4 cards en una fila, más altas y con la imagen más grande */
+  @media (min-width: 990px) {
+    #ct-ben-{{ section.id }} { --ct-img: calc({{ s.image_size }}px * 1.35); padding-top: 48px; padding-bottom: 48px; }
+    #ct-ben-{{ section.id }} .ct-ben__wrap { max-width: 1180px; }
+    #ct-ben-{{ section.id }} .ct-ben__titulo { margin-bottom: 28px; }
+    #ct-ben-{{ section.id }} .ct-ben__grilla { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+    #ct-ben-{{ section.id }} .ct-ben__card { height: calc({{ s.card_height }}px * 1.6); padding: 22px 22px 0; border-radius: 20px; }
+    #ct-ben-{{ section.id }} .ct-ben__card h3 { font-size: 19px; margin-bottom: 6px; }
+    #ct-ben-{{ section.id }} .ct-ben__card p { font-size: 15px; }
+  }
+</style>
+
+<section id="ct-ben-{{ section.id }}" class="ct-ben">
+  <div class="ct-ben__wrap">
+    {%- if s.heading != blank -%}<h2 class="ct-ben__titulo {{ s.heading_size }}">{{ s.heading }}</h2>{%- endif -%}
+    <div class="ct-ben__grilla">
+      {%- for b in section.blocks -%}
+        {%- liquid
+          if b.settings.image != blank
+            assign img = b.settings.image | image_url: width: 360
+          else
+            assign img = 'ct-ben-' | append: forloop.index | append: '.jpg' | asset_url
+          endif
+        -%}
+        <article class="ct-ben__card" {{ b.shopify_attributes }}>
+          <img class="ct-ben__img" src="{{ img }}" alt="" width="{{ s.image_size }}" height="{{ s.image_size }}" loading="lazy"
+            style="transition-delay: {{ forloop.index0 | times: 80 }}ms;{% if b.settings.image_down != 0 %} margin-bottom: -{{ b.settings.image_down }}px;{% endif %}">
+          <h3>{{ b.settings.title }}</h3>
+          {%- if b.settings.text != blank -%}<p>{{ b.settings.text }}</p>{%- endif -%}
+        </article>
       {%- endfor -%}
     </div>
   </div>
-</div>
+</section>
 
-{% stylesheet %}
-  .gad-cc__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-cc__grid {
-      grid-template-columns: repeat(var(--cc-cols, 2), minmax(0, 1fr));
-      gap: 1.6rem;
-    }
-  }
-
-  .gad-cc__card {
-    position: relative;
-    height: var(--cc-h, 260px);
-    overflow: hidden;
-    border-radius: 1.4rem;
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-  }
-
-  .gad-cc--fit .gad-cc__card {
-    height: min(var(--cc-h, 260px), 34svh);
-  }
-
-  .gad-cc__copy {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    gap: 0.4rem;
-    max-width: 75%;
-    padding: 1.4rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-cc__copy {
-      padding: 2rem;
-    }
-  }
-
-  .gad-cc__title {
-    margin: 0;
-  }
-
-  .gad-cc__text {
-    margin: 0;
-    font-size: 1.3rem;
-    opacity: 0.85;
-  }
-
-  .gad-cc__img {
-    position: absolute;
-    right: -8%;
-    bottom: -8%;
-    width: var(--cc-img, 70%);
-    height: auto;
-    object-fit: contain;
-  }
-{% endstylesheet %}
+<script>
+  (() => {
+    const raiz = document.getElementById('ct-ben-{{ section.id }}');
+    if (!raiz) return;
+    if (window.Shopify?.designMode) { raiz.classList.add('is-visible'); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { raiz.classList.add('is-visible'); io.disconnect(); } }, { threshold: 0.3 });
+    io.observe(raiz);
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Tarjetas con imagen",
-  "tag": "section",
-  "class": "section gad-section",
+  "name": "Tarjetas recortadas",
+  "tag": "div",
+  "class": "section",
+  "max_blocks": 4,
   "settings": [
+    { "type": "text", "id": "heading", "label": "Titular (lo que va en <em> sale gris)", "default": "Blanqueá <em>sin cambiar tu rutina</em>" },
     {
-      "type": "text",
-      "id": "caption",
-      "label": "Volanta",
-      "info": "Texto chico arriba del título. Vacío: no se muestra."
+      "type": "select", "id": "heading_size", "label": "Tamaño del titular", "default": "h2",
+      "options": [{ "value": "h2", "label": "Chico" }, { "value": "h1", "label": "Mediano" }]
     },
-    {
-      "type": "color",
-      "id": "caption_color",
-      "label": "Color de la volanta",
-      "info": "Vacío: el color del texto."
-    },
-    {
-      "type": "inline_richtext",
-      "id": "heading",
-      "label": "Título",
-      "default": "Por qué <strong>funciona</strong>",
-      "info": "Marcá en negrita las palabras que querés resaltar."
-    },
-    {
-      "type": "select",
-      "id": "heading_size",
-      "label": "Tamaño del título",
-      "options": [
-        {
-          "value": "h2",
-          "label": "Chico"
-        },
-        {
-          "value": "h1",
-          "label": "Mediano"
-        },
-        {
-          "value": "h0",
-          "label": "Grande"
-        }
-      ],
-      "default": "h1"
-    },
-    {
-      "type": "color",
-      "id": "heading_accent",
-      "label": "Color de las palabras resaltadas",
-      "info": "Vacío: el acento de la combinación de colores."
-    },
-    {
-      "type": "select",
-      "id": "heading_align",
-      "label": "Alineación del encabezado",
-      "default": "center",
-      "options": [
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ],
-      "info": "Volanta, título y texto de arriba."
-    },
-    {
-      "type": "select",
-      "id": "heading_align_m",
-      "label": "Alineación del encabezado en mobile",
-      "default": "same",
-      "options": [
-        {
-          "value": "same",
-          "label": "Igual que en desktop"
-        },
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ]
-    },
-    {
-      "type": "richtext",
-      "id": "text",
-      "label": "Texto"
-    },
-    {
-      "type": "range",
-      "id": "columns_d",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "label": "Columnas en desktop",
-      "default": 2,
-      "info": "En mobile, 2."
-    },
-    {
-      "type": "range",
-      "id": "card_height",
-      "min": 160,
-      "max": 420,
-      "step": 20,
-      "unit": "px",
-      "label": "Alto de las tarjetas",
-      "default": 240
-    },
-    {
-      "type": "range",
-      "id": "image_size",
-      "min": 40,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "label": "Tamaño de la imagen",
-      "default": 70
-    },
-    {
-      "type": "checkbox",
-      "id": "fit_screen",
-      "label": "Que todas entren en una pantalla de celular",
-      "default": false
-    },
-    {
-      "type": "color_scheme",
-      "id": "card_scheme",
-      "label": "Combinación de las tarjetas",
-      "default": "scheme-2"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Combinación de colores",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "Colores propios"
-    },
-    {
-      "type": "checkbox",
-      "id": "custom_colors",
-      "label": "Usar colores propios",
-      "default": false,
-      "info": "Pisan a la combinación de colores elegida arriba."
-    },
-    {
-      "type": "color",
-      "id": "cc_bg",
-      "label": "Fondo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color_background",
-      "id": "cc_bg_gradient",
-      "label": "Degradé de fondo",
-      "info": "Si cargás un degradé, reemplaza al color de fondo."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image",
-      "label": "Imagen de fondo",
-      "info": "Cubre todo el fondo y le gana al degradé."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image_mobile",
-      "label": "Imagen de fondo en mobile",
-      "info": "Vacía: usa la de desktop."
-    },
-    {
-      "type": "color",
-      "id": "cc_text",
-      "label": "Texto",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_accent",
-      "label": "Acento",
-      "default": "#334FB4"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_bg",
-      "label": "Fondo del botón lleno",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_text",
-      "label": "Texto del botón lleno",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "cc_outline",
-      "label": "Botón de contorno y enlaces",
-      "default": "#121212"
-    },
-    {
-      "type": "header",
-      "content": "Espaciado"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno arriba",
-      "default": 36
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno abajo",
-      "default": 36,
-      "info": "En mobile se aplica el 75 %."
-    },
-    {
-      "type": "header",
-      "content": "Visibilidad y ancla"
-    },
-    {
-      "type": "select",
-      "id": "visibility",
-      "label": "Mostrar en",
-      "options": [
-        {
-          "value": "all",
-          "label": "Todos los dispositivos"
-        },
-        {
-          "value": "mobile",
-          "label": "Sólo mobile"
-        },
-        {
-          "value": "desktop",
-          "label": "Sólo desktop"
-        }
-      ],
-      "default": "all",
-      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
-    },
-    {
-      "type": "text",
-      "id": "anchor",
-      "label": "Nombre del ancla",
-      "placeholder": "beneficios",
-      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
-    },
-    {
-      "type": "header",
-      "content": "Tamaño de la letra"
-    },
-    {
-      "type": "select",
-      "id": "title_scale",
-      "label": "Tamaño de los títulos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100"
-    },
-    {
-      "type": "select",
-      "id": "text_scale",
-      "label": "Tamaño de los textos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100",
-      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
-    }
+    { "type": "range", "id": "card_height", "label": "Alto de cada card", "min": 110, "max": 260, "step": 10, "unit": "px", "default": 170 },
+    { "type": "range", "id": "image_size", "label": "Tamaño de la imagen (se recorta por la card)", "min": 60, "max": 200, "step": 4, "unit": "px", "default": 152 },
+    { "type": "color", "id": "background", "label": "Color de la sección", "default": "#F5F7FA" },
+    { "type": "color", "id": "text_color", "label": "Color del texto", "default": "#0B0B0B" },
+    { "type": "range", "id": "padding_top", "label": "Margen arriba", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Margen abajo", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 }
   ],
   "blocks": [
     {
-      "type": "card",
-      "name": "Tarjeta",
-      "limit": 8,
+      "type": "beneficio",
+      "name": "Beneficio",
       "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "title",
-          "label": "Título",
-          "default": "Beneficio"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "text",
-          "label": "Frase",
-          "default": "Una frase que lo explica."
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Imagen",
-          "info": "Mejor un PNG con fondo transparente."
-        }
+        { "type": "image_picker", "id": "image", "label": "Imagen", "info": "Vacío = assets/ct-ben-N.jpg" },
+        { "type": "range", "id": "image_down", "label": "Bajar la imagen", "min": 0, "max": 60, "step": 2, "unit": "px", "default": 0 },
+        { "type": "text", "id": "title", "label": "Título", "default": "Beneficio" },
+        { "type": "text", "id": "text", "label": "Una frase" }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Tarjetas con imagen",
-      "blocks": [
-        {
-          "type": "card"
-        },
-        {
-          "type": "card"
-        },
-        {
-          "type": "card"
-        },
-        {
-          "type": "card"
-        }
-      ]
-    }
-  ]
+  "presets": [{ "name": "Tarjetas recortadas" }]
 }
 {% endschema %}

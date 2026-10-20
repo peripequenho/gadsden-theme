@@ -2060,10 +2060,14 @@
           {
             "value": "ecom",
             "label": "Ecom"
+          },
+          {
+            "value": "dawn",
+            "label": "Dawn"
           }
         ],
         "default": "clasico",
-        "info": "Clásico: tipografía y botones de la línea clásica de Dawn. Ecom: títulos compactos, botones y precios en negrita, campos y cantidades redondeados. Las fuentes, colores y redondeos se eligen aparte."
+        "info": "Clásico: tipografía y botones de la línea clásica de Dawn. Ecom: títulos compactos, botones y precios en negrita, campos y cantidades redondeados. Dawn: la tipografía y los botones de Dawn sin cambios. Las fuentes, colores y redondeos se eligen aparte."
       },
       {
         "type": "select",

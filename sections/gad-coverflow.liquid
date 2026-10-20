@@ -1,683 +1,235 @@
 {%- comment -%}
-  Carrusel 3D de videos (L10): la tarjeta del centro de frente y entera; las de los costados más
-  chicas, giradas hacia el centro y esfumadas. Se arrastra con impulso, encaja y es infinito.
-  Reproduce sin sonido el video del centro y los que estén dentro del rango elegido.
-  Con "reducir movimiento" queda plano, sin giro ni impulso.
+  CarboTiras · Videos y prueba social. Coverflow al estilo del ejemplo de Motion
+  (https://motion.dev/examples/react-carousel-coverflow, código pago: copiado de la demo en vivo):
+  tarjeta del centro derecha y entera; las de los costados se achican al 70%, giran 20° hacia el centro y se corren
+  hacia él (perspective 500px), interpolado según la distancia al centro; la más cercana queda encima;
+  los costados se esfuman con una máscara. Se arrastra (con impulso y encaje) y es infinito.
+  Reproduce (muteados, en loop) el del centro y hasta «play_range» a cada lado. Cada tarjeta lleva nombre, estrellas y una frase.
+  OJO: videos por defecto = b-rolls UGC hechos con IA (assets/ct-cover-N.mp4, 8-oct) y textos DUMMY. Reemplazar.
 {%- endcomment -%}
 {%- assign s = section.settings -%}
-{%- render 'gad-colors', s: s, key: section.id -%}
-<div
-  class="gad-cf gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --cf-w: {{ s.card_width }}px; --cf-star: {{ s.star_color }};"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="page-width">
-    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
+
+<style>
+  #ct-cov-{{ section.id }} {
+    --ct-w: {{ s.card_width }}px;
+    background: {{ s.background }}; color: {{ s.text_color }};
+    padding: {{ s.padding_top }}px 0 {{ s.padding_bottom }}px; overflow: hidden;
+  }
+  #ct-cov-{{ section.id }} .ct-cov__titulo { margin: 0 16px 14px; text-align: center; line-height: 1.15; text-wrap: balance; }
+  #ct-cov-{{ section.id }} .ct-cov__escena {
+    /* aire abajo para que la sombra termine de esfumarse antes del borde (la máscara recorta lo que sale) */
+    position: relative; height: calc(var(--ct-w) * 16 / 9 + 64px); touch-action: pan-y; cursor: grab;
+    user-select: none; -webkit-user-select: none; outline: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 4%, #000 22%, #000 78%, transparent 96%);
+            mask-image: linear-gradient(to right, transparent 4%, #000 22%, #000 78%, transparent 96%);
+  }
+  #ct-cov-{{ section.id }} .ct-cov__escena.is-arrastrando { cursor: grabbing; }
+  #ct-cov-{{ section.id }} .ct-cov__item {
+    position: absolute; top: 12px; left: 50%; width: var(--ct-w); margin-left: calc(var(--ct-w) / -2);
+    aspect-ratio: 9 / 16; will-change: transform;
+  }
+  #ct-cov-{{ section.id }} .ct-cov__card {
+    position: relative; width: 100%; height: 100%; border-radius: 14px; overflow: hidden; background: #0B0B0B;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18); will-change: transform;
+  }
+  #ct-cov-{{ section.id }} .ct-cov__card video,
+  #ct-cov-{{ section.id }} .ct-cov__card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  #ct-cov-{{ section.id }} .ct-cov__info {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 12px 12px; color: #fff;
+    background: linear-gradient(to top, rgba(11, 11, 11, .85), rgba(11, 11, 11, 0));
+    transition: opacity .3s;
+  }
+  #ct-cov-{{ section.id }} .ct-cov__item:not(.is-centro) .ct-cov__info { opacity: 0; }
+  #ct-cov-{{ section.id }} .ct-cov__estrellas { display: flex; gap: 2px; margin-bottom: 4px; color: #9FE1CB; }
+  #ct-cov-{{ section.id }} .ct-cov__estrellas svg { width: 12px; height: 12px; }
+  #ct-cov-{{ section.id }} .ct-cov__frase { margin: 0 0 4px; font-size: 13px; line-height: 1.3; font-weight: 600; }
+  #ct-cov-{{ section.id }} .ct-cov__nombre { margin: 0; font-size: 11px; opacity: .75; }
+
+  /* escritorio: tarjetas más grandes (el JS mide el ancho real y reparte en base a eso) */
+  @media (min-width: 990px) {
+    #ct-cov-{{ section.id }} { --ct-w: 250px; padding-top: 48px; padding-bottom: 32px; }
+    #ct-cov-{{ section.id }} .ct-cov__titulo { margin-bottom: 20px; }
+    #ct-cov-{{ section.id }} .ct-cov__frase { font-size: 15px; }
+    #ct-cov-{{ section.id }} .ct-cov__nombre { font-size: 12px; }
+  }
+</style>
+
+{%- capture estrella -%}<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z"/></svg>{%- endcapture -%}
+
+<section id="ct-cov-{{ section.id }}" class="ct-cov">
+  {%- if s.heading != blank -%}<h2 class="ct-cov__titulo {{ s.heading_size }}">{{ s.heading }}</h2>{%- endif -%}
+  <div class="ct-cov__escena" data-escena tabindex="0" role="region" aria-roledescription="carrusel" aria-label="{{ s.heading | escape }}">
+    {%- for b in section.blocks -%}
+      {%- liquid
+        assign n = forloop.index
+        if b.settings.poster != blank
+          assign poster = b.settings.poster | image_url: width: 500
+        else
+          assign poster = 'ct-cover-' | append: n | append: '.jpg' | asset_url
+        endif
+      -%}
+      <div class="ct-cov__item" data-item {{ b.shopify_attributes }}>
+        <div class="ct-cov__card">
+          {%- if b.settings.video != blank -%}
+            {{ b.settings.video | video_tag: muted: true, loop: true, playsinline: true, preload: 'metadata', image_size: '500x' }}
+          {%- else -%}
+            <video src="{{ 'ct-cover-' | append: n | append: '.mp4' | asset_url }}" poster="{{ poster }}" muted loop playsinline preload="metadata"></video>
+          {%- endif -%}
+          {%- if b.settings.quote != blank or b.settings.name != blank -%}
+            <div class="ct-cov__info">
+              {%- if b.settings.stars > 0 -%}
+                <div class="ct-cov__estrellas" role="img" aria-label="{{ b.settings.stars }} estrellas">{%- for i in (1..b.settings.stars) -%}{{ estrella }}{%- endfor -%}</div>
+              {%- endif -%}
+              {%- if b.settings.quote != blank -%}<p class="ct-cov__frase">“{{ b.settings.quote }}”</p>{%- endif -%}
+              {%- if b.settings.name != blank -%}<p class="ct-cov__nombre">{{ b.settings.name }}</p>{%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endfor -%}
   </div>
-  {%- if section.blocks.size > 0 -%}
-    <gad-coverflow class="gad-cf__stage" data-range="{{ s.play_range }}" tabindex="0" role="region" aria-roledescription="{{ 'gadsden.carousel.roledescription' | t }}" aria-label="{{ s.heading | strip_html | escape }}">
-      {%- for block in section.blocks -%}
-        {%- assign b = block.settings -%}
-        <figure class="gad-cf__card" {{ block.shopify_attributes }}>
-          <div class="gad-cf__media">
-            {%- if b.video != blank -%}
-              {{ b.video | video_tag: autoplay: false, loop: true, muted: true, playsinline: true, controls: false, preload: 'none' }}
-            {%- elsif b.poster != blank -%}
-              {{ b.poster | image_url: width: 600 | image_tag: loading: 'lazy', alt: '' }}
-            {%- else -%}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-cf__ph' }}
-            {%- endif -%}
-          </div>
-          <figcaption class="gad-cf__cap">
-            {%- if b.stars > 0 -%}
-              <span class="gad-cf__stars" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.stars }}">{%- for i in (1..b.stars) -%}★{%- endfor -%}</span>
-            {%- endif -%}
-            {%- if b.quote != blank -%}<span class="gad-cf__quote">{{ b.quote }}</span>{%- endif -%}
-            {%- if b.name != blank -%}<b>{{ b.name | escape }}</b>{%- endif -%}
-          </figcaption>
-        </figure>
-      {%- endfor -%}
-      <button type="button" class="gad-cf__arrow gad-cf__arrow--prev" aria-label="{{ 'gadsden.carousel.previous' | t }}">{%- render 'gad-icon', name: 'chevron_left' -%}</button>
-      <button type="button" class="gad-cf__arrow gad-cf__arrow--next" aria-label="{{ 'gadsden.carousel.next' | t }}">{%- render 'gad-icon', name: 'chevron_right' -%}</button>
-    </gad-coverflow>
-  {%- endif -%}
-</div>
+</section>
 
-{% stylesheet %}
-  .gad-cf {
-    overflow: hidden;
-  }
+<script>
+  (() => {
+    const raiz = document.getElementById('ct-cov-{{ section.id }}');
+    if (!raiz) return;
+    const escena = raiz.querySelector('[data-escena]');
+    const items = [...escena.querySelectorAll('[data-item]')];
+    const N = items.length;
+    if (!N) return;
+    const videos = items.map((it) => it.querySelector('video'));
+    let ancho = items[0].offsetWidth || 1, visible = false;
+    new ResizeObserver(() => { ancho = items[0].offsetWidth || 1; dibujar(); }).observe(escena);
 
-  .gad-cf__stage {
-    position: relative;
-    display: block;
-    height: calc(var(--cf-w, 260px) * 16 / 9 + 2rem);
-    perspective: 500px;
-    touch-action: pan-y;
-    user-select: none;
-    cursor: grab;
-    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-  }
+    // interpolación por tramos según |distancia al centro| (valores de la demo de Motion)
+    const tramos = (d, xs) => { const i = Math.min(Math.floor(d), xs.length - 2), k = Math.min(1, d - i); return xs[i] + (xs[i + 1] - xs[i]) * k; };
+    let pos = 0, objetivo = null, raf = 0, centro = -1;
+    // se reproducen (muteados, en loop) el del centro y los que están a hasta RANGO lugares; el resto queda en pausa
+    const RANGO = {{ s.play_range }};
+    const reproducir = () => videos.forEach((v, i) => {
+      if (!v) return;
+      const o = Math.abs(((i - centro) % N + N + N / 2) % N - N / 2);
+      if (visible && o <= RANGO) { v.preload = 'auto'; v.play().catch(() => {}); } else v.pause();
+    });
 
-  .gad-cf__stage.is-dragging {
-    cursor: grabbing;
-  }
-
-  .gad-cf__card {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: var(--cf-w, 260px);
-    margin: 0 0 0 calc(var(--cf-w, 260px) / -2);
-    overflow: hidden;
-    border-radius: 1.4rem;
-    background: #111;
-    color: #fff;
-    will-change: transform;
-  }
-
-  .gad-cf__media {
-    aspect-ratio: 9 / 16;
-  }
-
-  .gad-cf__media video,
-  .gad-cf__media img,
-  .gad-cf__ph {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-  }
-
-  .gad-cf__ph {
-    opacity: 0.3;
-  }
-
-  .gad-cf__cap {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: grid;
-    gap: 0.4rem;
-    padding: 4rem 1.4rem 1.4rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-    font-size: 1.3rem;
-  }
-
-  .gad-cf__stars {
-    color: var(--cf-star, #f5b301);
-  }
-
-  .gad-cf__quote {
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  .gad-cf__arrow {
-    position: absolute;
-    top: 50%;
-    z-index: 100;
-    display: grid;
-    place-items: center;
-    width: 4.4rem;
-    height: 4.4rem;
-    margin-top: -2.2rem;
-    border: 0;
-    border-radius: 50%;
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-    box-shadow: 0 0.2rem 1rem rgba(0, 0, 0, 0.2);
-    font-size: 2.4rem;
-    cursor: pointer;
-  }
-
-  .gad-cf__arrow--prev {
-    left: calc(50% - var(--cf-w, 260px) / 2 - 2.2rem);
-  }
-
-  .gad-cf__arrow--next {
-    right: calc(50% - var(--cf-w, 260px) / 2 - 2.2rem);
-  }
-
-  @media screen and (max-width: 749px) {
-    .gad-cf__arrow {
-      display: none;
-    }
-  }
-{% endstylesheet %}
-
-{% javascript %}
-  class GadCoverflow extends HTMLElement {
-    connectedCallback() {
-      if (this._ready) return;
-      this._ready = true;
-      this.cards = [...this.querySelectorAll('.gad-cf__card')];
-      this.n = this.cards.length;
-      this.pos = 0;
-      this.range = parseInt(this.dataset.range, 10) || 0;
-      this.flat = !!(window.Gadsden && Gadsden.reduceMotion());
-      this.querySelector('.gad-cf__arrow--prev').addEventListener('click', () => this.snapTo(Math.round(this.pos) - 1));
-      this.querySelector('.gad-cf__arrow--next').addEventListener('click', () => this.snapTo(Math.round(this.pos) + 1));
-      this.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') this.snapTo(Math.round(this.pos) - 1);
-        if (e.key === 'ArrowRight') this.snapTo(Math.round(this.pos) + 1);
+    const dibujar = () => {
+      items.forEach((it, i) => {
+        let o = i - pos;
+        o = ((o % N) + N + N / 2) % N - N / 2;              // infinito: la distancia más corta dando la vuelta
+        const d = Math.min(Math.abs(o), 3), lado = o < 0 ? 1 : -1;  // los de la izquierda giran y se corren a la derecha
+        const corr = tramos(d, [0, 25, 83.333, 100]) * lado;
+        const esc = tramos(d, [1, 0.7, 0.7, 0.7]);
+        const rot = tramos(d, [0, 20, 20, 20]) * lado;
+        it.style.transform = `translateX(${(o * ancho).toFixed(1)}px)`;
+        it.style.zIndex = Math.max(0, Math.round(1000 - Math.abs(o) * 350));
+        it.querySelector('.ct-cov__card').style.transform =
+          `perspective(500px) translateX(${corr.toFixed(2)}%) scale(${esc.toFixed(3)}) rotateY(${rot.toFixed(2)}deg)`;
+        it.style.visibility = Math.abs(o) > 3.5 ? 'hidden' : 'visible';
       });
-      this.addEventListener('pointerdown', (e) => this.down(e));
-      this.addEventListener('shopify:block:select', (e) => {
-        const i = this.cards.indexOf(e.target);
-        if (i >= 0) this.snapTo(i);
-      });
-      this.ro = new ResizeObserver(() => this.render());
-      this.ro.observe(this);
-      this.io = new IntersectionObserver((entries) => {
-        this.visible = entries[0].isIntersecting;
-        this.syncVideos();
-      });
-      this.io.observe(this);
-      this.render();
-    }
-
-    disconnectedCallback() {
-      if (this.ro) this.ro.disconnect();
-      if (this.io) this.io.disconnect();
-      this._ready = false;
-    }
-
-    offset(i) {
-      let d = i - this.pos;
-      d = ((((d + this.n / 2) % this.n) + this.n) % this.n) - this.n / 2;
-      return d;
-    }
-
-    render() {
-      const w = this.cards[0] ? this.cards[0].offsetWidth : 260;
-      this.cards.forEach((card, i) => {
-        const d = this.offset(i);
-        const a = Math.min(Math.abs(d), 3);
-        const x = d * w * (this.flat ? 1.05 : 0.62);
-        const scale = this.flat ? 1 : 1 - Math.min(a, 1) * 0.3;
-        const rot = this.flat ? 0 : Math.max(-1, Math.min(1, d)) * -20;
-        card.style.transform = `translateX(${x}px) rotateY(${rot}deg) scale(${scale})`;
-        card.style.zIndex = String(50 - Math.round(a * 10));
-        card.style.opacity = a > 2.6 ? '0' : '1';
-      });
-      this.syncVideos();
-    }
-
-    syncVideos() {
-      const center = Math.round(this.pos);
-      this.cards.forEach((card, i) => {
-        const v = card.querySelector('video');
-        if (!v) return;
-        const near = Math.abs(this.offset(i)) <= this.range + 0.5;
-        if (this.visible && near && !this.flat) {
-          if (v.preload === 'none') v.preload = 'auto';
-          v.play().catch(() => {});
-        } else if (!v.paused) v.pause();
-        if (this.flat && this.visible && ((i % this.n) + this.n) % this.n === ((center % this.n) + this.n) % this.n) v.play().catch(() => {});
-      });
-    }
-
-    down(e) {
-      if (e.target.closest('.gad-cf__arrow')) return;
-      cancelAnimationFrame(this.anim);
-      const w = this.cards[0].offsetWidth * (this.flat ? 1.05 : 0.62);
-      const startX = e.clientX;
-      const startPos = this.pos;
-      let lastX = e.clientX;
-      let lastT = performance.now();
-      let v = 0;
-      this.classList.add('is-dragging');
-      this.setPointerCapture(e.pointerId);
-      const move = (ev) => {
-        const now = performance.now();
-        v = (ev.clientX - lastX) / Math.max(1, now - lastT);
-        lastX = ev.clientX;
-        lastT = now;
-        this.pos = startPos - (ev.clientX - startX) / w;
-        this.render();
-      };
-      const up = () => {
-        this.removeEventListener('pointermove', move);
-        this.removeEventListener('pointerup', up);
-        this.removeEventListener('pointercancel', up);
-        this.classList.remove('is-dragging');
-        const fling = this.flat ? 0 : Math.max(-2, Math.min(2, (-v * 120) / w));
-        this.snapTo(Math.round(this.pos + fling));
-      };
-      this.addEventListener('pointermove', move);
-      this.addEventListener('pointerup', up);
-      this.addEventListener('pointercancel', up);
-    }
-
-    snapTo(target) {
-      cancelAnimationFrame(this.anim);
-      if (this.flat) {
-        this.pos = target;
-        return this.render();
+      const c = ((Math.round(pos) % N) + N) % N;
+      if (c !== centro) {
+        centro = c;
+        items.forEach((it, i) => it.classList.toggle('is-centro', i === c));
+        reproducir();
       }
-      const from = this.pos;
-      const start = performance.now();
-      const dur = 420;
-      const step = (now) => {
-        const t = Math.min(1, (now - start) / dur);
-        const e = 1 - Math.pow(1 - t, 3);
-        this.pos = from + (target - from) * e;
-        this.render();
-        if (t < 1) this.anim = requestAnimationFrame(step);
-      };
-      this.anim = requestAnimationFrame(step);
-    }
-  }
+    };
 
-  if (!customElements.get('gad-coverflow')) customElements.define('gad-coverflow', GadCoverflow);
-{% endjavascript %}
+    // un loop que lleva pos hacia el objetivo (encaje suave)
+    const loop = () => {
+      if (raf) return;
+      let prev = performance.now();
+      const paso = (t) => {
+        const dt = Math.min(0.033, (t - prev) / 1000); prev = t;
+        if (objetivo !== null) {
+          pos += (objetivo - pos) * (1 - Math.pow(0.0006, dt));
+          if (Math.abs(objetivo - pos) < 0.001) { pos = objetivo; objetivo = null; }
+        }
+        dibujar();
+        if (objetivo === null) { raf = 0; return; }
+        raf = requestAnimationFrame(paso);
+      };
+      raf = requestAnimationFrame(paso);
+    };
+    const ir = (p) => { objetivo = p; loop(); };
+
+    // arrastre con impulso; un toque sin arrastre sobre una tarjeta del costado la trae al centro
+    let arr = null;
+    escena.addEventListener('pointerdown', (e) => {
+      try { escena.setPointerCapture(e.pointerId); } catch (_) {}
+      objetivo = null;
+      arr = { x0: e.clientX, x: e.clientX, t: performance.now(), v: 0, p0: pos, movio: false };
+      escena.classList.add('is-arrastrando');
+    });
+    escena.addEventListener('pointermove', (e) => {
+      if (!arr) return;
+      const ahora = performance.now(), dx = e.clientX - arr.x;
+      arr.v = (-dx / ancho) / Math.max(1, ahora - arr.t) * 1000;   // tarjetas por segundo
+      arr.x = e.clientX; arr.t = ahora;
+      if (Math.abs(e.clientX - arr.x0) > 6) arr.movio = true;
+      pos = arr.p0 - (e.clientX - arr.x0) / ancho;
+      dibujar();
+    });
+    const soltar = (e) => {
+      if (!arr) return;
+      const a = arr; arr = null; escena.classList.remove('is-arrastrando');
+      if (!a.movio) {
+        const it = e.target.closest('[data-item]');
+        if (it) { const i = items.indexOf(it); let o = i - pos; o = ((o % N) + N + N / 2) % N - N / 2; return ir(Math.round(pos + o)); }
+      }
+      const v = performance.now() - a.t < 80 ? a.v : 0;
+      ir(Math.round(pos + Math.max(-2, Math.min(2, v * 0.25))));   // impulso: a lo sumo 2 tarjetas por tirón
+    };
+    escena.addEventListener('pointerup', soltar);
+    escena.addEventListener('pointercancel', () => { arr = null; escena.classList.remove('is-arrastrando'); ir(Math.round(pos)); });
+    escena.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); ir(Math.round(objetivo ?? pos) - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); ir(Math.round(objetivo ?? pos) + 1); }
+    });
+
+    // los videos sólo corren con la sección a la vista
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      reproducir();
+    }, { threshold: 0.3 }).observe(escena);
+
+    dibujar();
+  })();
+</script>
 
 {% schema %}
 {
-  "name": "Carrusel 3D de videos",
-  "tag": "section",
-  "class": "section gad-section",
+  "name": "Videos en coverflow",
+  "tag": "div",
+  "class": "section",
+  "max_blocks": 24,
   "settings": [
+    { "type": "range", "id": "play_range", "label": "Videos que se reproducen a cada lado del centro", "min": 0, "max": 3, "step": 1, "default": 3, "info": "0 = sólo el del centro · 1 = tres videos · 3 = todos los que se ven" },
+    { "type": "paragraph", "content": "OJO: los videos por defecto son recortes de los ads propios y los textos son DUMMY. Reemplazar por videos y testimonios reales." },
+    { "type": "text", "id": "heading", "label": "Titular", "default": "Mirá cómo les fue" },
     {
-      "type": "text",
-      "id": "caption",
-      "label": "Volanta",
-      "info": "Texto chico arriba del título. Vacío: no se muestra."
+      "type": "select", "id": "heading_size", "label": "Tamaño del titular", "default": "h2",
+      "options": [{ "value": "h2", "label": "Chico" }, { "value": "h1", "label": "Mediano" }]
     },
-    {
-      "type": "color",
-      "id": "caption_color",
-      "label": "Color de la volanta",
-      "info": "Vacío: el color del texto."
-    },
-    {
-      "type": "inline_richtext",
-      "id": "heading",
-      "label": "Título",
-      "default": "Lo que dicen <strong>en video</strong>",
-      "info": "Marcá en negrita las palabras que querés resaltar."
-    },
-    {
-      "type": "select",
-      "id": "heading_size",
-      "label": "Tamaño del título",
-      "options": [
-        {
-          "value": "h2",
-          "label": "Chico"
-        },
-        {
-          "value": "h1",
-          "label": "Mediano"
-        },
-        {
-          "value": "h0",
-          "label": "Grande"
-        }
-      ],
-      "default": "h1"
-    },
-    {
-      "type": "color",
-      "id": "heading_accent",
-      "label": "Color de las palabras resaltadas",
-      "info": "Vacío: el acento de la combinación de colores."
-    },
-    {
-      "type": "select",
-      "id": "heading_align",
-      "label": "Alineación del encabezado",
-      "default": "center",
-      "options": [
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ],
-      "info": "Volanta, título y texto de arriba."
-    },
-    {
-      "type": "select",
-      "id": "heading_align_m",
-      "label": "Alineación del encabezado en mobile",
-      "default": "same",
-      "options": [
-        {
-          "value": "same",
-          "label": "Igual que en desktop"
-        },
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ]
-    },
-    {
-      "type": "richtext",
-      "id": "text",
-      "label": "Texto"
-    },
-    {
-      "type": "range",
-      "id": "card_width",
-      "min": 180,
-      "max": 340,
-      "step": 10,
-      "unit": "px",
-      "label": "Ancho de las tarjetas",
-      "default": 240
-    },
-    {
-      "type": "range",
-      "id": "play_range",
-      "min": 0,
-      "max": 3,
-      "step": 1,
-      "label": "Videos que se reproducen a cada lado",
-      "default": 1,
-      "info": "El del centro siempre. Más videos a la vez gastan más datos."
-    },
-    {
-      "type": "color",
-      "id": "star_color",
-      "label": "Color de las estrellas",
-      "default": "#F5B301"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Combinación de colores",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "Colores propios"
-    },
-    {
-      "type": "checkbox",
-      "id": "custom_colors",
-      "label": "Usar colores propios",
-      "default": false,
-      "info": "Pisan a la combinación de colores elegida arriba."
-    },
-    {
-      "type": "color",
-      "id": "cc_bg",
-      "label": "Fondo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color_background",
-      "id": "cc_bg_gradient",
-      "label": "Degradé de fondo",
-      "info": "Si cargás un degradé, reemplaza al color de fondo."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image",
-      "label": "Imagen de fondo",
-      "info": "Cubre todo el fondo y le gana al degradé."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image_mobile",
-      "label": "Imagen de fondo en mobile",
-      "info": "Vacía: usa la de desktop."
-    },
-    {
-      "type": "color",
-      "id": "cc_text",
-      "label": "Texto",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_accent",
-      "label": "Acento",
-      "default": "#334FB4"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_bg",
-      "label": "Fondo del botón lleno",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_text",
-      "label": "Texto del botón lleno",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "cc_outline",
-      "label": "Botón de contorno y enlaces",
-      "default": "#121212"
-    },
-    {
-      "type": "header",
-      "content": "Espaciado"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno arriba",
-      "default": 36
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno abajo",
-      "default": 36,
-      "info": "En mobile se aplica el 75 %."
-    },
-    {
-      "type": "header",
-      "content": "Visibilidad y ancla"
-    },
-    {
-      "type": "select",
-      "id": "visibility",
-      "label": "Mostrar en",
-      "options": [
-        {
-          "value": "all",
-          "label": "Todos los dispositivos"
-        },
-        {
-          "value": "mobile",
-          "label": "Sólo mobile"
-        },
-        {
-          "value": "desktop",
-          "label": "Sólo desktop"
-        }
-      ],
-      "default": "all",
-      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
-    },
-    {
-      "type": "text",
-      "id": "anchor",
-      "label": "Nombre del ancla",
-      "placeholder": "beneficios",
-      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
-    },
-    {
-      "type": "header",
-      "content": "Tamaño de la letra"
-    },
-    {
-      "type": "select",
-      "id": "title_scale",
-      "label": "Tamaño de los títulos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100"
-    },
-    {
-      "type": "select",
-      "id": "text_scale",
-      "label": "Tamaño de los textos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100",
-      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
-    }
+    { "type": "range", "id": "card_width", "label": "Ancho de cada video", "min": 140, "max": 300, "step": 10, "unit": "px", "default": 200 },
+    { "type": "color", "id": "background", "label": "Color de la sección", "default": "#F5F7FA" },
+    { "type": "color", "id": "text_color", "label": "Color del texto", "default": "#0B0B0B" },
+    { "type": "range", "id": "padding_top", "label": "Margen arriba", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_bottom", "label": "Margen abajo", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 0 }
   ],
   "blocks": [
     {
       "type": "video",
       "name": "Video",
       "settings": [
-        {
-          "type": "video",
-          "id": "video",
-          "label": "Video",
-          "info": "Vertical 9:16, corto y sin sonido."
-        },
-        {
-          "type": "image_picker",
-          "id": "poster",
-          "label": "Imagen",
-          "info": "Se ve si no hay video."
-        },
-        {
-          "type": "range",
-          "id": "stars",
-          "min": 0,
-          "max": 5,
-          "step": 1,
-          "label": "Estrellas",
-          "default": 5,
-          "info": "0: sin estrellas."
-        },
-        {
-          "type": "inline_richtext",
-          "id": "quote",
-          "label": "Frase",
-          "default": "Una frase corta del cliente."
-        },
-        {
-          "type": "text",
-          "id": "name",
-          "label": "Nombre",
-          "default": "Cliente"
-        }
+        { "type": "video", "id": "video", "label": "Video", "info": "Vacío = assets/ct-cover-N.mp4 (b-roll UGC hecho con IA)" },
+        { "type": "image_picker", "id": "poster", "label": "Imagen de portada" },
+        { "type": "range", "id": "stars", "label": "Estrellas (0 = sin)", "min": 0, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "quote", "label": "Frase" },
+        { "type": "text", "id": "name", "label": "Nombre" }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Carrusel 3D de videos",
-      "blocks": [
-        {
-          "type": "video"
-        },
-        {
-          "type": "video"
-        },
-        {
-          "type": "video"
-        },
-        {
-          "type": "video"
-        },
-        {
-          "type": "video"
-        }
-      ]
-    }
-  ]
+  "presets": [{ "name": "Videos en coverflow" }]
 }
 {% endschema %}
