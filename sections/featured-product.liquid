@@ -122,7 +122,7 @@
                   <div
                     id="price-{{ section.id }}"
                     role="status"
-                    class="gad-price gad-price--{{ block.settings.order | default: 'price_first' }} gad-price--c-{{ block.settings.price_color | default: 'foreground' }} gad-price--cc-{{ block.settings.compare_color | default: 'foreground' }} gad-price--badge-{{ block.settings.badge | default: 'sale' }}"
+                    class="gad-price gad-price--{{ block.settings.order | default: 'price_first' }} gad-price--c-{{ block.settings.price_color | default: 'foreground' }} gad-price--f-{{ block.settings.price_font | default: 'body' }} gad-price--cc-{{ block.settings.compare_color | default: 'foreground' }} gad-price--badge-{{ block.settings.badge | default: 'sale' }} gad-price--bf-{{ block.settings.badge_font | default: 'body' }}"
                     {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}
                   >
                     {%- render 'price',
@@ -615,6 +615,10 @@
             {
               "value": "compare_first",
               "label": "Precio anterior primero"
+            },
+            {
+              "value": "compare_above",
+              "label": "Precio anterior arriba (etiqueta al costado)"
             }
           ],
           "default": "price_first"
@@ -642,6 +646,22 @@
             }
           ],
           "default": "foreground"
+        },
+        {
+          "type": "select",
+          "id": "price_font",
+          "label": "Letra del precio",
+          "options": [
+            {
+              "value": "body",
+              "label": "La del texto"
+            },
+            {
+              "value": "heading",
+              "label": "La de los títulos"
+            }
+          ],
+          "default": "body"
         },
         {
           "type": "select",
@@ -691,6 +711,22 @@
           ],
           "default": "sale",
           "info": "Con la variante agotada aparece la etiqueta de agotado."
+        },
+        {
+          "type": "select",
+          "id": "badge_font",
+          "label": "Letra de la etiqueta",
+          "options": [
+            {
+              "value": "body",
+              "label": "La del texto"
+            },
+            {
+              "value": "heading",
+              "label": "La de los títulos"
+            }
+          ],
+          "default": "body"
         },
         {
           "type": "text",

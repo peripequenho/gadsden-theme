@@ -94,6 +94,15 @@
   color: rgb(var(--color-secondary-button-text));
 }
 
+/* Letra del precio: la de los títulos (el precio anterior queda con la del texto) */
+.gad-price--f-heading .price-item--sale,
+.gad-price--f-heading .price__regular .price-item--regular:not(s) {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
+  letter-spacing: 0;
+}
+
 .gad-price--cc-foreground .price__sale s.price-item--regular {
   color: rgba(var(--color-foreground), 0.65);
 }
@@ -123,6 +132,48 @@
 
 .gad-price__badge-icon {
   font-size: calc(1em * var(--badge-icon-scale, 1.4));
+}
+
+/* Precio anterior arriba del precio y la etiqueta en una segunda columna */
+.gad-price--compare_above .price--on-sale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* la etiqueta no crece con el tamaño de letra del bloque (el zoom va sobre .price): si no, no entra al costado */
+.gad-price--compare_above .price--on-sale .price__badge-sale {
+  flex: none;
+  white-space: nowrap;
+}
+
+.gad-price--compare_above[data-gad-fs='70'] .price__badge-sale { zoom: calc(100 / 70); }
+.gad-price--compare_above[data-gad-fs='80'] .price__badge-sale { zoom: calc(100 / 80); }
+.gad-price--compare_above[data-gad-fs='90'] .price__badge-sale { zoom: calc(100 / 90); }
+.gad-price--compare_above[data-gad-fs='110'] .price__badge-sale { zoom: calc(100 / 110); }
+.gad-price--compare_above[data-gad-fs='125'] .price__badge-sale { zoom: calc(100 / 125); }
+.gad-price--compare_above[data-gad-fs='150'] .price__badge-sale { zoom: calc(100 / 150); }
+.gad-price--compare_above[data-gad-fs='175'] .price__badge-sale { zoom: calc(100 / 175); }
+.gad-price--compare_above[data-gad-fs='200'] .price__badge-sale { zoom: calc(100 / 200); }
+
+.gad-price--compare_above .price--on-sale .price__sale {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.gad-price--compare_above .price-item {
+  margin: 0;
+}
+
+/* Letra de la etiqueta: la de los títulos */
+.gad-price--bf-heading .gad-price__badge,
+.gad-price--bf-heading .price__badge-sale {
+  font-family: var(--font-heading-family);
+  font-style: var(--font-heading-style);
+  font-weight: var(--font-heading-weight);
 }
 
 /* ---------- PX5 cantidad ---------- */

@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.1.2
+
+### Ficha de producto (bloque Precio)
+- **Letra del precio**: la del texto o la de los títulos.
+- Orden **precio anterior arriba**, con la etiqueta en una segunda columna (la etiqueta no crece con el tamaño de letra del bloque).
+- **Letra de la etiqueta**: la del texto o la de los títulos.
+
 ## 1.1.1
 
 ### Widgets
