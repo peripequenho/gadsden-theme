@@ -1,5 +1,11 @@
 # Cambios
 
+## 1.1.3
+
+### Corregido
+- Ficha de producto: sin cuotas de Shop Pay para mostrar (por ejemplo, fuera de EE. UU.), el contenedor vacío ya no deja un margen debajo del precio.
+- Precio anterior arriba: renglones más juntos.
+
 ## 1.1.2
 
 ### Ficha de producto (bloque Precio)

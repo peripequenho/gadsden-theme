@@ -153,7 +153,7 @@
                       {%- endif -%}
                     </div>
                   {%- endif -%}
-                  <div {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
+                  <div class="gad-installment" {{ block.shopify_attributes }}{% render 'gad-fs', b: block %}>
                     {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                     {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
                       <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
