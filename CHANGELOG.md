@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.2.7
+
+### Ficha de producto
+- Ajuste global **Galería de la ficha en bucle** (Gadsden · Carruseles): en todas las fichas, después de la última foto vuelve la primera, con las flechas y deslizando, y desde la primera, hacia atrás, va a la última. Apagado por defecto.
+
 ## 1.2.6
 
 ### Ficha de producto

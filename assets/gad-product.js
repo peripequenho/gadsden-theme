@@ -183,6 +183,48 @@
       if (next) activate(gallery, next);
     });
     thumbsMotion(gallery);
+    if (gallery.dataset.gadLoop === 'true') loopGallery(gallery);
+  }
+
+  /* galería en bucle (ajuste global): en el slider de mobile, pasar de la última vuelve a la primera y al revés,
+     con las flechas y deslizando. En desktop las flechas de la foto principal ya dan la vuelta. */
+  function loopGallery(gallery) {
+    const viewer = gallery.querySelector('slider-component[id^="GalleryViewer"]');
+    const list = viewer && viewer.querySelector('[id^="Slider-"]');
+    if (!list) return;
+    const max = () => list.scrollWidth - list.clientWidth;
+    const go = (left) => list.scrollTo({ left, behavior: 'smooth' });
+    viewer.enableSliderLooping = true;
+    viewer.querySelectorAll('button[name="next"], button[name="previous"]').forEach((b) => b.removeAttribute('disabled'));
+    viewer.addEventListener(
+      'click',
+      (e) => {
+        const b = e.target.closest('button[name="next"], button[name="previous"]');
+        if (!b || max() <= 0) return;
+        const atEnd = list.scrollLeft >= max() - 2;
+        const atStart = list.scrollLeft <= 2;
+        if ((b.name === 'next' && atEnd) || (b.name === 'previous' && atStart)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          go(b.name === 'next' ? 0 : max());
+        }
+      },
+      true
+    );
+    let x0 = null;
+    let s0 = 0;
+    list.addEventListener('touchstart', (e) => {
+      x0 = e.touches[0].clientX;
+      s0 = list.scrollLeft;
+    }, { passive: true });
+    list.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      x0 = null;
+      if (max() <= 0) return;
+      if (dx < -40 && s0 >= max() - 2) go(0);
+      else if (dx > 40 && s0 <= 2) go(max());
+    }, { passive: true });
   }
 
   function activate(gallery, item) {

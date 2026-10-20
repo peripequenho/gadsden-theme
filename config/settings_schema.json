@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Gadsden",
-    "theme_version": "1.2.6",
+    "theme_version": "1.2.7",
     "theme_author": "Gero",
     "theme_documentation_url": "https://github.com/peripequenho/gadsden-theme",
     "theme_support_url": "https://cafecito.app/elcucholg"
@@ -2636,6 +2636,13 @@
         ],
         "default": "750",
         "info": "Ancho desde el que los carruseles, las pestañas y los sliders usan sus ajustes de desktop."
+      },
+      {
+        "type": "checkbox",
+        "id": "product_gallery_loop",
+        "label": "Galería de la ficha en bucle",
+        "default": false,
+        "info": "En todas las fichas: después de la última foto vuelve la primera (con las flechas y deslizando), y desde la primera, hacia atrás, va a la última."
       },
       {
         "type": "select",

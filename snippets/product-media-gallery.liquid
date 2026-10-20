@@ -91,6 +91,7 @@
   class="{{ gad_gallery_class }}"
   aria-label="{{ 'products.product.media.gallery_viewer' | t }}"
   data-desktop-layout="{{ section.settings.gallery_layout }}"
+  data-gad-loop="{% if settings.product_gallery_loop %}true{% else %}false{% endif %}"
   data-gad-thumbs-auto="{{ gs.thumbs_auto | default: 'off' }}"
   data-gad-thumbs-speed="{{ gs.thumbs_auto_speed | default: 30 }}"
   data-gad-thumbs-interval="{{ gs.thumbs_auto_interval | default: 2.5 }}"
