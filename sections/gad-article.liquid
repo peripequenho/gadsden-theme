@@ -1,1533 +1,960 @@
 {%- comment -%}
-  Nota / advertorial (L12): una sección para páginas de tipo nota. Cabecera de nota y el texto en
-  bloques: subtítulo, párrafo, frase destacada, imagen, tira de 3 imágenes, video, citas, firma,
-  índice automático, botón, caja de producto, puente a un cuestionario, "versus" (dos columnas de
-  pasos que se tildan) y "ciclo" (4 pasos en círculo). Barra fija opcional abajo con un botón.
+  ATHLEX · Nota (advertorial) — motor de artículo pre-venta.
+
+  Para qué: el ad no manda directo a la ficha, manda acá. Esta página tiene que
+  parecer una nota que alguien se sienta a leer, y hacer todo el trabajo de
+  educación que arriba de una ficha no entra (conciencia nivel 1: el tipo no
+  sabe cómo se llama lo que tiene ni por qué le vuelve).
+
+  UNA sola sección para TODAS las notas: el texto vive en los bloques de cada
+  plantilla (page.athlex-nota-*.json), así se escribe una nota nueva sin tocar
+  código y el copy se edita desde el customizer.
+
+  Bloques de TEXTO: subtitulo · parrafo (richtext) · destacado (la frase grande) ·
+  citas (de foros, textuales) · firma · imagen · cta (botón suelto) · caja
+  (tarjeta de producto) · test (el puente al quiz).
+
+  Bloques DEMOSTRATIVOS (mostrar antes que contar) — cada uno reemplaza tres
+  renglones de explicación:
+    dia     · la barra de 24 h con las horas húmedas rayadas
+    ciclo   · el círculo pica → usás → mejora → dejás, con un punto girando
+    semana  · dos líneas de 21 días: el que corta vs el que sigue siete más
+    versus  · los pasos de una crema contra los del spray, tildándose
+    video   · los videos que ya tenemos filmados (frío, ciencia, fábrica)
+    tira    · carrusel de escenas reales
+
+  Los demos se animan al entrar en pantalla con la mecánica de athlex-mecanismo:
+  el JS marca .ax-armado en el contenedor y un IntersectionObserver agrega .ax-va.
+  Si el JS no corre, no se escondió nada. Respetan prefers-reduced-motion.
+  OJO al verificar: el Chrome headless viene con reduced-motion ACTIVADO, así que
+  las animaciones parecen rotas — hay que emular no-preference para medirlas.
+
+  El precio y el link SALEN DE SHOPIFY (all_products): no hay un solo número
+  hardcodeado que se pueda quedar viejo.
+
+  La cinta "PUBLICIDAD" de arriba es a propósito y no se saca: la marca se para
+  en "sin cuentos", y una nota disfrazada de periodismo es exactamente el cuento
+  que decimos no hacer. Además es lo que pide Meta.
+
+  Instalar: node tools/tema.mjs put sections/athlex-nota.liquid
 {%- endcomment -%}
-{%- assign s = section.settings -%}
-{%- render 'gad-colors', s: s, key: section.id -%}
-<gad-article
-  class="gad-ar{% if s.look == 'news' %} gad-ar--news{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <article class="page-width gad-ar__body">
-    <header class="gad-ar__head">
-      {%- if s.ribbon != blank -%}<span class="gad-ar__ribbon">{{ s.ribbon | escape }}</span>{%- endif -%}
-      {%- if s.kicker != blank -%}<span class="gad-ar__kicker">{{ s.kicker | escape }}</span>{%- endif -%}
-      <h1 class="gad-ar__title {{ s.heading_size }} gad-hl"{% if s.heading_accent != blank %} style="--gad-hl: {{ s.heading_accent }};"{% endif %}>{{ s.heading }}</h1>
-      {%- if s.dek != blank -%}<p class="gad-ar__dek">{{ s.dek }}</p>{%- endif -%}
-      {%- if s.author != blank or s.meta != blank -%}
-        <p class="gad-ar__byline">{% if s.author != blank %}<b>{{ s.author | escape }}</b>{% endif %}{% if s.meta != blank %}<span>{{ s.meta | escape }}</span>{% endif %}</p>
-      {%- endif -%}
-    </header>
+
+{%- liquid
+  assign uid = section.id | replace: '_', '-'
+  assign p = all_products[section.settings.handle]
+-%}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@600;700;800&family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
+
+{% style %}
+  #ax-nota-{{ uid }}{
+    --tinta:#141210;--papel:#E6DFCE;--papel-2:#D6CDB6;--lima:#93D920;--lima-honda:#6BA512;
+    --impacto:'Archivo Black','Arial Black',Haettenschweiler,Impact,sans-serif;
+    --texto:'Barlow Semi Condensed','Barlow','Segoe UI',Arial,sans-serif;
+    --lectura:'Barlow','Barlow Semi Condensed','Segoe UI',Arial,sans-serif;
+    background:var(--papel);color:var(--tinta);font-family:var(--lectura);
+    padding:0 0 40px;
+    background-image:radial-gradient(var(--papel-2) 1.1px,transparent 1.2px);background-size:7px 7px;
+  }
+  #ax-nota-{{ uid }} *{box-sizing:border-box}
+  #ax-nota-{{ uid }} h1,#ax-nota-{{ uid }} h2,#ax-nota-{{ uid }} h3{color:inherit}
+  #ax-nota-{{ uid }} .ax-col{max-width:660px;margin:0 auto;padding:0 20px}
+
+  /* ── CABECERA ─────────────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-cinta{background:var(--tinta);color:var(--papel);
+    font-family:var(--impacto);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    padding:9px 20px;text-align:center;line-height:1.4}
+
+  #ax-nota-{{ uid }} .ax-cab{padding-top:28px}
+  #ax-nota-{{ uid }} .ax-eye{font-family:var(--impacto);font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;background:var(--lima);color:var(--tinta);padding:7px 12px;
+    display:block;width:max-content;max-width:100%;transform:skewX(-9deg);margin:0 0 16px}
+  #ax-nota-{{ uid }} .ax-eye span{display:inline-block;transform:skewX(9deg)}
+  #ax-nota-{{ uid }} h1{margin:0 0 16px;font-family:var(--impacto);text-transform:uppercase;
+    font-size:clamp(28px,8.2vw,44px);line-height:1.02;letter-spacing:-.02em;
+    transform:skewX(-9deg);display:inline-block;max-width:100%}
+  #ax-nota-{{ uid }} h1 em{font-style:normal;background:var(--lima);padding:1px 8px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  #ax-nota-{{ uid }} .ax-bajada{font-size:18px;line-height:1.5;margin:0 0 18px;font-weight:500}
+  #ax-nota-{{ uid }} .ax-firma-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    font-family:var(--texto);font-size:13px;letter-spacing:.04em;text-transform:uppercase;
+    border-top:2px solid var(--tinta);border-bottom:2px solid var(--tinta);padding:10px 0;margin:0 0 26px}
+  #ax-nota-{{ uid }} .ax-firma-top i{font-style:normal;opacity:.6}
+
+  /* ── CUERPO ───────────────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-p{font-size:17.5px;line-height:1.62;margin:0 0 18px}
+  #ax-nota-{{ uid }} .ax-p p{margin:0 0 18px}
+  #ax-nota-{{ uid }} .ax-p p:last-child{margin:0}
+  #ax-nota-{{ uid }} .ax-p strong{background:var(--lima);padding:0 4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  #ax-nota-{{ uid }} .ax-p ul,#ax-nota-{{ uid }} .ax-p ol{margin:0 0 18px;padding-left:20px}
+  #ax-nota-{{ uid }} .ax-p li{margin:0 0 8px}
+  #ax-nota-{{ uid }} .ax-p a{color:inherit;text-decoration:underline;text-decoration-thickness:2px;
+    text-underline-offset:3px;text-decoration-color:var(--lima-honda)}
+
+  #ax-nota-{{ uid }} h2{margin:34px 0 14px;font-family:var(--impacto);text-transform:uppercase;
+    font-size:clamp(20px,5.6vw,26px);line-height:1.08;letter-spacing:-.01em;
+    transform:skewX(-9deg);display:inline-block;max-width:100%}
+
+  #ax-nota-{{ uid }} .ax-dest{margin:26px 0;padding:18px 20px;background:var(--tinta);color:var(--papel);
+    font-family:var(--impacto);text-transform:uppercase;font-size:clamp(17px,4.8vw,22px);
+    line-height:1.18;letter-spacing:-.01em}
+  #ax-nota-{{ uid }} .ax-dest em{font-style:normal;background:var(--lima);color:var(--tinta);padding:0 5px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+  #ax-nota-{{ uid }} .ax-img{margin:26px 0;border:3px solid var(--tinta)}
+  #ax-nota-{{ uid }} .ax-img img{display:block;width:100%;height:auto}
+  #ax-nota-{{ uid }} .ax-img figcaption{font-family:var(--texto);font-size:13px;padding:8px 12px;
+    background:var(--tinta);color:var(--papel);letter-spacing:.03em}
+
+  /* ── FIRMA ────────────────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-firma{margin:28px 0 0;padding:16px 18px;background:var(--papel-2);
+    border-left:6px solid var(--tinta);font-family:var(--texto)}
+  #ax-nota-{{ uid }} .ax-firma b{display:block;font-family:var(--impacto);text-transform:uppercase;
+    font-size:15px;letter-spacing:.02em}
+  #ax-nota-{{ uid }} .ax-firma i{font-style:normal;font-size:14px;letter-spacing:.04em;
+    text-transform:uppercase;opacity:.7}
+
+  /* ── CAJA DE PRODUCTO ─────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-caja{margin:30px 0;background:var(--tinta);color:var(--papel);padding:20px}
+  #ax-nota-{{ uid }} .ax-caja-top{display:flex;gap:16px;align-items:center}
+  #ax-nota-{{ uid }} .ax-caja img{width:92px;height:92px;object-fit:contain;flex:none;background:var(--papel)}
+  #ax-nota-{{ uid }} .ax-caja h3{margin:0 0 6px;font-family:var(--impacto);text-transform:uppercase;
+    font-size:19px;line-height:1.06;letter-spacing:-.01em}
+  #ax-nota-{{ uid }} .ax-caja .ax-sub{font-family:var(--texto);font-size:14px;line-height:1.35;opacity:.85}
+  #ax-nota-{{ uid }} .ax-precio{display:flex;align-items:baseline;gap:10px;margin:14px 0 0;flex-wrap:wrap}
+  #ax-nota-{{ uid }} .ax-precio b{font-family:var(--impacto);font-size:30px;letter-spacing:-.02em}
+  #ax-nota-{{ uid }} .ax-precio s{font-family:var(--texto);font-size:16px;opacity:.6}
+  #ax-nota-{{ uid }} .ax-precio em{font-style:normal;background:var(--lima);color:var(--tinta);
+    font-family:var(--impacto);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:5px 8px;transform:skewX(-9deg)}
+  #ax-nota-{{ uid }} .ax-precio em span{display:inline-block;transform:skewX(9deg)}
+  #ax-nota-{{ uid }} .ax-cta{display:block;margin:14px 0 0;background:var(--lima);color:var(--tinta);
+    font-family:var(--impacto);text-transform:uppercase;font-size:17px;letter-spacing:.02em;
+    text-align:center;padding:16px 14px;transform:skewX(-9deg);text-decoration:none;border:none;
+    width:100%;cursor:pointer;line-height:1.1}
+  #ax-nota-{{ uid }} .ax-cta span{display:inline-block;transform:skewX(9deg)}
+  /* Shrine dibuja el contorno de sus botones con ::before/::after (radio + sombra
+     azul). Acá no queremos ninguno de los dos. Ver landing/TODOs. */
+  #ax-nota-{{ uid }} .ax-cta::before,#ax-nota-{{ uid }} .ax-cta::after{content:none !important;display:none !important}
+  #ax-nota-{{ uid }} .ax-cta{border-radius:0 !important;box-shadow:none !important}
+  #ax-nota-{{ uid }} .ax-caja-pie{margin:12px 0 0;font-family:var(--texto);font-size:13.5px;
+    line-height:1.4;display:flex;gap:8px;align-items:flex-start}
+  #ax-nota-{{ uid }} .ax-caja-pie svg{width:17px;height:17px;flex:none;color:var(--lima);margin-top:1px}
+
+  /* ── PUENTE AL TEST ───────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-test{margin:26px 0;padding:16px 18px;border:3px solid var(--tinta);
+    display:block;text-decoration:none;color:var(--tinta);background:var(--papel)}
+  #ax-nota-{{ uid }} .ax-test b{display:block;font-family:var(--impacto);text-transform:uppercase;
+    font-size:16px;line-height:1.1;margin:0 0 6px}
+  #ax-nota-{{ uid }} .ax-test i{font-style:normal;font-family:var(--texto);font-size:14.5px;line-height:1.4}
+  #ax-nota-{{ uid }} .ax-test u{display:inline-block;margin-top:10px;font-family:var(--impacto);
+    font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:var(--lima);
+    padding:7px 11px;text-decoration:none;transform:skewX(-9deg)}
+  #ax-nota-{{ uid }} .ax-test u span{display:inline-block;transform:skewX(9deg)}
+
+  /* ── PRUEBA SOCIAL (citas de foros, no clientes) ──────────────────────
+     Va TEJIDA en el medio del texto, no amontonada al final: la credibilidad
+     tiene que reforzarse mientras se lee, no después. */
+  #ax-nota-{{ uid }} .ax-voces{margin:26px 0;border:3px solid var(--tinta);background:var(--papel)}
+  #ax-nota-{{ uid }} .ax-voces-tit{background:var(--tinta);color:var(--papel);font-family:var(--impacto);
+    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:9px 14px;line-height:1.3;margin:0}
+  #ax-nota-{{ uid }} .ax-voces blockquote{margin:0;padding:14px 16px;
+    border-bottom:2px dashed var(--papel-2);font-size:16.5px;line-height:1.45;font-style:italic}
+  #ax-nota-{{ uid }} .ax-voces blockquote:last-of-type{border-bottom:none}
+  #ax-nota-{{ uid }} .ax-voces cite{display:block;margin-top:6px;font-family:var(--texto);font-size:12.5px;
+    font-style:normal;letter-spacing:.05em;text-transform:uppercase;opacity:.65}
+  #ax-nota-{{ uid }} .ax-voces-pie{padding:10px 14px;background:var(--papel-2);margin:0;
+    font-family:var(--texto);font-size:12.5px;line-height:1.4}
+
+  /* ── CTA SUELTO (el de arriba de todo) ────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-cta-suelto{margin:22px 0}
+  #ax-nota-{{ uid }} .ax-cta-suelto .ax-linea{font-family:var(--texto);font-size:14.5px;
+    line-height:1.4;margin:0 0 9px}
+  #ax-nota-{{ uid }} .ax-cta-suelto .ax-cta{margin:0}
+
+  /* ── INDICE con anclas ────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} h2{scroll-margin-top:90px}
+  #ax-nota-{{ uid }} .ax-indice{margin:24px 0;padding:16px 18px;background:var(--papel-2);
+    border-left:6px solid var(--tinta)}
+  #ax-nota-{{ uid }} .ax-indice-tit{margin:0 0 10px;font-family:var(--impacto);font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase}
+  /* sin numeracion propia: los subtitulos ya vienen numerados y quedaba "8. 8 ·" */
+  #ax-nota-{{ uid }} .ax-indice ol{margin:0;padding:0;list-style:none;font-family:var(--texto);font-size:16px}
+  #ax-nota-{{ uid }} .ax-indice li{margin:0 0 7px;line-height:1.35}
+  #ax-nota-{{ uid }} .ax-indice a{color:inherit;text-decoration:underline;
+    text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:var(--lima-honda)}
+  #ax-nota-{{ uid }} .ax-indice a:hover{background:var(--lima)}
+  #ax-nota-{{ uid }}.ax-portal .ax-indice{background:#f7f8fa;border:1px solid var(--linea);
+    border-left:4px solid #c8102e;padding:16px 18px}
+  #ax-nota-{{ uid }}.ax-portal .ax-indice-tit{font-family:var(--texto);color:var(--gris);font-size:11px}
+  #ax-nota-{{ uid }}.ax-portal .ax-indice ol{font-family:var(--texto);font-size:15.5px}
+  #ax-nota-{{ uid }}.ax-portal .ax-indice a{text-decoration-color:#c8102e}
+
+  /* ═══ PIEL "PORTAL" ═══════════════════════════════════════════════════════
+     Segunda piel de la misma sección, para las notas que tienen que leerse como
+     nota y no como pieza de marca. Estructura calcada de las convenciones de los
+     portales argentinos (relevadas sobre una nota real: título / bajada / línea
+     de fecha con hora / foto con epígrafe y crédito / ladillos / "Leé también" /
+     chips de temas al pie).
+
+     IDENTIDAD PROPIA, NO LA DE NADIE: ningún logo, nombre ni color de un medio
+     real. Se copia la GRAMÁTICA del formato, que es de donde sale la retención,
+     no la marca de un tercero — hacerse pasar por un medio es exactamente lo que
+     hace la competencia y lo que ANMAT llama publicidad encubierta.
+
+     Se enciende con el setting "estilo". El resto de las notas siguen en papel.  */
+
+  #ax-nota-{{ uid }}.ax-portal{
+    --tinta:#16181d;--papel:#ffffff;--papel-2:#eef0f3;--lima:#93D920;--lima-honda:#4a5568;
+    --gris:#6b7280;--linea:#dfe3e8;
+    --impacto:'Archivo','Helvetica Neue',Helvetica,Arial,sans-serif;
+    --lectura:'Georgia','Times New Roman',serif;
+    --texto:'Archivo','Helvetica Neue',Arial,sans-serif;
+    background:var(--papel);background-image:none;color:var(--tinta)}
+  #ax-nota-{{ uid }}.ax-portal .ax-col{max-width:700px;padding:0 18px}
+
+  /* cabecera de nota */
+  #ax-nota-{{ uid }}.ax-portal .ax-cinta{background:var(--papel-2);color:var(--gris);
+    font-family:var(--texto);font-size:10px;letter-spacing:.1em;font-weight:600;
+    border-bottom:1px solid var(--linea);padding:8px 18px}
+  #ax-nota-{{ uid }}.ax-portal .ax-cab{padding-top:22px}
+  #ax-nota-{{ uid }}.ax-portal .ax-eye{background:none;color:#c8102e;padding:0;transform:none;
+    font-family:var(--texto);font-weight:700;font-size:12px;letter-spacing:.09em;margin:0 0 10px}
+  #ax-nota-{{ uid }}.ax-portal .ax-eye span{transform:none}
+  #ax-nota-{{ uid }}.ax-portal h1{font-family:var(--impacto);font-weight:800;text-transform:none;
+    transform:none;display:block;font-size:clamp(28px,7.4vw,42px);line-height:1.08;
+    letter-spacing:-.022em;margin:0 0 14px}
+  #ax-nota-{{ uid }}.ax-portal h1 em{background:none;padding:0;font-style:normal}
+  #ax-nota-{{ uid }}.ax-portal .ax-bajada{font-family:var(--texto);font-size:18.5px;line-height:1.45;
+    font-weight:400;color:#374151;margin:0 0 16px}
+  #ax-nota-{{ uid }}.ax-portal .ax-firma-top{border-top:1px solid var(--linea);
+    border-bottom:1px solid var(--linea);font-family:var(--texto);font-size:12.5px;
+    letter-spacing:0;text-transform:none;color:var(--gris);padding:11px 0;margin:0 0 22px;font-weight:500}
+
+  /* cuerpo en serif, que es lo que hace que se lea como nota */
+  #ax-nota-{{ uid }}.ax-portal .ax-p{font-family:var(--lectura);font-size:18px;line-height:1.68;
+    margin:0 0 20px;color:#1f2328}
+  #ax-nota-{{ uid }}.ax-portal .ax-p strong{background:none;padding:0;font-weight:700}
+  #ax-nota-{{ uid }}.ax-portal .ax-p p{margin:0 0 20px}
+  #ax-nota-{{ uid }}.ax-portal h2{font-family:var(--impacto);font-weight:800;text-transform:none;
+    transform:none;display:block;font-size:clamp(20px,5vw,25px);line-height:1.2;
+    letter-spacing:-.015em;margin:34px 0 12px}
+  #ax-nota-{{ uid }}.ax-portal .ax-dest{background:var(--papel);color:var(--tinta);
+    border-left:4px solid #c8102e;padding:4px 0 4px 18px;margin:26px 0;
+    font-family:var(--impacto);font-weight:700;text-transform:none;letter-spacing:-.01em;
+    font-size:clamp(19px,4.6vw,23px);line-height:1.3}
+  #ax-nota-{{ uid }}.ax-portal .ax-dest em{background:none;color:inherit;padding:0;
+    border-bottom:3px solid var(--lima)}
+
+  /* foto con epígrafe y crédito, como en cualquier portal */
+  #ax-nota-{{ uid }}.ax-portal .ax-img{border:none;margin:22px 0}
+  #ax-nota-{{ uid }}.ax-portal .ax-img figcaption{background:none;color:var(--gris);
+    font-family:var(--texto);font-size:13px;line-height:1.4;padding:8px 0 0;letter-spacing:0;
+    border-bottom:1px solid var(--linea);padding-bottom:12px}
+  #ax-nota-{{ uid }}.ax-portal .ax-tira figure{border:1px solid var(--linea);background:var(--papel)}
+  #ax-nota-{{ uid }}.ax-portal .ax-tira figcaption{color:var(--gris);background:var(--papel)}
+
+  /* "Leé también": el bloque del test, con la ropa del módulo de nota relacionada */
+  #ax-nota-{{ uid }}.ax-portal .ax-test{border:none;border-top:3px solid var(--tinta);
+    border-bottom:1px solid var(--linea);padding:14px 0;background:none}
+  #ax-nota-{{ uid }}.ax-portal .ax-test b{font-family:var(--texto);font-size:11px;
+    letter-spacing:.12em;color:#c8102e;text-transform:uppercase;margin:0 0 8px}
+  #ax-nota-{{ uid }}.ax-portal .ax-test i{font-family:var(--impacto);font-weight:700;font-size:19px;
+    line-height:1.25;color:var(--tinta);display:block}
+  #ax-nota-{{ uid }}.ax-portal .ax-test u{background:none;color:#c8102e;transform:none;
+    font-family:var(--texto);font-size:13px;letter-spacing:.02em;padding:0;margin-top:9px}
+  #ax-nota-{{ uid }}.ax-portal .ax-test u span{transform:none}
+
+  /* citas de foro con formato de recuadro de nota */
+  #ax-nota-{{ uid }}.ax-portal .ax-voces{border:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-voces-tit{background:var(--papel-2);color:var(--gris);
+    font-family:var(--texto);font-size:11px;letter-spacing:.1em}
+  #ax-nota-{{ uid }}.ax-portal .ax-voces blockquote{font-family:var(--lectura);font-size:17px;
+    border-bottom:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-voces cite{font-family:var(--texto);color:var(--gris)}
+  #ax-nota-{{ uid }}.ax-portal .ax-voces-pie{background:var(--papel-2);color:var(--gris);
+    font-family:var(--texto)}
+
+  /* los demos: mismo dibujo, paleta de portal */
+  #ax-nota-{{ uid }}.ax-portal .ax-demo{border:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-demo-tit{background:var(--papel-2);color:var(--tinta);
+    font-family:var(--texto);font-size:11.5px;letter-spacing:.08em;border-bottom:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-demo-pie{background:var(--papel);color:var(--gris);
+    font-family:var(--texto);border-top:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-dia-riel{border:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-dia-marcas li{font-family:var(--texto)}
+  #ax-nota-{{ uid }}.ax-portal .ax-dia-marcas b{background:var(--tinta);color:#fff}
+  #ax-nota-{{ uid }}.ax-portal .ax-sem-dias i{border:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-sem-dias i.vuelve{background:#c8102e}
+  #ax-nota-{{ uid }}.ax-portal .ax-vs-col b{border:1px solid var(--linea);font-family:var(--texto)}
+  #ax-nota-{{ uid }}.ax-portal .ax-vs-col li{font-family:var(--texto);border-bottom:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-vs-col li::before{background:var(--tinta);color:#fff}
+  #ax-nota-{{ uid }}.ax-portal .ax-ciclo text{font-family:var(--texto);fill:var(--tinta)}
+  #ax-nota-{{ uid }}.ax-portal .ax-ciclo .nodo{fill:var(--papel);stroke:var(--tinta);stroke-width:2}
+  #ax-nota-{{ uid }}.ax-portal .ax-ciclo .aro{stroke:var(--linea);opacity:1}
+
+  /* la caja de producto SÍ se identifica: es lo único que se ve como aviso */
+  #ax-nota-{{ uid }}.ax-portal .ax-caja{background:#f7f8fa;color:var(--tinta);
+    border:1px solid var(--linea);border-top:4px solid var(--lima)}
+  #ax-nota-{{ uid }}.ax-portal .ax-caja h3{font-family:var(--impacto);text-transform:none;font-weight:800}
+  #ax-nota-{{ uid }}.ax-portal .ax-caja .ax-sub{font-family:var(--texto);opacity:1;color:var(--gris)}
+  #ax-nota-{{ uid }}.ax-portal .ax-caja img{background:#fff;border:1px solid var(--linea)}
+  #ax-nota-{{ uid }}.ax-portal .ax-precio b{font-family:var(--impacto);font-weight:800}
+  #ax-nota-{{ uid }}.ax-portal .ax-precio s{font-family:var(--texto)}
+  #ax-nota-{{ uid }}.ax-portal .ax-cta{background:var(--lima);color:#16181d;transform:none;
+    font-family:var(--impacto);font-weight:800;text-transform:none;font-size:17px;border-radius:3px}
+  #ax-nota-{{ uid }}.ax-portal .ax-cta span{transform:none}
+  #ax-nota-{{ uid }}.ax-portal .ax-caja-pie{font-family:var(--texto);color:var(--gris)}
+  #ax-nota-{{ uid }}.ax-portal .ax-caja-pie svg{color:var(--lima-honda)}
+  #ax-nota-{{ uid }}.ax-portal .ax-cta-suelto .ax-linea{font-family:var(--texto);color:var(--gris)}
+  #ax-nota-{{ uid }}.ax-portal .ax-firma{background:var(--papel-2);border-left:3px solid var(--tinta);
+    font-family:var(--texto)}
+  #ax-nota-{{ uid }}.ax-portal .ax-firma b{font-family:var(--impacto);text-transform:none;font-weight:800}
+  #ax-nota-{{ uid }}.ax-portal .ax-legal{font-family:var(--texto);border-top:1px solid var(--linea);
+    color:var(--gris);opacity:1;font-size:12px}
+
+  /* chips de "Temas de la nota", al pie */
+  #ax-nota-{{ uid }} .ax-temas{margin:26px 0 0;padding:16px 0 0;border-top:1px solid var(--linea)}
+  #ax-nota-{{ uid }} .ax-temas p{margin:0 0 9px;font-family:var(--texto);font-size:11px;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--gris);font-weight:600}
+  #ax-nota-{{ uid }} .ax-temas ul{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0}
+  #ax-nota-{{ uid }} .ax-temas li{font-family:var(--texto);font-size:13px;padding:6px 11px;
+    background:var(--papel-2);border:1px solid var(--linea);border-radius:3px;color:#374151}
+
+  /* la barra fija también se viste de portal */
+  #ax-barra-{{ uid }}.ax-portal-barra{background:#16181d}
+  #ax-barra-{{ uid }}.ax-portal-barra a{background:#93D920;border-radius:3px;transform:none;
+    font-family:'Archivo',Arial,sans-serif;font-weight:800;text-transform:none}
+  #ax-barra-{{ uid }}.ax-portal-barra a span{transform:none}
+
+  /* ═══ BLOQUES DEMOSTRATIVOS ═══════════════════════════════════════════════
+     Regla de la casa: mostrar antes que contar. Cada uno de estos demuestra en
+     imagen lo que el párrafo de al lado explicaría en tres renglones.
+
+     Mecánica compartida (la misma de athlex-mecanismo): el JS agrega .ax-armado
+     al contenedor y recién ahí el CSS esconde el estado inicial; un
+     IntersectionObserver agrega .ax-va al entrar en pantalla. Si el JS no llega,
+     no se escondió nada y todo se ve quieto pero completo.
+
+     NADA de escalar hacia afuera en la entrada (scale > 1 desborda el viewport
+     aunque esté invisible, y eso rompió el móvil de la landing en agosto).      */
+
+  #ax-nota-{{ uid }} .ax-demo{margin:26px 0;border:3px solid var(--tinta);background:var(--papel)}
+  #ax-nota-{{ uid }} .ax-demo-tit{background:var(--tinta);color:var(--papel);font-family:var(--impacto);
+    font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;padding:9px 14px;margin:0;line-height:1.3}
+  #ax-nota-{{ uid }} .ax-demo-cuerpo{padding:18px 16px}
+  #ax-nota-{{ uid }} .ax-demo-pie{margin:0;padding:11px 14px;background:var(--papel-2);
+    font-family:var(--texto);font-size:13.5px;line-height:1.4}
+
+  /* ── 1 · EL DÍA (cuánto tiempo pasa la zona húmeda) ─────────────────────
+     La barra es el día entero; los tramos rayados son las horas húmedas.
+     Las posiciones van en CSS y no en el HTML a propósito: un style inline con
+     porcentajes lo cazaría el chequeo de claims como si fuera un dato inventado. */
+  #ax-nota-{{ uid }} .ax-dia-riel{position:relative;height:56px;border:3px solid var(--tinta);
+    background:var(--papel);overflow:hidden}
+  #ax-nota-{{ uid }} .ax-dia-h{position:absolute;top:0;bottom:0;
+    background:repeating-linear-gradient(-45deg,var(--lima) 0 7px,var(--lima-honda) 7px 14px);
+    transform-origin:left}
+  #ax-nota-{{ uid }}.ax-armado .ax-dia-h{transform:scaleX(0)}
+  #ax-nota-{{ uid }} .ax-va .ax-dia-h{transform:scaleX(1);transition:transform .55s ease}
+  #ax-nota-{{ uid }} .ax-dia-h.d1{left:8%;width:13%;transition-delay:.05s}
+  #ax-nota-{{ uid }} .ax-dia-h.d2{left:26%;width:34%;transition-delay:.35s}
+  #ax-nota-{{ uid }} .ax-dia-h.d3{left:66%;width:16%;transition-delay:.65s}
+  #ax-nota-{{ uid }} .ax-dia-h.d4{left:86%;width:9%;transition-delay:.95s}
+  #ax-nota-{{ uid }} .ax-dia-horas{display:flex;justify-content:space-between;margin:7px 0 0;
+    font-family:var(--impacto);font-size:9.5px;letter-spacing:.1em;opacity:.65}
+  #ax-nota-{{ uid }} .ax-dia-marcas{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+  #ax-nota-{{ uid }} .ax-dia-marcas li{display:flex;gap:9px;align-items:flex-start;
+    font-family:var(--texto);font-size:15px;line-height:1.35}
+  #ax-nota-{{ uid }} .ax-dia-marcas b{font-family:var(--impacto);font-size:12px;letter-spacing:.06em;
+    background:var(--lima);padding:3px 7px;flex:none;text-transform:uppercase}
+
+  /* ── 2 · EL CICLO (por qué vuelve) ──────────────────────────────────────
+     Cuatro estados y un punto que gira sin parar. El loop ES el argumento.   */
+  #ax-nota-{{ uid }} .ax-ciclo{display:block;width:100%;max-width:330px;margin:0 auto;height:auto}
+  #ax-nota-{{ uid }} .ax-ciclo .aro{fill:none;stroke:var(--tinta);stroke-width:3;stroke-dasharray:9 7;opacity:.35}
+  #ax-nota-{{ uid }} .ax-ciclo .nodo{fill:var(--papel);stroke:var(--tinta);stroke-width:3}
+  #ax-nota-{{ uid }} .ax-ciclo text{font-family:var(--texto);font-size:13px;fill:var(--tinta);text-anchor:middle}
+  #ax-nota-{{ uid }} .ax-ciclo .num{font-family:var(--impacto);font-size:15px}
+  #ax-nota-{{ uid }} .ax-ciclo .bolita{fill:var(--lima-honda);stroke:var(--tinta);stroke-width:2.5}
+  #ax-nota-{{ uid }} .ax-va .ax-ciclo .rota{animation:ax-gira-{{ uid }} 9s linear infinite}
+  @keyframes ax-gira-{{ uid }}{to{transform:rotate(360deg)}}
+  #ax-nota-{{ uid }} .ax-ciclo .rota{transform-origin:160px 174px}
+
+  /* ── 3 · LA SEMANA DE MÁS (E4) ──────────────────────────────────────────
+     Dos líneas de días. Arriba el que corta cuando deja de picar; abajo el que
+     sigue siete días más. El final de cada línea es distinto y se ve.          */
+  #ax-nota-{{ uid }} .ax-sem{display:grid;gap:16px}
+  #ax-nota-{{ uid }} .ax-sem-fila b{display:block;font-family:var(--impacto);font-size:12px;
+    letter-spacing:.08em;text-transform:uppercase;margin:0 0 7px}
+  #ax-nota-{{ uid }} .ax-sem-dias{display:flex;gap:3px;flex-wrap:nowrap}
+  #ax-nota-{{ uid }} .ax-sem-dias i{flex:1 1 0;height:26px;border:2px solid var(--tinta);
+    background:var(--papel-2)}
+  #ax-nota-{{ uid }}.ax-armado .ax-sem-dias i{opacity:0}
+  #ax-nota-{{ uid }} .ax-va .ax-sem-dias i{opacity:1;transition:opacity .18s ease}
+  #ax-nota-{{ uid }} .ax-sem-dias i.usa{background:var(--lima)}
+  #ax-nota-{{ uid }} .ax-sem-dias i.extra{background:var(--lima-honda)}
+  #ax-nota-{{ uid }} .ax-sem-dias i.vuelve{background:var(--tinta)}
+  #ax-nota-{{ uid }} .ax-sem-pie{margin:7px 0 0;font-family:var(--texto);font-size:14px;line-height:1.35}
+  #ax-nota-{{ uid }} .ax-sem-pie em{font-style:normal;background:var(--lima);padding:1px 5px}
+
+  /* ── 4 · VERSUS (la fricción del ritual, en pasos) ──────────────────────
+     No se explica que la crema es un bardo: se cuentan los pasos al lado de los
+     del spray y se tildan en cascada. La columna corta termina primero.        */
+  #ax-nota-{{ uid }} .ax-vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  #ax-nota-{{ uid }} .ax-vs-col b{display:block;font-family:var(--impacto);font-size:12.5px;
+    letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;text-align:center;
+    background:var(--papel-2);border:3px solid var(--tinta);margin:0 0 9px}
+  #ax-nota-{{ uid }} .ax-vs-col.nuestra b{background:var(--lima)}
+  #ax-nota-{{ uid }} .ax-vs-col ol{list-style:none;margin:0;padding:0;counter-reset:paso}
+  #ax-nota-{{ uid }} .ax-vs-col li{counter-increment:paso;position:relative;padding:7px 0 7px 26px;
+    font-family:var(--texto);font-size:14.5px;line-height:1.3;border-bottom:2px dotted var(--papel-2)}
+  #ax-nota-{{ uid }}.ax-armado .ax-vs-col li{opacity:0;transform:translateY(6px)}
+  #ax-nota-{{ uid }} .ax-va .ax-vs-col li{opacity:1;transform:none;transition:opacity .3s ease,transform .3s ease}
+  #ax-nota-{{ uid }} .ax-vs-col li::before{content:counter(paso);position:absolute;left:0;top:7px;
+    font-family:var(--impacto);font-size:11px;width:18px;height:18px;line-height:18px;text-align:center;
+    background:var(--tinta);color:var(--papel)}
+  #ax-nota-{{ uid }} .ax-vs-col.nuestra li::before{background:var(--lima-honda);color:var(--tinta)}
+  #ax-nota-{{ uid }} .ax-vs-total{margin:10px 0 0;font-family:var(--impacto);font-size:12px;
+    letter-spacing:.06em;text-transform:uppercase;text-align:center}
+
+  /* ── 5 · VIDEO (los que ya tenemos filmados) ───────────────────────────── */
+  #ax-nota-{{ uid }} .ax-video video{display:block;width:100%;height:auto;background:var(--tinta)}
+
+  /* ── 6 · TIRA de escenas (carrusel con snap, como el resto de la landing) ─ */
+  #ax-nota-{{ uid }} .ax-tira{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 0 4px}
+  #ax-nota-{{ uid }} .ax-tira::-webkit-scrollbar{display:none}
+  #ax-nota-{{ uid }} .ax-tira figure{flex:0 0 76%;scroll-snap-align:center;margin:0;
+    border:3px solid var(--tinta);background:var(--tinta)}
+  #ax-nota-{{ uid }} .ax-tira img{display:block;width:100%;height:auto}
+  #ax-nota-{{ uid }} .ax-tira figcaption{font-family:var(--texto);font-size:13px;padding:8px 11px;
+    color:var(--papel);line-height:1.35}
+
+  @media (min-width:750px){
+    #ax-nota-{{ uid }} .ax-tira figure{flex:0 0 46%}
+  }
+  /* Quien pidió menos movimiento, no recibe movimiento. */
+  @media (prefers-reduced-motion:reduce){
+    #ax-nota-{{ uid }} .ax-dia-h,#ax-nota-{{ uid }} .ax-sem-dias i,#ax-nota-{{ uid }} .ax-vs-col li{
+      transition:none !important;transform:none !important;opacity:1 !important}
+    #ax-nota-{{ uid }} .ax-ciclo .rota{animation:none !important}
+  }
+
+  /* ── PIE LEGAL ────────────────────────────────────────────────────────── */
+  #ax-nota-{{ uid }} .ax-legal{margin:34px 0 0;padding:14px 0 0;border-top:2px solid var(--tinta);
+    font-family:var(--texto);font-size:12.5px;line-height:1.5;opacity:.75}
+
+  /* ── BARRA FIJA (celular) ─────────────────────────────────────────────── */
+  #ax-barra-{{ uid }}{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#141210;
+    padding:10px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;
+    transform:translateY(120px);transition:transform .22s ease;
+    font-family:'Barlow Semi Condensed','Barlow',Arial,sans-serif}
+  #ax-barra-{{ uid }}.ax-ver{transform:translateY(0)}
+  #ax-barra-{{ uid }} .ax-b-txt{color:#E6DFCE;font-size:13px;line-height:1.2}
+  #ax-barra-{{ uid }} .ax-b-txt b{display:block;font-family:'Archivo Black',Arial,sans-serif;font-size:16px}
+  #ax-barra-{{ uid }} a{background:#93D920;color:#141210;font-family:'Archivo Black',Arial,sans-serif;
+    text-transform:uppercase;font-size:14px;padding:15px 14px;text-decoration:none;
+    transform:skewX(-9deg);white-space:nowrap;flex:none}
+  #ax-barra-{{ uid }} a span{display:inline-block;transform:skewX(9deg)}
+
+  @media (min-width:750px){
+    #ax-nota-{{ uid }} .ax-col{padding:0 24px}
+    #ax-nota-{{ uid }} .ax-caja img{width:120px;height:120px}
+    #ax-barra-{{ uid }}{display:none}
+  }
+{% endstyle %}
+
+<div id="ax-nota-{{ uid }}" class="{% if section.settings.estilo == 'portal' %}ax-portal{% endif %}">
+  {%- if section.settings.cinta != blank -%}
+    <div class="ax-cinta">{{ section.settings.cinta }}</div>
+  {%- endif -%}
+
+  <article class="ax-col ax-cab">
+    {%- if section.settings.eyebrow != blank -%}
+      <span class="ax-eye"><span>{{ section.settings.eyebrow }}</span></span>
+    {%- endif -%}
+
+    <h1>{{ section.settings.titulo }}</h1>
+
+    {%- if section.settings.bajada != blank -%}
+      <p class="ax-bajada">{{ section.settings.bajada }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.autor != blank or section.settings.dato != blank -%}
+      <div class="ax-firma-top">
+        {%- if section.settings.autor != blank -%}<span>{{ section.settings.autor }}</span>{%- endif -%}
+        {%- if section.settings.dato != blank -%}<i>·</i><i>{{ section.settings.dato }}</i>{%- endif -%}
+      </div>
+    {%- endif -%}
 
     {%- for block in section.blocks -%}
-      {%- assign b = block.settings -%}
       {%- case block.type -%}
-        {%- when 'subtitle' -%}
-          <h2 class="gad-ar__h2 h3" id="GadAr-{{ block.id }}" {{ block.shopify_attributes }}>{{ b.text }}</h2>
 
-        {%- when 'paragraph' -%}
-          <div class="gad-ar__p rte" {{ block.shopify_attributes }}>{{ b.text }}</div>
+        {%- when 'subtitulo' -%}
+          <h2 id="ax-s-{{ uid }}-{{ forloop.index }}" {{ block.shopify_attributes }}>{{ block.settings.texto }}</h2>
 
-        {%- when 'highlight' -%}
-          <p class="gad-ar__hl" {{ block.shopify_attributes }}>{{ b.text }}</p>
+        {%- when 'parrafo' -%}
+          <div class="ax-p" {{ block.shopify_attributes }}>{{ block.settings.texto }}</div>
 
-        {%- when 'image' -%}
-          <figure class="gad-ar__fig" {{ block.shopify_attributes }}>
-            {%- if b.image != blank -%}
-              {{ b.image | image_url: width: 1400 | image_tag: loading: 'lazy', alt: b.image.alt, sizes: '(min-width: 750px) 720px, 100vw', widths: '500, 800, 1100, 1400' }}
-            {%- else -%}
-              {{ 'lifestyle-1' | placeholder_svg_tag: 'gad-ar__ph' }}
-            {%- endif -%}
-            {%- if b.caption != blank -%}<figcaption>{{ b.caption }}</figcaption>{%- endif -%}
-          </figure>
+        {%- when 'destacado' -%}
+          <p class="ax-dest" {{ block.shopify_attributes }}>{{ block.settings.texto }}</p>
 
-        {%- when 'strip' -%}
-          <div class="gad-ar__strip" {{ block.shopify_attributes }}>
-            {%- for i in (1..3) -%}
-              {%- liquid
-                assign ki = 'image_' | append: i
-                assign kc = 'caption_' | append: i
-              -%}
-              <figure>
-                {%- if b[ki] != blank -%}
-                  {{ b[ki] | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', sizes: '33vw', widths: '300, 600' }}
-                {%- else -%}
-                  {{ 'image' | placeholder_svg_tag: 'gad-ar__ph' }}
-                {%- endif -%}
-                {%- if b[kc] != blank -%}<figcaption>{{ b[kc] | escape }}</figcaption>{%- endif -%}
-              </figure>
-            {%- endfor -%}
-          </div>
-
-        {%- when 'video' -%}
-          <figure class="gad-ar__fig" {{ block.shopify_attributes }}>
-            {%- if b.video != blank -%}
-              {%- render 'gad-video', video: b.video, autoplay: b.autoplay, loop: true, tap: true, sound: true -%}
-            {%- elsif b.video_url != blank -%}
-              {%- liquid
-                if b.video_url.type == 'youtube'
-                  assign embed = 'https://www.youtube-nocookie.com/embed/' | append: b.video_url.id | append: '?rel=0&playsinline=1'
-                else
-                  assign embed = 'https://player.vimeo.com/video/' | append: b.video_url.id | append: '?dnt=1'
-                endif
-              -%}
-              <div class="gad-ar__embed"><iframe src="{{ embed }}" title="{{ b.caption | strip_html | default: 'Video' | escape }}" loading="lazy" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe></div>
-            {%- elsif request.design_mode -%}
-              {{ 'hero-apparel-1' | placeholder_svg_tag: 'gad-ar__ph' }}
-            {%- endif -%}
-            {%- if b.caption != blank -%}<figcaption>{{ b.caption }}</figcaption>{%- endif -%}
-          </figure>
-
-        {%- when 'quotes' -%}
-          <div class="gad-ar__quotes" {{ block.shopify_attributes }}>
-            {%- if b.title != blank -%}<p class="gad-ar__qt">{{ b.title | escape }}</p>{%- endif -%}
-            {%- for i in (1..3) -%}
-              {%- liquid
-                assign kq = 'quote_' | append: i
-                assign ks = 'source_' | append: i
-              -%}
-              {%- if b[kq] != blank -%}
-                <blockquote><p>{{ b[kq] }}</p>{%- if b[ks] != blank -%}<cite>{{ b[ks] | escape }}</cite>{%- endif -%}</blockquote>
-              {%- endif -%}
-            {%- endfor -%}
-            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
-          </div>
-
-        {%- when 'signature' -%}
-          <div class="gad-ar__sign" {{ block.shopify_attributes }}>
-            {%- if b.image != blank -%}{{ b.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '', width: 56, height: 56 }}{%- endif -%}
-            <span><b>{{ b.name | escape }}</b>{%- if b.role != blank -%}<small>{{ b.role | escape }}</small>{%- endif -%}</span>
-          </div>
-
-        {%- when 'index' -%}
-          {%- assign subs = section.blocks | where: 'type', 'subtitle' -%}
-          {%- if subs.size > 0 -%}
-            <nav class="gad-ar__index" aria-label="{{ b.title | escape }}" {{ block.shopify_attributes }}>
-              {%- if b.title != blank -%}<p>{{ b.title | escape }}</p>{%- endif -%}
-              <ol>
-                {%- for sub in subs -%}
-                  <li><a href="#GadAr-{{ sub.id }}" class="link">{{ sub.settings.text | strip_html }}</a></li>
-                {%- endfor -%}
-              </ol>
-            </nav>
+        {%- when 'imagen' -%}
+          {%- if block.settings.imagen != blank -%}
+            <figure class="ax-img" {{ block.shopify_attributes }}>
+              <img src="{{ block.settings.imagen | image_url: width: 1200 }}"
+                   alt="{{ block.settings.alt | escape }}" loading="lazy" width="1200" height="900">
+              {%- if block.settings.pie != blank -%}<figcaption>{{ block.settings.pie }}</figcaption>{%- endif -%}
+            </figure>
           {%- endif -%}
 
-        {%- when 'button' -%}
-          <div class="gad-ar__btn" {{ block.shopify_attributes }}>
-            <a href="{{ b.link | default: '#' }}" class="button">{{ b.label | escape }}</a>
+        {%- when 'firma' -%}
+          <div class="ax-firma" {{ block.shopify_attributes }}>
+            <b>{{ block.settings.nombre }}</b>
+            {%- if block.settings.rol != blank -%}<i>{{ block.settings.rol }}</i>{%- endif -%}
           </div>
 
-        {%- when 'product_box' -%}
-          {%- assign p = b.product -%}
-          <div class="gad-ar__box color-{{ b.scheme }}" {{ block.shopify_attributes }}>
-            {%- if p.featured_media -%}
-              <div class="gad-ar__box-img">{{ p.featured_media | image_url: width: 500 | image_tag: loading: 'lazy', alt: p.title }}</div>
-            {%- endif -%}
-            <div class="gad-ar__box-info">
-              <p class="gad-ar__box-title h4">{{ b.title | default: p.title }}</p>
-              {%- if b.text != blank -%}<div class="rte">{{ b.text }}</div>{%- endif -%}
-              {%- if p != blank -%}
-                <p class="gad-ar__box-price">{{ p.price | money }}</p>
-                {%- render 'gad-atc-button', label: b.button_label, product: p -%}
-              {%- elsif request.design_mode -%}
-                <p class="gad-ar__small">{{ 'gadsden.offer.pick' | t }}</p>
-              {%- endif -%}
+        {%- when 'test' -%}
+          <a class="ax-test" href="{{ block.settings.url }}" {{ block.shopify_attributes }}>
+            <b>{{ block.settings.titulo }}</b>
+            <i>{{ block.settings.texto }}</i>
+            <u><span>{{ block.settings.boton }}</span></u>
+          </a>
+
+        {%- comment -%} ── INDICE (se genera de los subtitulos de la nota) ── {%- endcomment -%}
+        {%- when 'indice' -%}
+          {%- comment -%} sólo lista lo que viene DESPUÉS del índice, o se lista a sí mismo {%- endcomment -%}
+          {%- assign pos_indice = forloop.index -%}
+          <nav class="ax-indice" {{ block.shopify_attributes }} aria-label="Contenido de la nota">
+            {%- if block.settings.titulo != blank -%}<p class="ax-indice-tit">{{ block.settings.titulo }}</p>{%- endif -%}
+            <ol>
+              {%- for b in section.blocks -%}
+                {%- if b.type == 'subtitulo' and b.settings.texto != blank and forloop.index > pos_indice -%}
+                  <li><a href="#ax-s-{{ uid }}-{{ forloop.index }}">{{ b.settings.texto }}</a></li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ol>
+          </nav>
+
+        {%- comment -%} ── DEMO 1 · el día ── {%- endcomment -%}
+        {%- when 'dia' -%}
+          <div class="ax-demo ax-mira" {{ block.shopify_attributes }}>
+            <p class="ax-demo-tit">{{ block.settings.titulo }}</p>
+            <div class="ax-demo-cuerpo">
+              <div class="ax-dia-riel">
+                <span class="ax-dia-h d1"></span><span class="ax-dia-h d2"></span>
+                <span class="ax-dia-h d3"></span><span class="ax-dia-h d4"></span>
+              </div>
+              <div class="ax-dia-horas"><span>7:00</span><span>13:00</span><span>19:00</span><span>23:00</span></div>
+              <ul class="ax-dia-marcas">
+                {%- assign marcas = block.settings.marcas | newline_to_br | split: '<br />' -%}
+                {%- for m in marcas -%}
+                  {%- assign partes = m | strip | split: '|' -%}
+                  {%- if partes[0] != blank -%}
+                    <li><b>{{ partes[0] | strip }}</b><span>{{ partes[1] | strip }}</span></li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
             </div>
+            {%- if block.settings.pie != blank -%}<p class="ax-demo-pie">{{ block.settings.pie }}</p>{%- endif -%}
           </div>
 
-        {%- when 'quiz_bridge' -%}
-          <div class="gad-ar__bridge" {{ block.shopify_attributes }}>
-            <p class="h4">{{ b.title }}</p>
-            {%- if b.text != blank -%}<p>{{ b.text }}</p>{%- endif -%}
-            <a href="{{ b.link | default: '#' }}" class="button button--secondary">{{ b.label | escape }}</a>
+        {%- comment -%} ── DEMO 2 · el ciclo ── {%- endcomment -%}
+        {%- when 'ciclo' -%}
+          <div class="ax-demo ax-mira" {{ block.shopify_attributes }}>
+            <p class="ax-demo-tit">{{ block.settings.titulo }}</p>
+            <div class="ax-demo-cuerpo">
+              {%- comment -%}
+                El número va DENTRO del círculo y la etiqueta AFUERA: adentro se
+                desborda con cualquier palabra de más de seis letras. Y la bolita
+                se dibuja al final, o los nodos la tapan.
+              {%- endcomment -%}
+              <svg class="ax-ciclo" viewBox="0 0 320 348" role="img"
+                   aria-label="{{ block.settings.n1 }}, {{ block.settings.n2 }}, {{ block.settings.n3 }}, {{ block.settings.n4 }}, y otra vez desde el principio">
+                <circle class="aro" cx="160" cy="174" r="104"/>
+                <circle class="nodo" cx="160" cy="70"  r="31"/><text class="num" x="160" y="78">1</text><text x="160" y="26">{{ block.settings.n1 }}</text>
+                <circle class="nodo" cx="264" cy="174" r="31"/><text class="num" x="264" y="182">2</text><text x="264" y="228">{{ block.settings.n2 }}</text>
+                <circle class="nodo" cx="160" cy="278" r="31"/><text class="num" x="160" y="286">3</text><text x="160" y="332">{{ block.settings.n3 }}</text>
+                <circle class="nodo" cx="56"  cy="174" r="31"/><text class="num" x="56"  y="182">4</text><text x="56"  y="228">{{ block.settings.n4 }}</text>
+                <g class="rota"><circle class="bolita" cx="160" cy="110" r="9"/></g>
+              </svg>
+            </div>
+            {%- if block.settings.pie != blank -%}<p class="ax-demo-pie">{{ block.settings.pie }}</p>{%- endif -%}
           </div>
 
-        {%- when 'versus' -%}
-          <div class="gad-ar__vs" data-gad-ar-ticks {{ block.shopify_attributes }}>
-            {%- if b.title != blank -%}<p class="gad-ar__vs-title h4">{{ b.title }}</p>{%- endif -%}
-            <div class="gad-ar__vs-cols">
-              {%- for side in (1..2) -%}
-                {%- liquid
-                  if side == 1
-                    assign col = b.col_a
-                    assign steps = b.steps_a
-                  else
-                    assign col = b.col_b
-                    assign steps = b.steps_b
-                  endif
-                -%}
-                <div class="gad-ar__vs-col gad-ar__vs-col--{{ side }}">
-                  <p class="gad-ar__vs-head">{{ col | escape }}</p>
-                  <ol class="list-unstyled">
-                    {%- assign sl = steps | newline_to_br | split: '<br />' -%}
-                    {%- for x in sl -%}
-                      {%- assign x = x | strip -%}
-                      {%- if x != blank -%}<li style="--d: {{ forloop.index0 }};">{%- render 'gad-icon', name: 'check_circle', filled: true -%}<span>{{ x | escape }}</span></li>{%- endif -%}
-                    {%- endfor -%}
-                  </ol>
+        {%- comment -%} ── DEMO 3 · la semana de más ── {%- endcomment -%}
+        {%- when 'semana' -%}
+          <div class="ax-demo ax-mira" {{ block.shopify_attributes }}>
+            <p class="ax-demo-tit">{{ block.settings.titulo }}</p>
+            <div class="ax-demo-cuerpo ax-sem">
+              <div class="ax-sem-fila">
+                <b>{{ block.settings.fila_a }}</b>
+                <div class="ax-sem-dias">
+                  {%- for i in (1..21) -%}
+                    {%- if i <= 10 -%}<i class="usa" style="transition-delay:{{ i | times: 30 }}ms"></i>
+                    {%- else -%}<i class="vuelve" style="transition-delay:{{ i | times: 30 }}ms"></i>{%- endif -%}
+                  {%- endfor -%}
                 </div>
-              {%- endfor -%}
+                <p class="ax-sem-pie">{{ block.settings.pie_a }}</p>
+              </div>
+              <div class="ax-sem-fila">
+                <b>{{ block.settings.fila_b }}</b>
+                <div class="ax-sem-dias">
+                  {%- for i in (1..21) -%}
+                    {%- if i <= 10 -%}<i class="usa" style="transition-delay:{{ i | times: 30 }}ms"></i>
+                    {%- elsif i <= 17 -%}<i class="extra" style="transition-delay:{{ i | times: 30 }}ms"></i>
+                    {%- else -%}<i style="transition-delay:{{ i | times: 30 }}ms"></i>{%- endif -%}
+                  {%- endfor -%}
+                </div>
+                <p class="ax-sem-pie">{{ block.settings.pie_b }}</p>
+              </div>
             </div>
-            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
           </div>
 
-        {%- when 'cycle' -%}
-          <div class="gad-ar__cycle" {{ block.shopify_attributes }}>
-            {%- if b.title != blank -%}<p class="gad-ar__vs-title h4">{{ b.title }}</p>{%- endif -%}
-            <div class="gad-ar__ring">
-              <span class="gad-ar__dot" aria-hidden="true"></span>
-              {%- for i in (1..4) -%}
-                {%- assign k = 'step_' | append: i -%}
-                <span class="gad-ar__node gad-ar__node--{{ i }}">{{ b[k] | escape }}</span>
-              {%- endfor -%}
+        {%- comment -%} ── DEMO 4 · versus (pasos contra pasos) ── {%- endcomment -%}
+        {%- when 'versus' -%}
+          <div class="ax-demo ax-mira" {{ block.shopify_attributes }}>
+            <p class="ax-demo-tit">{{ block.settings.titulo }}</p>
+            <div class="ax-demo-cuerpo">
+              <div class="ax-vs">
+                {%- assign izq = block.settings.pasos_a | newline_to_br | split: '<br />' -%}
+                {%- assign der = block.settings.pasos_b | newline_to_br | split: '<br />' -%}
+                <div class="ax-vs-col">
+                  <b>{{ block.settings.col_a }}</b>
+                  <ol>{%- for x in izq -%}{%- if x != blank -%}<li style="transition-delay:{{ forloop.index | times: 120 }}ms">{{ x | strip }}</li>{%- endif -%}{%- endfor -%}</ol>
+                  <p class="ax-vs-total">{{ izq.size }} pasos</p>
+                </div>
+                <div class="ax-vs-col nuestra">
+                  <b>{{ block.settings.col_b }}</b>
+                  <ol>{%- for x in der -%}{%- if x != blank -%}<li style="transition-delay:{{ forloop.index | times: 120 }}ms">{{ x | strip }}</li>{%- endif -%}{%- endfor -%}</ol>
+                  <p class="ax-vs-total">{{ der.size }} pasos</p>
+                </div>
+              </div>
             </div>
-            {%- if b.footer != blank -%}<p class="gad-ar__small">{{ b.footer }}</p>{%- endif -%}
+            {%- if block.settings.pie != blank -%}<p class="ax-demo-pie">{{ block.settings.pie }}</p>{%- endif -%}
           </div>
+
+        {%- comment -%} ── DEMO 5 · video ── {%- endcomment -%}
+        {%- when 'video' -%}
+          {%- if block.settings.video != blank -%}
+            <div class="ax-demo ax-video" {{ block.shopify_attributes }}>
+              {%- if block.settings.titulo != blank -%}<p class="ax-demo-tit">{{ block.settings.titulo }}</p>{%- endif -%}
+              {{ block.settings.video | video_tag: image_size: '800x', autoplay: true, loop: true, muted: true, controls: false }}
+              {%- if block.settings.pie != blank -%}<p class="ax-demo-pie">{{ block.settings.pie }}</p>{%- endif -%}
+            </div>
+          {%- endif -%}
+
+        {%- comment -%} ── DEMO 6 · tira de escenas ── {%- endcomment -%}
+        {%- when 'tira' -%}
+          <div class="ax-tira" {{ block.shopify_attributes }}>
+            {%- for n in (1..3) -%}
+              {%- assign clave = 'img_' | append: n -%}
+              {%- assign cap = 'pie_' | append: n -%}
+              {%- if block.settings[clave] != blank -%}
+                <figure>
+                  <img src="{{ block.settings[clave] | image_url: width: 700 }}" alt="{{ block.settings[cap] | escape }}" loading="lazy" width="700" height="875">
+                  {%- if block.settings[cap] != blank -%}<figcaption>{{ block.settings[cap] }}</figcaption>{%- endif -%}
+                </figure>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+        {%- when 'citas' -%}
+          <div class="ax-voces" {{ block.shopify_attributes }}>
+            {%- if block.settings.titulo != blank -%}
+              <p class="ax-voces-tit">{{ block.settings.titulo }}</p>
+            {%- endif -%}
+            <blockquote>&laquo;{{ block.settings.cita_1 }}&raquo;<cite>{{ block.settings.fuente_1 }}</cite></blockquote>
+            {%- if block.settings.cita_2 != blank -%}
+              <blockquote>&laquo;{{ block.settings.cita_2 }}&raquo;<cite>{{ block.settings.fuente_2 }}</cite></blockquote>
+            {%- endif -%}
+            {%- if block.settings.pie != blank -%}
+              <p class="ax-voces-pie">{{ block.settings.pie }}</p>
+            {%- endif -%}
+          </div>
+
+        {%- when 'cta' -%}
+          <div class="ax-cta-suelto" {{ block.shopify_attributes }}>
+            {%- if block.settings.linea != blank -%}
+              <p class="ax-linea">{{ block.settings.linea }}</p>
+            {%- endif -%}
+            <a class="ax-cta" href="{{ p.url | default: '/products/athlex' }}{{ section.settings.utm }}">
+              <span>{{ block.settings.boton }}</span>
+            </a>
+          </div>
+
+        {%- when 'caja' -%}
+          <div class="ax-caja" {{ block.shopify_attributes }}>
+            <div class="ax-caja-top">
+              {%- if p.featured_image != blank -%}
+                <img src="{{ p.featured_image | image_url: width: 300 }}"
+                     alt="{{ p.featured_image.alt | escape }}" loading="lazy" width="300" height="300">
+              {%- endif -%}
+              <div>
+                <h3>{{ block.settings.titulo }}</h3>
+                <div class="ax-sub">{{ block.settings.sub }}</div>
+              </div>
+            </div>
+
+            {%- if p != blank -%}
+              <div class="ax-precio">
+                <b>{{ p.price | money }}</b>
+                {%- if p.compare_at_price > p.price -%}
+                  <s>{{ p.compare_at_price | money }}</s>
+                  {%- comment -%} el round es obligatorio: sin él, fuera de Shopify la división da 25.000312503906297 {%- endcomment -%}
+                  {%- assign off = p.compare_at_price | minus: p.price | times: 100.0 | divided_by: p.compare_at_price | round -%}
+                  <em><span>Ahorr&aacute;s {{ off }}&#37;</span></em>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+
+            <a class="ax-cta" href="{{ p.url | default: '/products/athlex' }}{{ section.settings.utm }}">
+              <span>{{ block.settings.boton }}</span>
+            </a>
+
+            {%- if block.settings.pie != blank -%}
+              <p class="ax-caja-pie">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z"/><path d="m9 12 2 2 4-4"/>
+                </svg>
+                <span>{{ block.settings.pie }}</span>
+              </p>
+            {%- endif -%}
+          </div>
+
       {%- endcase -%}
     {%- endfor -%}
 
-    {%- assign topics = s.topics | split: ',' -%}
-    {%- if s.topics != blank -%}
-      <nav class="gad-ar__topics"{% if s.topics_title != blank %} aria-label="{{ s.topics_title | escape }}"{% endif %}>
-        {%- if s.topics_title != blank -%}<p class="gad-ar__topics-title">{{ s.topics_title | escape }}</p>{%- endif -%}
-        <ul class="list-unstyled" role="list">
-          {%- for t in topics -%}
-            {%- assign topic = t | strip -%}
-            {%- if topic != blank -%}<li>{{ topic | escape }}</li>{%- endif -%}
-          {%- endfor -%}
+    {%- if section.settings.temas != blank -%}
+      <div class="ax-temas">
+        <p>{{ section.settings.temas_titulo | default: 'Temas de la nota' }}</p>
+        <ul>
+          {%- assign temas = section.settings.temas | split: ',' -%}
+          {%- for t in temas -%}{%- if t != blank -%}<li>{{ t | strip }}</li>{%- endif -%}{%- endfor -%}
         </ul>
-      </nav>
+      </div>
     {%- endif -%}
-    {%- if s.legal != blank -%}<div class="gad-ar__legal rte">{{ s.legal }}</div>{%- endif -%}
+
+    {%- if section.settings.legal != blank -%}
+      <p class="ax-legal">{{ section.settings.legal }}</p>
+    {%- endif -%}
   </article>
+</div>
 
-  {%- if s.bar_on and s.bar_button != blank -%}
-    <div class="gad-ar__bar color-{{ s.bar_scheme }}" data-gad-ar-bar hidden>
-      <span class="gad-ar__bar-title">{{ s.bar_title | escape }}</span>
-      <a href="{{ s.bar_link | default: '#oferta' }}" class="button">{{ s.bar_button | escape }}</a>
+<script>
+  /* Los bloques demostrativos se animan al entrar en pantalla. Misma mecánica
+     que athlex-mecanismo: recién acá se marca .ax-armado, así que si este script
+     no corre, nada quedó escondido — se ve todo, quieto. */
+  (function () {
+    var caja = document.getElementById('ax-nota-{{ uid }}');
+    if (!caja || caja.dataset.axDemos) return;
+    caja.dataset.axDemos = '1';
+    var demos = [].slice.call(caja.querySelectorAll('.ax-mira'));
+    if (!demos.length || !('IntersectionObserver' in window)) return;
+    caja.classList.add('ax-armado');
+    var ojo = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('ax-va'); ojo.unobserve(e.target); }
+      });
+    }, { threshold: 0.35 });
+    demos.forEach(function (d) { ojo.observe(d); });
+  })();
+</script>
+
+{%- if section.settings.barra -%}
+  <div id="ax-barra-{{ uid }}" class="{% if section.settings.estilo == 'portal' %}ax-portal-barra{% endif %}">
+    <div class="ax-b-txt">
+      <b>{{ section.settings.barra_titulo }}</b>
+      {%- if p != blank -%}{{ p.price | money }}{%- endif -%}
     </div>
-  {%- endif -%}
-</gad-article>
-
-{% stylesheet %}
-  .gad-ar__body {
-    max-width: 72rem;
-  }
-
-  .gad-ar__head {
-    display: grid;
-    gap: 1rem;
-    margin-bottom: 2.8rem;
-  }
-
-  .gad-ar__ribbon {
-    width: fit-content;
-    padding: 0.3rem 1rem;
-    background: rgb(var(--color-button));
-    color: rgb(var(--color-button-text));
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.1rem;
-    text-transform: uppercase;
-  }
-
-  .gad-ar__kicker {
-    font-size: 1.3rem;
-    font-weight: 700;
-    letter-spacing: 0.12rem;
-    text-transform: uppercase;
-    opacity: 0.8;
-  }
-
-  .gad-ar__title {
-    margin: 0;
-  }
-
-  .gad-ar__dek {
-    margin: 0;
-    font-size: 1.9rem;
-    line-height: 1.45;
-  }
-
-  .gad-ar__byline {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1rem;
-    margin: 0;
-    padding-top: 1.2rem;
-    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    font-size: 1.3rem;
-  }
-
-  .gad-ar__byline span {
-    opacity: 0.7;
-  }
-
-  .gad-ar__body > * + * {
-    margin-top: 2rem;
-  }
-
-  .gad-ar__h2 {
-    margin-top: 3.6rem;
-    scroll-margin-top: 10rem;
-  }
-
-  .gad-ar__p {
-    font-size: 1.7rem;
-    line-height: 1.7;
-  }
-
-  .gad-ar__hl {
-    margin: 3.2rem 0;
-    padding-left: 1.6rem;
-    border-left: 0.4rem solid rgb(var(--color-button));
-    font-size: 2.4rem;
-    font-weight: 700;
-    line-height: 1.3;
-  }
-
-  .gad-ar__fig {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .gad-ar__fig img,
-  .gad-ar__ph {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 0.8rem;
-  }
-
-  .gad-ar__ph {
-    aspect-ratio: 16 / 9;
-    background: rgba(var(--color-foreground), 0.06);
-  }
-
-  .gad-ar__fig figcaption,
-  .gad-ar__strip figcaption,
-  .gad-ar__small {
-    margin-top: 0.6rem;
-    font-size: 1.3rem;
-    opacity: 0.75;
-  }
-
-  .gad-ar__embed {
-    position: relative;
-    aspect-ratio: 16 / 9;
-  }
-
-  .gad-ar__embed iframe {
-    width: 100%;
-    height: 100%;
-    border: 0;
-    border-radius: 0.8rem;
-  }
-
-  .gad-ar__strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.8rem;
-  }
-
-  .gad-ar__strip figure {
-    margin: 0;
-  }
-
-  .gad-ar__strip img,
-  .gad-ar__strip .gad-ar__ph {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 0.6rem;
-  }
-
-  .gad-ar__quotes {
-    padding: 2rem;
-    border-radius: 1.2rem;
-    background: rgba(var(--color-foreground), 0.05);
-  }
-
-  .gad-ar__qt {
-    margin: 0 0 1rem;
-    font-weight: 700;
-  }
-
-  .gad-ar__quotes blockquote {
-    margin: 0 0 1.2rem;
-    padding: 0 0 0 1.2rem;
-    border-left: 0.3rem solid rgba(var(--color-foreground), 0.25);
-    font-style: italic;
-  }
-
-  .gad-ar__quotes blockquote p {
-    margin: 0;
-  }
-
-  .gad-ar__quotes cite {
-    display: block;
-    margin-top: 0.4rem;
-    font-size: 1.2rem;
-    font-style: normal;
-    opacity: 0.7;
-  }
-
-  .gad-ar__sign {
-    display: flex;
-    align-items: center;
-    gap: 1.2rem;
-  }
-
-  .gad-ar__sign img {
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .gad-ar__sign small {
-    display: block;
-    opacity: 0.7;
-  }
-
-  .gad-ar__index {
-    padding: 1.6rem 2rem;
-    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    border-radius: 1rem;
-  }
-
-  .gad-ar__index p {
-    margin: 0 0 0.6rem;
-    font-weight: 700;
-  }
-
-  .gad-ar__index ol {
-    margin: 0;
-    padding-left: 2rem;
-  }
-
-  .gad-ar__btn {
-    text-align: center;
-  }
-
-  .gad-ar__box {
-    display: grid;
-    gap: 1.6rem;
-    padding: 2rem;
-    border-radius: 1.4rem;
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-    box-shadow: 0 0.6rem 2.4rem rgba(0, 0, 0, 0.08);
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-ar__box {
-      grid-template-columns: 2fr 3fr;
-      align-items: center;
-    }
-  }
-
-  .gad-ar__box-img img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 0.8rem;
-  }
-
-  .gad-ar__box-info {
-    display: grid;
-    gap: 0.8rem;
-  }
-
-  .gad-ar__box-title,
-  .gad-ar__box-price {
-    margin: 0;
-  }
-
-  .gad-ar__box-price {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-
-  .gad-ar__box .button {
-    width: 100%;
-  }
-
-  .gad-ar__bridge {
-    padding: 2rem;
-    border: 0.2rem dashed rgb(var(--color-button));
-    border-radius: 1.2rem;
-    text-align: center;
-  }
-
-  .gad-ar__bridge .h4 {
-    margin: 0 0 0.6rem;
-  }
-
-  .gad-ar__vs-title {
-    margin: 0 0 1.2rem;
-  }
-
-  .gad-ar__vs-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-  }
-
-  .gad-ar__vs-col {
-    padding: 1.4rem;
-    border-radius: 1rem;
-    background: rgba(var(--color-foreground), 0.05);
-  }
-
-  .gad-ar__vs-col--2 {
-    background: rgba(var(--color-button), 0.1);
-  }
-
-  .gad-ar__vs-head {
-    margin: 0 0 0.8rem;
-    font-weight: 700;
-  }
-
-  .gad-ar__vs-col ol {
-    display: grid;
-    gap: 0.6rem;
-    margin: 0;
-    font-size: 1.4rem;
-  }
-
-  .gad-ar__vs-col li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.4rem;
-  }
-
-  .gad-ar__vs-col--1 .gad-icon {
-    opacity: 0.4;
-  }
-
-  .gad-ar__vs.is-armed li .gad-icon {
-    transform: scale(0);
-  }
-
-  .gad-ar__vs.is-armed.is-in li .gad-icon {
-    transform: scale(1);
-    transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
-    transition-delay: calc(var(--d, 0) * 250ms);
-  }
-
-  .gad-ar__cycle {
-    overflow-x: clip;
-    padding: 1.6rem 0;
-  }
-
-  .gad-ar__ring {
-    position: relative;
-    width: min(32rem, 66%);
-    aspect-ratio: 1;
-    margin: 0 auto;
-    border: 0.2rem dashed rgba(var(--color-foreground), 0.3);
-    border-radius: 50%;
-  }
-
-  .gad-ar__dot {
-    position: absolute;
-    inset: 0;
-    animation: gadArSpin 8s linear infinite;
-  }
-
-  .gad-ar__dot::before {
-    content: '';
-    position: absolute;
-    top: -0.8rem;
-    left: 50%;
-    width: 1.4rem;
-    height: 1.4rem;
-    margin-left: -0.7rem;
-    border-radius: 50%;
-    background: rgb(var(--color-button));
-  }
-
-  html.gad-reduce .gad-ar__dot {
-    animation: none;
-  }
-
-  @keyframes gadArSpin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .gad-ar__node {
-    position: absolute;
-    max-width: 50%;
-    padding: 0.4rem 1rem;
-    border-radius: 99rem;
-    background: rgb(var(--color-background));
-    box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.12);
-    font-size: 1.3rem;
-    font-weight: 600;
-    text-align: center;
-    translate: -50% -50%;
-  }
-
-  .gad-ar__node--1 {
-    top: 0;
-    left: 50%;
-  }
-
-  .gad-ar__node--2 {
-    top: 50%;
-    left: 100%;
-  }
-
-  .gad-ar__node--3 {
-    top: 100%;
-    left: 50%;
-  }
-
-  .gad-ar__node--4 {
-    top: 50%;
-    left: 0;
-  }
-
-  /* chips de temas al pie */
-  .gad-ar__topics {
-    margin-top: 4rem;
-    padding-top: 1.6rem;
-    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
-  }
-
-  .gad-ar__topics-title {
-    margin: 0 0 1rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.1rem;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
-
-  .gad-ar__topics ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin: 0;
-  }
-
-  .gad-ar__topics li {
-    padding: 0.4rem 1.2rem;
-    border: 0.1rem solid rgba(var(--color-foreground), 0.2);
-    border-radius: 10rem;
-    font-size: 1.3rem;
-  }
-
-  /* estilo "Diario": portal de noticias; letra de lectura con serifa, líneas finas en lugar de cajas */
-  .gad-ar--news .gad-ar__ribbon {
-    background: rgba(var(--color-foreground), 0.06);
-    color: rgba(var(--color-foreground), 0.7);
-  }
-
-  .gad-ar--news .gad-ar__kicker {
-    color: rgb(var(--color-button));
-    opacity: 1;
-  }
-
-  .gad-ar--news .gad-ar__dek,
-  .gad-ar--news .gad-ar__p,
-  .gad-ar--news .gad-ar__hl,
-  .gad-ar--news .gad-ar__quotes blockquote {
-    font-family: Georgia, Cambria, 'Times New Roman', Times, serif;
-  }
-
-  .gad-ar--news .gad-ar__p {
-    font-size: 1.8rem;
-    line-height: 1.68;
-  }
-
-  .gad-ar--news .gad-ar__p a {
-    text-decoration-color: rgb(var(--color-button));
-  }
-
-  .gad-ar--news .gad-ar__hl {
-    padding: 1.6rem 0;
-    border-left: 0;
-    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    font-weight: 400;
-    font-style: italic;
-  }
-
-  .gad-ar--news .gad-ar__box,
-  .gad-ar--news .gad-ar__index,
-  .gad-ar--news .gad-ar__quotes,
-  .gad-ar--news .gad-ar__vs-col {
-    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .gad-ar--news .gad-ar__index,
-  .gad-ar--news .gad-ar__quotes,
-  .gad-ar--news .gad-ar__vs-col {
-    background: none;
-  }
-
-  .gad-ar--news .gad-ar__bridge {
-    border: 0;
-    border-top: 0.3rem solid rgb(var(--color-foreground));
-    border-radius: 0;
-  }
-
-  .gad-ar--news .gad-ar__fig img,
-  .gad-ar--news .gad-ar__strip img,
-  .gad-ar--news .gad-ar__box-img img {
-    border-radius: 0;
-  }
-
-  .gad-ar__legal {
-    margin-top: 4rem;
-    font-size: 1.2rem;
-    opacity: 0.7;
-  }
-
-  .gad-ar__bar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 25;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem 1.6rem calc(1rem + env(safe-area-inset-bottom));
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-    box-shadow: 0 -0.4rem 1.6rem rgba(0, 0, 0, 0.12);
-  }
-
-  .gad-ar__bar[hidden] {
-    display: none;
-  }
-
-  .gad-ar__bar-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  .gad-ar__bar .button {
-    flex: 0 0 auto;
-    min-height: 4.2rem;
-  }
-{% endstylesheet %}
-
-{% javascript %}
-  class GadArticle extends HTMLElement {
-    connectedCallback() {
-      if (this._ready) return;
-      this._ready = true;
-      const reduce = window.Gadsden && Gadsden.reduceMotion();
-      if (!reduce) {
-        this.querySelectorAll('[data-gad-ar-ticks]').forEach((vs) => {
-          vs.classList.add('is-armed');
-          const io = new IntersectionObserver((entries) => {
-            if (!entries[0].isIntersecting) return;
-            io.disconnect();
-            vs.classList.add('is-in');
-          }, { threshold: 0.4 });
-          io.observe(vs);
-        });
+    <a href="{{ p.url | default: '/products/athlex' }}{{ section.settings.utm }}">
+      <span>{{ section.settings.barra_boton }}</span>
+    </a>
+  </div>
+
+  <script>
+    (function () {
+      var barra = document.getElementById('ax-barra-{{ uid }}');
+      if (!barra || barra.dataset.axListo) return;
+      barra.dataset.axListo = '1';
+      var pedido = false;
+      function pintar () {
+        pedido = false;
+        barra.classList.toggle('ax-ver', window.scrollY > window.innerHeight * 0.9);
       }
-      const bar = this.querySelector('[data-gad-ar-bar]');
-      const head = this.querySelector('.gad-ar__head');
-      if (bar && head) {
-        const body = this.querySelector('.gad-ar__body');
-        const sync = () => {
-          this.raf = 0;
-          const h = head.getBoundingClientRect();
-          const end = body.getBoundingClientRect();
-          bar.hidden = !(h.bottom < 0 && end.bottom > window.innerHeight * 0.6);
-        };
-        this.onScroll = () => this.raf || (this.raf = requestAnimationFrame(sync));
-        window.addEventListener('scroll', this.onScroll, { passive: true });
-        sync();
-      }
-    }
-
-    disconnectedCallback() {
-      if (this.onScroll) window.removeEventListener('scroll', this.onScroll);
-      this._ready = false;
-    }
-  }
-
-  if (!customElements.get('gad-article')) customElements.define('gad-article', GadArticle);
-{% endjavascript %}
+      window.addEventListener('scroll', function () {
+        if (!pedido) { pedido = true; requestAnimationFrame(pintar); }
+      }, { passive: true });
+      pintar();
+    })();
+  </script>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "Nota",
   "tag": "section",
-  "class": "section gad-section",
+  "class": "athlex-nota-section",
   "settings": [
-    {
-      "type": "text",
-      "id": "ribbon",
-      "label": "Cinta",
-      "default": "Nota"
-    },
-    {
-      "type": "text",
-      "id": "kicker",
-      "label": "Volanta",
-      "default": "Salud y bienestar"
-    },
-    {
-      "type": "inline_richtext",
-      "id": "heading",
-      "label": "Título",
-      "default": "El título de la nota, como en un diario"
-    },
-    {
-      "type": "select",
-      "id": "heading_size",
-      "label": "Tamaño del título",
+    { "type": "select", "id": "estilo", "label": "Piel de la nota", "default": "papel",
       "options": [
-        {
-          "value": "h2",
-          "label": "Chico"
-        },
-        {
-          "value": "h1",
-          "label": "Mediano"
-        },
-        {
-          "value": "h0",
-          "label": "Grande"
-        }
+        { "value": "papel", "label": "ATHLEX (papel)" },
+        { "value": "portal", "label": "Portal de noticias" }
       ],
-      "default": "h1"
-    },
-    {
-      "type": "color",
-      "id": "heading_accent",
-      "label": "Color de las palabras resaltadas"
-    },
-    {
-      "type": "inline_richtext",
-      "id": "dek",
-      "label": "Bajada",
-      "default": "Dos líneas que cuentan de qué se trata y por qué leerla."
-    },
-    {
-      "type": "text",
-      "id": "author",
-      "label": "Autor"
-    },
-    {
-      "type": "text",
-      "id": "meta",
-      "label": "Dato",
-      "default": "5 min de lectura"
-    },
-    {
-      "type": "select",
-      "id": "look",
-      "label": "Estilo de la nota",
-      "default": "scheme",
-      "options": [
-        {
-          "value": "scheme",
-          "label": "Combinación de colores"
-        },
-        {
-          "value": "news",
-          "label": "Diario"
-        }
-      ],
-      "info": "Diario: cuerpo en letra de lectura con serifa, volanta en el color del botón, líneas finas en lugar de cajas y sombras. Los colores siguen siendo los de la combinación."
-    },
-    {
-      "type": "richtext",
-      "id": "legal",
-      "label": "Aclaración al final"
-    },
-    {
-      "type": "text",
-      "id": "topics_title",
-      "label": "Título de los temas",
-      "info": "Va al final de la nota, arriba del texto legal."
-    },
-    {
-      "type": "text",
-      "id": "topics",
-      "label": "Temas",
-      "info": "Separados por comas. Vacío: no se muestran."
-    },
-    {
-      "type": "header",
-      "content": "Barra fija abajo"
-    },
-    {
-      "type": "checkbox",
-      "id": "bar_on",
-      "label": "Mostrar al bajar",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "bar_title",
-      "label": "Texto",
-      "default": "¿Querés probarlo?"
-    },
-    {
-      "type": "text",
-      "id": "bar_button",
-      "label": "Botón",
-      "default": "Ver oferta"
-    },
-    {
-      "type": "url",
-      "id": "bar_link",
-      "label": "Enlace",
-      "info": "Vacío: baja a la sección con el ancla \"oferta\"."
-    },
-    {
-      "type": "color_scheme",
-      "id": "bar_scheme",
-      "label": "Combinación",
-      "default": "scheme-1"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Combinación de colores",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "Colores propios"
-    },
-    {
-      "type": "checkbox",
-      "id": "custom_colors",
-      "label": "Usar colores propios",
-      "default": false,
-      "info": "Pisan a la combinación de colores elegida arriba."
-    },
-    {
-      "type": "color",
-      "id": "cc_bg",
-      "label": "Fondo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color_background",
-      "id": "cc_bg_gradient",
-      "label": "Degradé de fondo",
-      "info": "Si cargás un degradé, reemplaza al color de fondo."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image",
-      "label": "Imagen de fondo",
-      "info": "Cubre todo el fondo y le gana al degradé."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image_mobile",
-      "label": "Imagen de fondo en mobile",
-      "info": "Vacía: usa la de desktop."
-    },
-    {
-      "type": "color",
-      "id": "cc_text",
-      "label": "Texto",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_accent",
-      "label": "Acento",
-      "default": "#334FB4"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_bg",
-      "label": "Fondo del botón lleno",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_text",
-      "label": "Texto del botón lleno",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "cc_outline",
-      "label": "Botón de contorno y enlaces",
-      "default": "#121212"
-    },
-    {
-      "type": "header",
-      "content": "Espaciado"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno arriba",
-      "default": 24
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno abajo",
-      "default": 48,
-      "info": "En mobile se aplica el 75 %."
-    },
-    {
-      "type": "header",
-      "content": "Visibilidad y ancla"
-    },
-    {
-      "type": "select",
-      "id": "visibility",
-      "label": "Mostrar en",
-      "options": [
-        {
-          "value": "all",
-          "label": "Todos los dispositivos"
-        },
-        {
-          "value": "mobile",
-          "label": "Sólo mobile"
-        },
-        {
-          "value": "desktop",
-          "label": "Sólo desktop"
-        }
-      ],
-      "default": "all",
-      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
-    },
-    {
-      "type": "text",
-      "id": "anchor",
-      "label": "Nombre del ancla",
-      "placeholder": "beneficios",
-      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
-    },
-    {
-      "type": "header",
-      "content": "Tamaño de la letra"
-    },
-    {
-      "type": "select",
-      "id": "title_scale",
-      "label": "Tamaño de los títulos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100"
-    },
-    {
-      "type": "select",
-      "id": "text_scale",
-      "label": "Tamaño de los textos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100",
-      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
-    }
+      "info": "Portal = identidad neutra tipo nota. Nunca la marca de un medio real." },
+    { "type": "text", "id": "cinta", "label": "Cinta de arriba", "default": "PUBLICIDAD · CONTENIDO DE ATHLEX" },
+    { "type": "text", "id": "eyebrow", "label": "Volanta", "default": "LEELO ANTES DE COMPRAR NADA" },
+    { "type": "inline_richtext", "id": "titulo", "label": "Titular", "default": "Titular de la nota" },
+    { "type": "textarea", "id": "bajada", "label": "Bajada" },
+    { "type": "text", "id": "autor", "label": "Firma de arriba" },
+    { "type": "text", "id": "dato", "label": "Dato al lado de la firma", "default": "3 minutos de lectura" },
+    { "type": "header", "content": "Producto y links" },
+    { "type": "text", "id": "handle", "label": "Handle del producto", "default": "athlex" },
+    { "type": "text", "id": "utm", "label": "Parametros del link (arranca con ?)", "default": "?ref=nota" },
+    { "type": "header", "content": "Barra fija de celular" },
+    { "type": "checkbox", "id": "barra", "label": "Mostrar barra fija", "default": true },
+    { "type": "text", "id": "barra_titulo", "label": "Texto de la barra", "default": "ATHLEX PSS · 120 ml" },
+    { "type": "text", "id": "barra_boton", "label": "Boton de la barra", "default": "Lo quiero" },
+    { "type": "header", "content": "Pie" },
+    { "type": "text", "id": "temas_titulo", "label": "Titulo de los chips", "default": "Temas de la nota" },
+    { "type": "text", "id": "temas", "label": "Chips de temas (separados por coma)" },
+    { "type": "textarea", "id": "legal", "label": "Aviso legal" }
   ],
   "blocks": [
     {
-      "type": "subtitle",
-      "name": "Subtítulo",
+      "type": "subtitulo", "name": "Subtitulo",
+      "settings": [ { "type": "text", "id": "texto", "label": "Texto", "default": "Subtitulo" } ]
+    },
+    {
+      "type": "parrafo", "name": "Parrafo",
+      "settings": [ { "type": "richtext", "id": "texto", "label": "Texto", "default": "<p>Texto del parrafo.</p>" } ]
+    },
+    {
+      "type": "destacado", "name": "Frase destacada",
+      "settings": [ { "type": "inline_richtext", "id": "texto", "label": "Texto", "default": "Frase destacada" } ]
+    },
+    {
+      "type": "imagen", "name": "Imagen",
       "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "text",
-          "label": "Texto",
-          "default": "Un subtítulo"
-        }
+        { "type": "image_picker", "id": "imagen", "label": "Imagen" },
+        { "type": "text", "id": "alt", "label": "Texto alternativo" },
+        { "type": "text", "id": "pie", "label": "Epigrafe" }
       ]
     },
     {
-      "type": "paragraph",
-      "name": "Párrafo",
+      "type": "firma", "name": "Firma",
       "settings": [
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Texto",
-          "default": "<p>Un párrafo de la nota. Frases cortas, una idea por párrafo.</p>"
-        }
+        { "type": "text", "id": "nombre", "label": "Nombre", "default": "Nombre Apellido" },
+        { "type": "text", "id": "rol", "label": "Rol", "default": "Fundador de ATHLEX" }
       ]
     },
     {
-      "type": "highlight",
-      "name": "Frase destacada",
+      "type": "test", "name": "Puente al test",
       "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "text",
-          "label": "Frase",
-          "default": "La frase que querés que quede."
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "No sabes si es roce o es otra cosa" },
+        { "type": "text", "id": "texto", "label": "Texto", "default": "Son 6 preguntas y te decimos que encaja con lo que contas." },
+        { "type": "text", "id": "boton", "label": "Boton", "default": "Hacer el test" },
+        { "type": "url", "id": "url", "label": "Link al test" }
       ]
     },
     {
-      "type": "image",
-      "name": "Imagen",
+      "type": "dia", "name": "DEMO · El dia humedo",
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Imagen"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "caption",
-          "label": "Pie"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "Un dia cualquiera, y las horas en que la zona queda humeda" },
+        { "type": "textarea", "id": "marcas", "label": "Momentos (uno por linea, formato: HORA | que pasa)",
+          "default": "7:00 | Salis de la ducha. Te secas rapido y te vestis.\n9 a 17 | Sentado, con ropa encima, sin aire que circule.\n19:00 | Entrenas. Y volves a tu casa con la ropa mojada.\n23:00 | Te acostas. El calor de la cama hace el resto." },
+        { "type": "text", "id": "pie", "label": "Pie", "default": "Las franjas verdes son las horas humedas. No es una vez por dia: es casi todo el dia." }
       ]
     },
     {
-      "type": "strip",
-      "name": "Tira de 3 imágenes",
+      "type": "ciclo", "name": "DEMO · El ciclo",
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image_1",
-          "label": "Imagen 1"
-        },
-        {
-          "type": "text",
-          "id": "caption_1",
-          "label": "Pie 1"
-        },
-        {
-          "type": "image_picker",
-          "id": "image_2",
-          "label": "Imagen 2"
-        },
-        {
-          "type": "text",
-          "id": "caption_2",
-          "label": "Pie 2"
-        },
-        {
-          "type": "image_picker",
-          "id": "image_3",
-          "label": "Imagen 3"
-        },
-        {
-          "type": "text",
-          "id": "caption_3",
-          "label": "Pie 3"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "El circulo que ya conoces de memoria" },
+        { "type": "text", "id": "n1", "label": "Estado 1", "default": "Pica" },
+        { "type": "text", "id": "n2", "label": "Estado 2", "default": "Te ponés algo" },
+        { "type": "text", "id": "n3", "label": "Estado 3", "default": "Mejora" },
+        { "type": "text", "id": "n4", "label": "Estado 4", "default": "Lo dejás" },
+        { "type": "text", "id": "pie", "label": "Pie", "default": "El circulo no se corta solo. Se corta en el paso 4." }
       ]
     },
     {
-      "type": "video",
-      "name": "Video",
+      "type": "semana", "name": "DEMO · La semana de mas",
       "settings": [
-        {
-          "type": "video",
-          "id": "video",
-          "label": "Video subido"
-        },
-        {
-          "type": "checkbox",
-          "id": "autoplay",
-          "label": "Reproducción automática sin sonido",
-          "default": false
-        },
-        {
-          "type": "video_url",
-          "id": "video_url",
-          "label": "O de YouTube o Vimeo",
-          "accept": [
-            "youtube",
-            "vimeo"
-          ]
-        },
-        {
-          "type": "inline_richtext",
-          "id": "caption",
-          "label": "Pie"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "Tres semanas, dos finales distintos" },
+        { "type": "text", "id": "fila_a", "label": "Fila A", "default": "El que corta cuando deja de picar" },
+        { "type": "text", "id": "pie_a", "label": "Pie A", "default": "Corta el dia 10, y las semanas oscuras son el tiempo que tarda en volver." },
+        { "type": "text", "id": "fila_b", "label": "Fila B", "default": "El que sigue una semana mas" },
+        { "type": "text", "id": "pie_b", "label": "Pie B", "default": "Sigue siete dias despues de dejar de sentirlo. Esa franja es toda la diferencia." }
       ]
     },
     {
-      "type": "quotes",
-      "name": "Citas",
+      "type": "versus", "name": "DEMO · Pasos contra pasos",
       "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Título",
-          "default": "Lo que se dice"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "quote_1",
-          "label": "Cita 1",
-          "default": "Una cita textual."
-        },
-        {
-          "type": "text",
-          "id": "source_1",
-          "label": "Fuente 1"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "quote_2",
-          "label": "Cita 2"
-        },
-        {
-          "type": "text",
-          "id": "source_2",
-          "label": "Fuente 2"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "quote_3",
-          "label": "Cita 3"
-        },
-        {
-          "type": "text",
-          "id": "source_3",
-          "label": "Fuente 3"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "footer",
-          "label": "Aclaración",
-          "default": "Citas textuales de publicaciones públicas."
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "Lo que hay que hacer, contado en pasos" },
+        { "type": "text", "id": "col_a", "label": "Columna A", "default": "Una crema" },
+        { "type": "textarea", "id": "pasos_a", "label": "Pasos A (uno por linea)",
+          "default": "Lavarte las manos\nAbrir el pomo\nTocarte la zona y esparcir\nEsperar a que se absorba\nVolver a lavarte las manos\nEsperar para vestirte" },
+        { "type": "text", "id": "col_b", "label": "Columna B", "default": "ATHLEX" },
+        { "type": "textarea", "id": "pasos_b", "label": "Pasos B (uno por linea)", "default": "Apuntar y apretar\nVestirte" },
+        { "type": "text", "id": "pie", "label": "Pie", "default": "La diferencia no es la potencia. Es cuantas veces vas a tener ganas de hacerlo." }
       ]
     },
     {
-      "type": "signature",
-      "name": "Firma",
+      "type": "video", "name": "DEMO · Video",
       "settings": [
-        {
-          "type": "text",
-          "id": "name",
-          "label": "Nombre",
-          "default": "Nombre y apellido"
-        },
-        {
-          "type": "text",
-          "id": "role",
-          "label": "Rol"
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Foto"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo" },
+        { "type": "video", "id": "video", "label": "Video (se reproduce solo, sin sonido)" },
+        { "type": "text", "id": "pie", "label": "Pie" }
       ]
     },
     {
-      "type": "index",
-      "name": "Índice",
-      "limit": 1,
+      "type": "tira", "name": "DEMO · Tira de escenas",
       "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Título",
-          "default": "En esta nota"
-        },
-        {
-          "type": "paragraph",
-          "content": "Lista los subtítulos de la nota con un enlace a cada uno."
-        }
+        { "type": "image_picker", "id": "img_1", "label": "Escena 1" },
+        { "type": "text", "id": "pie_1", "label": "Pie 1" },
+        { "type": "image_picker", "id": "img_2", "label": "Escena 2" },
+        { "type": "text", "id": "pie_2", "label": "Pie 2" },
+        { "type": "image_picker", "id": "img_3", "label": "Escena 3" },
+        { "type": "text", "id": "pie_3", "label": "Pie 3" }
       ]
     },
     {
-      "type": "button",
-      "name": "Botón",
+      "type": "indice", "name": "Indice de la nota",
       "settings": [
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Texto",
-          "default": "Ver la oferta"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Enlace"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "Lo que vas a encontrar" }
       ]
     },
     {
-      "type": "product_box",
-      "name": "Caja de producto",
+      "type": "citas", "name": "Citas de foros",
       "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Producto"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Título",
-          "info": "Vacío: el nombre del producto."
-        },
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Texto"
-        },
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "Texto del botón",
-          "default": "Agregar al carrito"
-        },
-        {
-          "type": "color_scheme",
-          "id": "scheme",
-          "label": "Combinación",
-          "default": "scheme-1"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "Lo que escribe la gente cuando cree que nadie la lee" },
+        { "type": "textarea", "id": "cita_1", "label": "Cita 1 (TEXTUAL, sin retocar)" },
+        { "type": "text", "id": "fuente_1", "label": "Fuente 1", "default": "Mensaje de un foro publico, en espanol" },
+        { "type": "textarea", "id": "cita_2", "label": "Cita 2 (vacio = no se muestra)" },
+        { "type": "text", "id": "fuente_2", "label": "Fuente 2", "default": "Mensaje de un foro publico, en espanol" },
+        { "type": "text", "id": "pie", "label": "Aclaracion", "default": "Citas textuales de foros publicos. No son clientes de ATHLEX." }
       ]
     },
     {
-      "type": "quiz_bridge",
-      "name": "Puente al cuestionario",
+      "type": "cta", "name": "Boton suelto",
       "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "title",
-          "label": "Título",
-          "default": "¿No sabés si es para vos?"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "text",
-          "label": "Texto",
-          "default": "Hacé el test: son pocas preguntas."
-        },
-        {
-          "type": "text",
-          "id": "label",
-          "label": "Botón",
-          "default": "Hacer el test"
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "Enlace"
-        }
+        { "type": "text", "id": "linea", "label": "Linea de arriba", "default": "Si ya sabes de que va y solo queres el producto:" },
+        { "type": "text", "id": "boton", "label": "Boton", "default": "Ver ATHLEX y su precio" }
       ]
     },
     {
-      "type": "versus",
-      "name": "Versus",
+      "type": "caja", "name": "Caja de producto",
       "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "title",
-          "label": "Título",
-          "default": "Comparalo"
-        },
-        {
-          "type": "text",
-          "id": "col_a",
-          "label": "Columna 1",
-          "default": "Lo de siempre"
-        },
-        {
-          "type": "textarea",
-          "id": "steps_a",
-          "label": "Pasos de la columna 1",
-          "default": "Paso uno\nPaso dos\nPaso tres\nPaso cuatro",
-          "info": "Uno por renglón."
-        },
-        {
-          "type": "text",
-          "id": "col_b",
-          "label": "Columna 2",
-          "default": "Con esto"
-        },
-        {
-          "type": "textarea",
-          "id": "steps_b",
-          "label": "Pasos de la columna 2",
-          "default": "Un solo paso"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "footer",
-          "label": "Aclaración"
-        }
-      ]
-    },
-    {
-      "type": "cycle",
-      "name": "Ciclo",
-      "settings": [
-        {
-          "type": "inline_richtext",
-          "id": "title",
-          "label": "Título",
-          "default": "El círculo que se repite"
-        },
-        {
-          "type": "text",
-          "id": "step_1",
-          "label": "Paso 1",
-          "default": "Empieza"
-        },
-        {
-          "type": "text",
-          "id": "step_2",
-          "label": "Paso 2",
-          "default": "Probás algo"
-        },
-        {
-          "type": "text",
-          "id": "step_3",
-          "label": "Paso 3",
-          "default": "Mejora"
-        },
-        {
-          "type": "text",
-          "id": "step_4",
-          "label": "Paso 4",
-          "default": "Vuelve"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "footer",
-          "label": "Aclaración"
-        }
+        { "type": "text", "id": "titulo", "label": "Titulo", "default": "ATHLEX PSS" },
+        { "type": "text", "id": "sub", "label": "Bajada", "default": "Spray corporal para zonas de roce. 120 ml." },
+        { "type": "text", "id": "boton", "label": "Boton", "default": "Ver la pagina del producto" },
+        { "type": "text", "id": "pie", "label": "Linea de garantia", "default": "Garantia de 30 dias." }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Nota",
-      "blocks": [
-        {
-          "type": "index"
-        },
-        {
-          "type": "subtitle"
-        },
-        {
-          "type": "paragraph"
-        },
-        {
-          "type": "highlight"
-        },
-        {
-          "type": "paragraph"
-        },
-        {
-          "type": "versus"
-        },
-        {
-          "type": "subtitle",
-          "settings": {
-            "text": "Otro subtítulo"
-          }
-        },
-        {
-          "type": "paragraph"
-        },
-        {
-          "type": "product_box"
-        }
-      ]
-    }
-  ]
+  "presets": [ { "name": "Nota" } ]
 }
 {% endschema %}

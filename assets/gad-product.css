@@ -19,29 +19,30 @@
   line-height: 1.15;
 }
 
+/* Tamaños del título como el código propio: Dawn h2 agrandado (2,4/3 rem), h1 (3/4 rem) y h0 (4/5,2 rem) */
 .gad-title--sm h1 {
-  font-size: calc(var(--font-heading-scale) * 1.9rem);
+  font-size: calc(var(--font-heading-scale) * 2.4rem);
 }
 
 .gad-title--md h1 {
-  font-size: calc(var(--font-heading-scale) * 2.6rem);
+  font-size: calc(var(--font-heading-scale) * 3rem);
 }
 
 .gad-title--lg h1 {
-  font-size: calc(var(--font-heading-scale) * 3.2rem);
+  font-size: calc(var(--font-heading-scale) * 4rem);
 }
 
 @media screen and (min-width: 750px) {
   .gad-title--sm h1 {
-    font-size: calc(var(--font-heading-scale) * 2.2rem);
+    font-size: calc(var(--font-heading-scale) * 3rem);
   }
 
   .gad-title--md h1 {
-    font-size: calc(var(--font-heading-scale) * 3.2rem);
+    font-size: calc(var(--font-heading-scale) * 4rem);
   }
 
   .gad-title--lg h1 {
-    font-size: calc(var(--font-heading-scale) * 4rem);
+    font-size: calc(var(--font-heading-scale) * 5.2rem);
   }
 }
 

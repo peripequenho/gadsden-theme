@@ -1,840 +1,303 @@
 {%- comment -%}
-  Muro de reseñas (L08): reseñas en mampostería (columnas de CSS) con formatos mezclados: con foto,
-  sólo texto y destacadas. Arriba, opcional, el promedio y una cinta que usa las mismas reseñas.
-  Muestra de a tantas y un botón "Ver más". Sin reseñas cargadas no se muestra.
-{%- endcomment -%}
-{%- assign s = section.settings -%}
-{%- if section.blocks.size > 0 -%}
-  {%- render 'gad-colors', s: s, key: section.id -%}
-  <div
-    class="gad-rw gad-rw--h-{{ s.heading_align | default: 'center' }} gad-rw--hm-{{ s.heading_align_m | default: 'same' }} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-    style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --rw-cols: {{ s.columns_d }}; --rw-star: {{ s.star_color }};"
-    {% render 'gad-section-attrs', s: s %}
-  >
-    <div class="page-width">
-      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
-      {%- if s.average != blank -%}
-        {%- assign avg = s.average | replace: ',', '.' | times: 1.0 | round -%}
-        <div class="gad-rw__summary">
-          <strong class="gad-rw__avg">{{ s.average | escape }}</strong>
-          <span class="gad-rw__stars" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: s.average }}">
-            {%- for i in (1..5) -%}<span{% if i > avg %} class="is-off"{% endif %}>★</span>{%- endfor -%}
-          </span>
-          {%- if s.count_text != blank -%}<span class="gad-rw__count">{{ s.count_text }}</span>{%- endif -%}
-        </div>
-      {%- endif -%}
-    </div>
+  ATHLEX · Reseñas — v2 "EL MURO".
 
-    {%- if s.marquee -%}
-      <div class="gad-rw__marquee" aria-hidden="true">
-        <div class="gad-rw__strip">
-          {%- for copy in (1..2) -%}
-            <div class="gad-rw__group">
-              {%- for block in section.blocks limit: 12 -%}
-                <span class="gad-rw__chip">
-                  <span class="gad-rw__stars">{%- for i in (1..5) -%}<span{% if i > block.settings.stars %} class="is-off"{% endif %}>★</span>{%- endfor -%}</span>
-                  <span>{{ block.settings.text | strip_html | truncate: 60 }}</span>
-                  <b>{{ block.settings.author | escape }}</b>
-                </span>
-              {%- endfor -%}
-            </div>
-          {%- endfor -%}
-        </div>
+  2026-08-03, pedido de Gero: sección TOP, mostrar LA MAYOR CANTIDAD POSIBLE de
+  reseñas, con formas variadas. El carrusel v1 mostraba UNA por pantalla — lo
+  contrario. El muro es mampostería por columnas CSS (2 en celular, 3 y 4 en
+  desktop): en una pantalla de celular conviven 4-5 reseñas de formatos mixtos
+  — con foto, sólo texto, y destacadas en lima. La variedad de alturas es a
+  propósito: un muro parejo parece plantilla; uno desparejo parece gente.
+
+  Hecho con ponytail activo: CERO JavaScript (las columnas son CSS `columns`),
+  un solo tipo de bloque, y variantes por contenido — si tiene foto es tarjeta
+  con foto, si está marcada "destacada" va en lima. Nada más.
+
+  ⚠️ LO ÚNICO IMPORTANTE: las reseñas son de clientes o no son. Los defaults
+  dicen [VACÍO] a propósito. La casilla "compra verificada" arranca apagada.
+  Si no hay reseñas cargadas, la sección NO se renderiza.
+
+  JUDGE.ME: cuando se instale, esta sección se borra de la plantilla — dos
+  promedios distintos en la misma página es peor que ninguno.
+
+  La versión chica para arriba es OTRA sección: athlex-reviews-mini.
+
+  Instalar: node tools/tema.mjs put sections/athlex-reviews.liquid
+{%- endcomment -%}
+
+{%- liquid
+  assign uid = section.id | replace: '_', '-'
+  assign hay = section.blocks.size
+-%}
+
+{%- if hay > 0 -%}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
+
+<style>
+  /* ── BASE = CELULAR ─────────────────────────────────────────────────────── */
+  #ax-rev-{{ uid }}{
+    --tinta:#141210;--papel:#E6DFCE;--papel-2:#D6CDB6;--lima:#93D920;--lima-honda:#6BA512;
+    --impacto:'Archivo Black','Arial Black',Haettenschweiler,Impact,sans-serif;
+    --texto:'Barlow Semi Condensed','Barlow','Segoe UI Semibold','Segoe UI',Arial,sans-serif;
+    background:var(--papel);color:var(--tinta);font-family:var(--texto);
+    padding:44px 20px 40px;border-bottom:4px solid var(--tinta);
+    background-image:radial-gradient(var(--papel-2) 1.1px,transparent 1.2px);background-size:7px 7px;
+  }
+  #ax-rev-{{ uid }} h1,#ax-rev-{{ uid }} h2,#ax-rev-{{ uid }} h3{color:inherit}
+  #ax-rev-{{ uid }} .ax-wrap{max-width:1180px;margin:0 auto}
+
+  #ax-rev-{{ uid }} .ax-eye{font-family:var(--impacto);font-size:9px;letter-spacing:.16em;
+    text-transform:uppercase;background:var(--tinta);color:var(--papel);padding:7px 12px;
+    display:block;width:max-content;max-width:100%;transform:skewX(-9deg);margin:0 0 16px}
+  #ax-rev-{{ uid }} .ax-eye span{display:inline-block;transform:skewX(9deg)}
+  #ax-rev-{{ uid }} h2{margin:0 0 10px;font-family:var(--impacto);text-transform:uppercase;
+    font-size:clamp(25px,7.2vw,34px);line-height:1.02;letter-spacing:-.02em;
+    transform:skewX(-9deg);display:inline-block}
+  #ax-rev-{{ uid }} h2 span{display:inline-block}
+  #ax-rev-{{ uid }} h2 em{font-style:normal;background:var(--lima);padding:1px 8px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+
+  /* resumen en una línea, sin caja: el muro es el protagonista */
+  #ax-rev-{{ uid }} .ax-resumen{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+    margin:0 0 18px;font-family:var(--impacto)}
+  #ax-rev-{{ uid }} .ax-nota{font-size:30px;line-height:1}
+  #ax-rev-{{ uid }} .ax-estrellas{letter-spacing:.1em;font-size:16px;color:var(--lima-honda)}
+  #ax-rev-{{ uid }} .ax-cuantas{font-family:var(--texto);font-size:15.5px;opacity:.7}
+
+  /* ── EL TICKER: chips completos volando sobre el papel, a todo el ancho ────
+     Pedido de Gero (2026-08-03): mismo formato que la mini — foto, estrellas,
+     nombre, verificada, fecha y cita — SIN franja de fondo: cada chip lleva su
+     fondo tinta propio y vuela sobre el papel de la sección, de borde a borde
+     de la pantalla. overflow-x:clip en la sección evita que el 100vw dispare
+     scroll horizontal donde la barra de scroll ocupa ancho.                   */
+  #ax-rev-{{ uid }}{overflow-x:clip}
+  #ax-rev-{{ uid }} .ax-marq{overflow:hidden;width:100vw;margin:0 0 16px calc(50% - 50vw)}
+  #ax-rev-{{ uid }} .ax-tira{display:flex;gap:9px;width:max-content;
+    animation:ax-rueda-{{ uid }} 48s linear infinite}
+  #ax-rev-{{ uid }} .ax-marq:hover .ax-tira{animation-play-state:paused}
+  @keyframes ax-rueda-{{ uid }}{to{transform:translateX(-50%)}}
+  #ax-rev-{{ uid }} .ax-mq{flex:none;display:flex;align-items:center;gap:9px;
+    background:var(--tinta);color:var(--papel);padding:7px 12px 7px 7px;max-width:330px}
+  #ax-rev-{{ uid }} .ax-mq img{width:34px;height:34px;object-fit:cover;flex:none;
+    border:2px solid var(--lima)}
+  #ax-rev-{{ uid }} .ax-mq .txt{min-width:0}
+  #ax-rev-{{ uid }} .ax-mq .fila1{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+  #ax-rev-{{ uid }} .ax-mq .e{color:var(--lima);font-size:11px;letter-spacing:.05em}
+  #ax-rev-{{ uid }} .ax-mq b{font-family:var(--impacto);font-size:10.5px;letter-spacing:.05em;
+    text-transform:uppercase}
+  #ax-rev-{{ uid }} .ax-mq .ok{font-family:var(--impacto);font-size:10px;line-height:1;
+    color:var(--tinta);background:var(--lima);padding:2px 4px}
+  #ax-rev-{{ uid }} .ax-mq .cita{font-size:13.5px;line-height:1.25;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;opacity:.92;display:block}
+  #ax-rev-{{ uid }} .ax-mq .fecha{font-size:11.5px;opacity:.55;white-space:nowrap}
+  /* Decisión de Gero (2026-08-03): el ticker corre SIEMPRE, en loop infinito y
+     sin barra de scroll — incluso con prefers-reduced-motion (su Windows lo
+     tiene activo y veía la tira quieta con scrollbar). Queda la pausa al pasar
+     el mouse como única concesión. */
+
+  /* ── EL MURO: mampostería por columnas ──────────────────────────────────── */
+  #ax-rev-{{ uid }} .ax-muro{columns:2;column-gap:10px}
+  /* las que exceden el lote inicial: las esconde el JS; sin JS se ven todas */
+  #ax-rev-{{ uid }} .ax-rev.ax-oculta{display:none}
+  #ax-rev-{{ uid }} .ax-vermas{display:none;margin:14px auto 0;background:var(--tinta);
+    color:var(--papel);font-family:var(--impacto);text-transform:uppercase;font-size:14px;
+    letter-spacing:.08em;padding:15px 26px;border:0;cursor:pointer;min-height:44px;
+    transform:skewX(-9deg)}
+  #ax-rev-{{ uid }} .ax-vermas span{display:inline-block;transform:skewX(9deg)}
+  #ax-rev-{{ uid }} .ax-vermas.ax-visible{display:block}
+  #ax-rev-{{ uid }} .ax-vermas:focus-visible{outline:3px solid var(--lima-honda);outline-offset:2px}
+  #ax-rev-{{ uid }} .ax-rev{break-inside:avoid;margin:0 0 10px;border:3px solid var(--tinta);
+    background:var(--papel);overflow:hidden}
+  #ax-rev-{{ uid }} .ax-rev img{width:100%;height:auto;display:block}
+  #ax-rev-{{ uid }} .ax-cuerpo{padding:10px 11px 12px}
+  #ax-rev-{{ uid }} .ax-rev .ax-estrellas{display:block;font-size:13px;margin:0 0 4px}
+  #ax-rev-{{ uid }} .ax-rev h3{margin:0 0 4px;font-family:var(--impacto);text-transform:uppercase;
+    font-size:14px;line-height:1.15;letter-spacing:-.01em}
+  #ax-rev-{{ uid }} .ax-rev p{margin:0;font-size:15.5px;line-height:1.38;opacity:.9}
+  #ax-rev-{{ uid }} .ax-firma{margin:8px 0 0;padding:7px 0 0;border-top:2px solid rgba(20,18,16,.12);
+    display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13.5px}
+  #ax-rev-{{ uid }} .ax-nombre{white-space:nowrap;font-weight:600}
+  #ax-rev-{{ uid }} .ax-cuando{font-size:12px;opacity:.55;white-space:nowrap}
+  #ax-rev-{{ uid }} .ax-ok{font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--lima-honda);font-family:var(--impacto);margin-left:auto;white-space:nowrap}
+
+  /* destacada: fondo lima, cita grande. Rompe el ritmo del muro a propósito. */
+  #ax-rev-{{ uid }} .ax-rev.es-destacada{background:var(--lima)}
+  #ax-rev-{{ uid }} .es-destacada .ax-estrellas{color:var(--tinta)}
+  #ax-rev-{{ uid }} .es-destacada p{font-family:var(--impacto);text-transform:uppercase;
+    font-size:15px;line-height:1.25;letter-spacing:-.01em;opacity:1}
+  #ax-rev-{{ uid }} .es-destacada .ax-ok{color:var(--tinta);opacity:.7}
+  #ax-rev-{{ uid }} .es-destacada .ax-firma{border-top-color:rgba(20,18,16,.25)}
+
+  /* ── DESKTOP ────────────────────────────────────────────────────────────── */
+  @media(min-width:900px){
+    #ax-rev-{{ uid }}{padding:74px 28px}
+    #ax-rev-{{ uid }} .ax-eye{font-size:10.5px;letter-spacing:.19em;padding:7px 14px;margin-bottom:24px}
+    #ax-rev-{{ uid }} h2{font-size:clamp(34px,4.3vw,48px)}
+    #ax-rev-{{ uid }} .ax-nota{font-size:40px}
+    #ax-rev-{{ uid }} .ax-resumen{margin-bottom:26px}
+    #ax-rev-{{ uid }} .ax-muro{columns:3;column-gap:16px}
+    #ax-rev-{{ uid }} .ax-rev{margin-bottom:16px;border-width:3px}
+    #ax-rev-{{ uid }} .ax-cuerpo{padding:13px 15px 15px}
+    #ax-rev-{{ uid }} .ax-rev h3{font-size:15.5px}
+    #ax-rev-{{ uid }} .ax-rev p{font-size:16px;line-height:1.42}
+    #ax-rev-{{ uid }} .es-destacada p{font-size:17px}
+    #ax-rev-{{ uid }} .ax-firma{font-size:14.5px}
+  }
+  @media(min-width:900px){
+    #ax-rev-{{ uid }} .ax-marq{margin-bottom:22px}
+    #ax-rev-{{ uid }} .ax-mq .cita{max-width:230px}
+  }
+  @media(min-width:1200px){
+    #ax-rev-{{ uid }} .ax-muro{columns:4}
+  }
+</style>
+
+<div id="ax-rev-{{ uid }}">
+  {%- comment -%} ancla estable: la mini de arriba linkea acá con #athlex-resenas {%- endcomment -%}
+  <span id="athlex-resenas" style="position:absolute;margin-top:-80px"></span>
+  <div class="ax-wrap">
+    {%- if section.settings.eyebrow != blank -%}
+      <div class="ax-eye"><span>{{ section.settings.eyebrow }}</span></div>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2><span>{{ section.settings.heading }}</span></h2>
+    {%- endif -%}
+
+    {%- if section.settings.mostrar_resumen and section.settings.promedio != blank -%}
+      {%- assign p = section.settings.promedio | replace: ',', '.' | times: 1.0 | round -%}
+      <div class="ax-resumen">
+        <span class="ax-nota">{{ section.settings.promedio }}</span>
+        <span class="ax-estrellas" role="img" aria-label="{{ section.settings.promedio }} de 5">
+          {%- for i in (1..5) -%}{% if i <= p %}★{% else %}☆{% endif %}{%- endfor -%}
+        </span>
+        {%- if section.settings.cuantas != blank -%}
+          <span class="ax-cuantas">{{ section.settings.cuantas }}</span>
+        {%- endif -%}
       </div>
     {%- endif -%}
 
-    <gad-reviews-wall class="page-width{% if s.featured_title_font %} gad-rw--featured-title{% endif %}{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} gad-rw--ratio{% endif %}" data-batch="{{ s.batch }}"{% if s.photo_ratio != blank and s.photo_ratio != 'auto' %} style="--rw-ratio: {{ s.photo_ratio }};"{% endif %}>
-      <div class="gad-rw__wall">
-        {%- for block in section.blocks -%}
-          {%- assign b = block.settings -%}
-          <article
-            class="gad-rw__card color-{% if b.featured %}{{ s.featured_scheme }}{% else %}{{ s.card_scheme }}{% endif %}{% if b.featured %} gad-rw__card--featured{% endif %}"
-            {% if b.featured and s.featured_custom %}
-              style="--color-background: {{ s.featured_bg.red }},{{ s.featured_bg.green }},{{ s.featured_bg.blue }}; --color-foreground: {{ s.featured_text.red }},{{ s.featured_text.green }},{{ s.featured_text.blue }}; background: {{ s.featured_bg }}; color: {{ s.featured_text }};"
-            {% endif %}
-            {% if forloop.index > s.batch %}
-              hidden data-gad-rw-more
-            {% endif %}
-            {{ block.shopify_attributes }}
-          >
-            {%- if b.image != blank -%}
-              {{ b.image | image_url: width: 600 | image_tag: loading: 'lazy', alt: '', class: 'gad-rw__photo', sizes: '(min-width: 990px) 25vw, 50vw', widths: '300, 450, 600' }}
-            {%- endif -%}
-            <div class="gad-rw__body">
-              <span class="gad-rw__stars" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.stars }}">
-                {%- for i in (1..5) -%}<span{% if i > b.stars %} class="is-off"{% endif %}>★</span>{%- endfor -%}
-              </span>
-              {%- if b.title != blank -%}<h3 class="gad-rw__title">{{ b.title | escape }}</h3>{%- endif -%}
-              <div class="gad-rw__text rte">{{ b.text }}</div>
-              <footer class="gad-rw__foot">
-                <span class="gad-rw__author">{{ b.author | escape }}</span>
-                {%- if b.verified -%}
-                  <span class="gad-rw__verified">{%- render 'gad-icon', name: 'verified', filled: true -%}{{ 'gadsden.reviews.verified' | t }}</span>
+    {%- comment -%}
+      El ticker se alimenta de las mismas reseñas del muro (recorte de 60
+      caracteres): cero contenido extra que mantener. Se imprime dos veces
+      para que el bucle sea continuo; la segunda copia va oculta a lectores.
+    {%- endcomment -%}
+    <div class="ax-marq" aria-hidden="false">
+      <div class="ax-tira">
+        {%- for copia in (1..2) -%}
+          <div style="display:flex;gap:9px" {% if copia == 2 %}aria-hidden="true"{% endif %}>
+            {%- for block in section.blocks limit: 10 -%}
+              {%- assign e = block.settings.estrellas | default: 5 -%}
+              <span class="ax-mq">
+                {%- if block.settings.image != blank -%}
+                  <img src="{{ block.settings.image | image_url: width: 80 }}" alt="" width="34" height="34" loading="lazy">
                 {%- endif -%}
-                {%- if b.date != blank -%}<span class="gad-rw__date">{{ b.date | escape }}</span>{%- endif -%}
-              </footer>
-            </div>
-          </article>
+                <span class="txt">
+                  <span class="fila1">
+                    <span class="e">{% for i in (1..e) %}★{% endfor %}</span>
+                    {%- if block.settings.autor != blank -%}<b>{{ block.settings.autor }}</b>{%- endif -%}
+                    {%- if block.settings.verificada -%}<span class="ok" role="img" aria-label="Compra verificada" title="Compra verificada">✓</span>{%- endif -%}
+                    {%- if block.settings.fecha != blank -%}<span class="fecha">{{ block.settings.fecha }}</span>{%- endif -%}
+                  </span>
+                  <span class="cita">“{{ block.settings.text | strip_html | truncate: 60 }}”</span>
+                </span>
+              </span>
+            {%- endfor -%}
+          </div>
         {%- endfor -%}
       </div>
-      {%- if section.blocks.size > s.batch -%}
-        <div class="gad-rw__more">
-          {%- liquid
-            assign rw_left = section.blocks.size | minus: s.batch | append: ''
-            assign rw_label = s.more_label | replace: '{cantidad}', rw_left
-          -%}
-          <button type="button" class="button{% if s.more_style == 'solid' %} gad-title-font{% else %} button--secondary{% endif %}" data-gad-rw-btn data-label="{{ s.more_label | escape }}">{{ rw_label | escape }}</button>
+    </div>
+
+    <div class="ax-muro">
+      {%- for block in section.blocks -%}
+        <div class="ax-rev{% if block.settings.destacada %} es-destacada{% endif %}" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img src="{{ block.settings.image | image_url: width: 600 }}"
+                 alt="{{ block.settings.image.alt | default: 'Foto enviada por quien dejó la reseña' | escape }}"
+                 width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}"
+                 loading="lazy">
+          {%- endif -%}
+          <div class="ax-cuerpo">
+            {%- assign e = block.settings.estrellas | default: 5 -%}
+            <span class="ax-estrellas" role="img" aria-label="{{ e }} de 5">
+              {%- for i in (1..5) -%}{% if i <= e %}★{% else %}☆{% endif %}{%- endfor -%}
+            </span>
+            {%- if block.settings.title != blank -%}<h3>{{ block.settings.title }}</h3>{%- endif -%}
+            {%- if block.settings.text != blank -%}<p>{{ block.settings.text }}</p>{%- endif -%}
+            {%- if block.settings.autor != blank -%}
+              <div class="ax-firma">
+                <span class="ax-nombre">{{ block.settings.autor }}</span>
+                {%- if block.settings.fecha != blank -%}<span class="ax-cuando">{{ block.settings.fecha }}</span>{%- endif -%}
+                {%- if block.settings.verificada -%}<span class="ax-ok">Compra verificada</span>{%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
         </div>
-      {%- endif -%}
-    </gad-reviews-wall>
+      {%- endfor -%}
+    </div>
+
+    <button type="button" class="ax-vermas"><span>Ver más reseñas</span></button>
   </div>
-{%- elsif request.design_mode -%}
-  <p class="gad-rw__empty page-width">{{ 'gadsden.reviews.empty' | t }}</p>
+</div>
+
+<script>
+  /* Ver más: el servidor manda TODAS visibles (sin JS, muro completo). El JS
+     esconde las que pasan del lote inicial y va soltando de a un lote. */
+  (function () {
+    var caja = document.getElementById('ax-rev-{{ uid }}');
+    if (!caja || caja.dataset.axListo) return;
+    caja.dataset.axListo = '1';
+    var lote = parseInt('{{ section.settings.lote | default: 6 }}', 10) || 6;
+    var revs = [].slice.call(caja.querySelectorAll('.ax-rev'));
+    var btn  = caja.querySelector('.ax-vermas');
+    if (!btn || revs.length <= lote) return;
+    var visibles = lote;
+    function pintar () {
+      revs.forEach(function (r, i) { r.classList.toggle('ax-oculta', i >= visibles); });
+      var quedan = revs.length - visibles;
+      if (quedan > 0) {
+        btn.querySelector('span').textContent = 'Ver más reseñas (' + quedan + ')';
+        btn.classList.add('ax-visible');
+      } else {
+        btn.classList.remove('ax-visible');
+      }
+    }
+    btn.addEventListener('click', function () { visibles += lote; pintar(); });
+    pintar();
+  })();
+</script>
 {%- endif -%}
-
-{% stylesheet %}
-  .gad-rw__summary {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem 1.2rem;
-    margin-bottom: 2.4rem;
-  }
-
-  .gad-rw__avg {
-    font-size: 3.2rem;
-    line-height: 1;
-  }
-
-  .gad-rw__summary .gad-rw__stars {
-    font-size: 2.2rem;
-  }
-
-  .gad-rw__count {
-    font-size: 1.4rem;
-    opacity: 0.8;
-  }
-
-  .gad-rw__stars {
-    color: var(--rw-star, #f5b301);
-    letter-spacing: 0.1rem;
-  }
-
-  .gad-rw__stars .is-off {
-    opacity: 0.25;
-  }
-
-  .gad-rw__marquee {
-    overflow: hidden;
-    margin-bottom: 2.4rem;
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-
-  .gad-rw__strip {
-    display: flex;
-    width: max-content;
-    animation: gadRwMarquee 60s linear infinite;
-  }
-
-  .gad-rw__marquee:hover .gad-rw__strip,
-  html.gad-reduce .gad-rw__strip {
-    animation-play-state: paused;
-  }
-
-  .gad-rw__group {
-    display: flex;
-    gap: 1rem;
-    padding-right: 1rem;
-  }
-
-  .gad-rw__chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 0.6rem 1.4rem;
-    border: 0.1rem solid rgba(var(--color-foreground), 0.15);
-    border-radius: 99rem;
-    font-size: 1.3rem;
-    white-space: nowrap;
-  }
-
-  @keyframes gadRwMarquee {
-    to {
-      transform: translateX(-50%);
-    }
-  }
-
-  .gad-rw__wall {
-    columns: 2;
-    column-gap: 1.2rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-rw__wall {
-      columns: var(--rw-cols, 3);
-      column-gap: 2rem;
-    }
-  }
-
-  .gad-rw__card {
-    display: inline-block;
-    width: 100%;
-    margin: 0 0 1.2rem;
-    overflow: hidden;
-    break-inside: avoid;
-    border: 0.1rem solid rgba(var(--color-foreground), 0.1);
-    border-radius: 1.2rem;
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-rw__card {
-      margin-bottom: 2rem;
-    }
-  }
-
-  .gad-rw__card[hidden] {
-    display: none;
-  }
-
-  .gad-rw__photo {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .gad-rw__body {
-    display: grid;
-    gap: 0.6rem;
-    padding: 1.4rem;
-  }
-
-  .gad-rw__card--featured .gad-rw__text {
-    font-size: 1.7rem;
-    font-weight: 600;
-  }
-
-  .gad-rw__title {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-
-  .gad-rw__text {
-    font-size: 1.4rem;
-  }
-
-  .gad-rw__text p {
-    margin: 0;
-  }
-
-  .gad-rw__foot {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.4rem 0.8rem;
-    font-size: 1.2rem;
-  }
-
-  .gad-rw__author {
-    font-weight: 700;
-  }
-
-  .gad-rw__verified {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.2rem;
-    opacity: 0.8;
-  }
-
-  .gad-rw__date {
-    opacity: 0.6;
-  }
-
-  .gad-rw__more {
-    margin-top: 1.2rem;
-    text-align: center;
-  }
-
-  .gad-rw__empty {
-    padding: 1.2rem;
-    border: 0.1rem dashed rgba(var(--color-foreground), 0.3);
-    font-size: 1.3rem;
-    text-align: center;
-  }
-  .gad-rw--ratio .gad-rw__photo {
-    aspect-ratio: var(--rw-ratio);
-    object-fit: cover;
-  }
-  .gad-rw--h-left .gad-rw__summary {
-    justify-content: flex-start;
-  }
-
-  @media screen and (max-width: 749px) {
-    .gad-rw--hm-left .gad-rw__summary {
-      justify-content: flex-start;
-    }
-
-    .gad-rw--hm-center .gad-rw__summary {
-      justify-content: center;
-    }
-  }
-  .gad-rw--featured-title .gad-rw__card--featured .gad-rw__text {
-    font-family: var(--font-heading-family);
-    font-weight: var(--font-heading-weight);
-    font-size: 1.5rem;
-    line-height: 1.3;
-    text-transform: uppercase;
-  }
-{% endstylesheet %}
-
-{% javascript %}
-  class GadReviewsWall extends HTMLElement {
-    connectedCallback() {
-      const btn = this.querySelector('[data-gad-rw-btn]');
-      if (!btn) return;
-      const batch = parseInt(this.dataset.batch, 10) || 8;
-      btn.addEventListener('click', () => {
-        const hidden = [...this.querySelectorAll('[data-gad-rw-more][hidden]')];
-        hidden.slice(0, batch).forEach((el) => (el.hidden = false));
-        if (hidden.length <= batch) return btn.parentElement.remove();
-        btn.textContent = (btn.dataset.label || btn.textContent).replace('{cantidad}', hidden.length - batch);
-      });
-    }
-  }
-
-  if (!customElements.get('gad-reviews-wall')) customElements.define('gad-reviews-wall', GadReviewsWall);
-{% endjavascript %}
 
 {% schema %}
 {
   "name": "Muro de reseñas",
   "tag": "section",
-  "class": "section gad-section",
+  "class": "athlex-reviews-section",
   "settings": [
-    {
-      "type": "text",
-      "id": "caption",
-      "label": "Volanta",
-      "info": "Texto chico arriba del título. Vacío: no se muestra."
-    },
-    {
-      "type": "color",
-      "id": "caption_color",
-      "label": "Color de la volanta",
-      "info": "Vacío: el color del texto."
-    },
-    {
-      "type": "inline_richtext",
-      "id": "heading",
-      "label": "Título",
-      "default": "Lo que dicen <strong>los que lo usan</strong>",
-      "info": "Marcá en negrita las palabras que querés resaltar."
-    },
-    {
-      "type": "select",
-      "id": "heading_size",
-      "label": "Tamaño del título",
-      "options": [
-        {
-          "value": "h2",
-          "label": "Chico"
-        },
-        {
-          "value": "h1",
-          "label": "Mediano"
-        },
-        {
-          "value": "h0",
-          "label": "Grande"
-        }
-      ],
-      "default": "h1"
-    },
-    {
-      "type": "color",
-      "id": "heading_accent",
-      "label": "Color de las palabras resaltadas",
-      "info": "Vacío: el acento de la combinación de colores."
-    },
-    {
-      "type": "select",
-      "id": "heading_align",
-      "label": "Alineación del encabezado",
-      "default": "center",
-      "options": [
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ],
-      "info": "Volanta, título y texto de arriba."
-    },
-    {
-      "type": "select",
-      "id": "heading_align_m",
-      "label": "Alineación del encabezado en mobile",
-      "default": "same",
-      "options": [
-        {
-          "value": "same",
-          "label": "Igual que en desktop"
-        },
-        {
-          "value": "left",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        }
-      ]
-    },
-    {
-      "type": "richtext",
-      "id": "text",
-      "label": "Texto"
-    },
-    {
-      "type": "header",
-      "content": "Resumen"
-    },
-    {
-      "type": "text",
-      "id": "average",
-      "label": "Promedio",
-      "info": "Ej. 4,8. Vacío: sin resumen. Poné el promedio real."
-    },
-    {
-      "type": "inline_richtext",
-      "id": "count_text",
-      "label": "Cantidad",
-      "info": "Ej. 128 reseñas."
-    },
-    {
-      "type": "checkbox",
-      "id": "marquee",
-      "label": "Cinta corrida con las mismas reseñas",
-      "default": true
-    },
-    {
-      "type": "color",
-      "id": "star_color",
-      "label": "Color de las estrellas",
-      "default": "#F5B301"
-    },
-    {
-      "type": "header",
-      "content": "Muro"
-    },
-    {
-      "type": "range",
-      "id": "columns_d",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "label": "Columnas en desktop",
-      "default": 3,
-      "info": "En mobile, 2."
-    },
-    {
-      "type": "range",
-      "id": "batch",
-      "min": 4,
-      "max": 30,
-      "step": 1,
-      "label": "Reseñas visibles de entrada",
-      "default": 9
-    },
-    {
-      "type": "select",
-      "id": "photo_ratio",
-      "label": "Proporción de las fotos",
-      "default": "auto",
-      "options": [
-        {
-          "value": "auto",
-          "label": "La de cada foto"
-        },
-        {
-          "value": "1 / 1",
-          "label": "1:1"
-        },
-        {
-          "value": "4 / 5",
-          "label": "4:5"
-        },
-        {
-          "value": "3 / 4",
-          "label": "3:4"
-        }
-      ]
-    },
-    {
-      "type": "select",
-      "id": "more_style",
-      "label": "Botón \"ver más\"",
-      "default": "outline",
-      "options": [
-        {
-          "value": "outline",
-          "label": "Con borde"
-        },
-        {
-          "value": "solid",
-          "label": "Lleno"
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "id": "more_label",
-      "label": "Texto del botón para ver más",
-      "default": "Ver más reseñas",
-      "info": "Usá {cantidad} para mostrar cuántas reseñas quedan."
-    },
-    {
-      "type": "color_scheme",
-      "id": "card_scheme",
-      "label": "Combinación de las reseñas",
-      "default": "scheme-1"
-    },
-    {
-      "type": "color_scheme",
-      "id": "featured_scheme",
-      "label": "Combinación de las destacadas",
-      "default": "scheme-3"
-    },
-    {
-      "type": "checkbox",
-      "id": "featured_custom",
-      "label": "Colores propios para las destacadas",
-      "default": false,
-      "info": "Pisan a la combinación de las destacadas."
-    },
-    {
-      "type": "color",
-      "id": "featured_bg",
-      "label": "Fondo de las destacadas",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "featured_text",
-      "label": "Texto de las destacadas",
-      "default": "#121212"
-    },
-    {
-      "type": "checkbox",
-      "id": "featured_title_font",
-      "label": "Texto de las destacadas con la letra de los títulos",
-      "default": false
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Combinación de colores",
-      "default": "scheme-2"
-    },
-    {
-      "type": "header",
-      "content": "Colores propios"
-    },
-    {
-      "type": "checkbox",
-      "id": "custom_colors",
-      "label": "Usar colores propios",
-      "default": false,
-      "info": "Pisan a la combinación de colores elegida arriba."
-    },
-    {
-      "type": "color",
-      "id": "cc_bg",
-      "label": "Fondo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color_background",
-      "id": "cc_bg_gradient",
-      "label": "Degradé de fondo",
-      "info": "Si cargás un degradé, reemplaza al color de fondo."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image",
-      "label": "Imagen de fondo",
-      "info": "Cubre todo el fondo y le gana al degradé."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image_mobile",
-      "label": "Imagen de fondo en mobile",
-      "info": "Vacía: usa la de desktop."
-    },
-    {
-      "type": "color",
-      "id": "cc_text",
-      "label": "Texto",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_accent",
-      "label": "Acento",
-      "default": "#334FB4"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_bg",
-      "label": "Fondo del botón lleno",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_text",
-      "label": "Texto del botón lleno",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "cc_outline",
-      "label": "Botón de contorno y enlaces",
-      "default": "#121212"
-    },
-    {
-      "type": "header",
-      "content": "Espaciado"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno arriba",
-      "default": 36
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno abajo",
-      "default": 36,
-      "info": "En mobile se aplica el 75 %."
-    },
-    {
-      "type": "header",
-      "content": "Visibilidad y ancla"
-    },
-    {
-      "type": "select",
-      "id": "visibility",
-      "label": "Mostrar en",
-      "options": [
-        {
-          "value": "all",
-          "label": "Todos los dispositivos"
-        },
-        {
-          "value": "mobile",
-          "label": "Sólo mobile"
-        },
-        {
-          "value": "desktop",
-          "label": "Sólo desktop"
-        }
-      ],
-      "default": "all",
-      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
-    },
-    {
-      "type": "text",
-      "id": "anchor",
-      "label": "Nombre del ancla",
-      "placeholder": "beneficios",
-      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
-    },
-    {
-      "type": "header",
-      "content": "Tamaño de la letra"
-    },
-    {
-      "type": "select",
-      "id": "title_scale",
-      "label": "Tamaño de los títulos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100"
-    },
-    {
-      "type": "select",
-      "id": "text_scale",
-      "label": "Tamaño de los textos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100",
-      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
-    }
+    { "type": "text", "id": "eyebrow", "label": "Bajada (eyebrow)", "default": "07 — LO QUE DICEN" },
+    { "type": "inline_richtext", "id": "heading", "label": "Título (cursiva → lima)", "default": "Reseñas de <em>clientes</em>" },
+    { "type": "header", "content": "Resumen" },
+    { "type": "checkbox", "id": "mostrar_resumen", "label": "Mostrar el resumen", "default": true, "info": "Apagalo si Judge.me ya muestra el promedio." },
+    { "type": "text", "id": "promedio", "label": "Promedio real (ej: 4,8)", "info": "Vacío oculta el resumen. No lo estimes." },
+    { "type": "text", "id": "cuantas", "label": "Cantidad (ej: 23 opiniones)" },
+    { "type": "range", "id": "lote", "label": "Reseñas visibles antes del Ver más", "min": 4, "max": 12, "step": 2, "default": 6 }
   ],
   "blocks": [
     {
-      "type": "review",
-      "name": "Reseña",
+      "type": "resena", "name": "Reseña", "limit": 24,
       "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Foto"
-        },
-        {
-          "type": "range",
-          "id": "stars",
-          "min": 1,
-          "max": 5,
-          "step": 1,
-          "label": "Estrellas",
-          "default": 5
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Título"
-        },
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Texto",
-          "default": "<p>Escribí acá lo que dijo el cliente, con sus palabras.</p>"
-        },
-        {
-          "type": "text",
-          "id": "author",
-          "label": "Autor",
-          "default": "Nombre del cliente"
-        },
-        {
-          "type": "text",
-          "id": "date",
-          "label": "Fecha"
-        },
-        {
-          "type": "checkbox",
-          "id": "verified",
-          "label": "Compra verificada",
-          "default": false,
-          "info": "Marcala sólo si es una compra real."
-        },
-        {
-          "type": "checkbox",
-          "id": "featured",
-          "label": "Destacada",
-          "default": false
-        }
+        { "type": "image_picker", "id": "image", "label": "Foto del cliente", "info": "Opcional. Altura libre: el muro la acomoda." },
+        { "type": "range", "id": "estrellas", "label": "Estrellas", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "text", "id": "title", "label": "Título (opcional)" },
+        { "type": "textarea", "id": "text", "label": "Texto", "default": "[VACÍO — pegar la reseña tal cual la escribió la persona, sin corregirle la redacción.]" },
+        { "type": "text", "id": "autor", "label": "Nombre", "default": "[VACÍO]" },
+        { "type": "checkbox", "id": "verificada", "label": "Compra verificada", "default": false, "info": "Marcá sólo si existe el pedido." },
+        { "type": "text", "id": "fecha", "label": "Fecha de compra (mm/aa, ej: 07/26)", "info": "Real o nada, como todo acá." },
+        { "type": "checkbox", "id": "destacada", "label": "Destacada (fondo lima)", "default": false }
       ]
     }
   ],
-  "presets": [
-    {
-      "name": "Muro de reseñas",
-      "blocks": [
-        {
-          "type": "review"
-        },
-        {
-          "type": "review",
-          "settings": {
-            "featured": true
-          }
-        },
-        {
-          "type": "review",
-          "settings": {
-            "stars": 4
-          }
-        }
-      ]
-    }
-  ]
+  "max_blocks": 24,
+  "presets": [ { "name": "Muro de reseñas" } ]
 }
 {% endschema %}

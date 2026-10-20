@@ -1,477 +1,137 @@
 {%- comment -%}
-  Aviso y datos legales (L18): una franja compacta con un aviso siempre visible y una línea de datos;
-  el resto (advertencias, modo de uso, composición, titular, registro) va en un desplegable cerrado.
-  Cada texto se puede conectar a un metacampo del producto desde el editor (origen dinámico). Si un
-  dato marcado como obligatorio está vacío, en el editor se ve un aviso.
+  ATHLEX · Legal — v3, COMPRIMIDA AL MÁXIMO.
+
+  Pedido de Gero (2026-08-03): que ocupe lo mínimo posible. Pasó de ~740 px a
+  una franja: sólo el aviso de seguridad y una línea de datos. Todo lo demás
+  (advertencias completas, modo de uso, INCI, titular, ANMAT) vive dentro de un
+  <details> cerrado.
+
+  QUÉ NO SE PLIEGA Y POR QUÉ: el aviso de seguridad ("uso externo, suspender si
+  irrita, lejos de los niños") queda a la vista. Es la advertencia que tiene que
+  verse sin buscarla; el resto es información de consulta y cumple igual dentro
+  de un acordeón accesible.
+
+  Lee los datos regulatorios de los metafields del producto. Vacíos imprimen
+  [PENDIENTE] a la vista, para que un publicado accidental salte al ojo.
+  Las advertencias son las de la etiqueta aprobada: no editarlas sin revisarla.
+
+  Instalar: node tools/tema.mjs put sections/athlex-legal.liquid
 {%- endcomment -%}
-{%- assign s = section.settings -%}
-{%- render 'gad-colors', s: s, key: section.id -%}
-<div
-  class="gad-lg{% if s.label_accent %} gad-lg--label-accent{% endif %}{% if s.line_upper %} gad-lg--line-upper{% endif %} gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="page-width page-width--narrow">
-    {%- if s.notice != blank -%}
-      <div class="gad-lg__notice">{%- if s.notice_icon_line -%}<span class="gad-lg__icon-line">{%- render 'gad-icon', name: s.notice_icon, filled: false -%}</span>{%- else -%}{%- render 'gad-icon', name: s.notice_icon, filled: true -%}{%- endif -%}<div class="rte">{{ s.notice }}</div></div>
+
+{%- liquid
+  assign uid = section.id | replace: '_', '-'
+  assign pend = '[PENDIENTE]'
+  assign inci = product.metafields.athlex.inci | default: pend
+  assign titular = product.metafields.athlex.titular | default: pend
+  assign legajo = product.metafields.athlex.anmat_legajo | default: pend
+  assign neto = product.metafields.athlex.contenido_neto | default: section.settings.neto
+-%}
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
+
+<style>
+  /* ── BASE = CELULAR ─────────────────────────────────────────────────────── */
+  #ax-legal-{{ uid }}{
+    --tinta:#141210;--papel:#E6DFCE;--lima:#93D920;
+    --impacto:'Archivo Black','Arial Black',Haettenschweiler,Impact,sans-serif;
+    --texto:'Barlow Semi Condensed','Barlow','Segoe UI Semibold','Segoe UI',Arial,sans-serif;
+    background:var(--tinta);color:var(--papel);font-family:var(--texto);
+    padding:16px 20px 18px;border-top:4px solid var(--lima);
+  }
+  #ax-legal-{{ uid }} .ax-wrap{max-width:1000px;margin:0 auto}
+
+  /* el aviso: una línea, con el ícono al lado. Es lo único que no se pliega. */
+  #ax-legal-{{ uid }} .ax-aviso{display:flex;align-items:flex-start;gap:9px;
+    font-size:13.5px;line-height:1.35;margin:0 0 10px}
+  #ax-legal-{{ uid }} .ax-aviso svg{flex:none;width:17px;height:17px;color:var(--lima);margin-top:1px}
+
+  /* el desplegable con todo lo demás */
+  #ax-legal-{{ uid }} details{border-top:1px solid rgba(230,223,206,.22)}
+  #ax-legal-{{ uid }} summary{list-style:none;cursor:pointer;min-height:38px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    font-family:var(--impacto);font-size:9.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--lima);opacity:.9}
+  #ax-legal-{{ uid }} summary::-webkit-details-marker{display:none}
+  #ax-legal-{{ uid }} summary:after{content:"+";font-size:15px;line-height:1}
+  #ax-legal-{{ uid }} details[open] summary:after{content:"–"}
+  #ax-legal-{{ uid }} .ax-cols{display:grid;gap:12px;padding:2px 0 12px}
+  #ax-legal-{{ uid }} .ax-cols h3{margin:0 0 3px;font-family:var(--impacto);
+    text-transform:uppercase;font-size:9.5px;letter-spacing:.16em;color:var(--lima);opacity:.85}
+  #ax-legal-{{ uid }} .ax-cols p{margin:0;font-size:14px;line-height:1.4;opacity:.8;max-width:62ch}
+  #ax-legal-{{ uid }} .ax-pend{opacity:.55;font-style:italic}
+
+  /* el pie: una sola línea con separadores */
+  #ax-legal-{{ uid }} .ax-pie{border-top:1px solid rgba(230,223,206,.22);padding:9px 0 0;
+    font-family:var(--impacto);font-size:8.5px;letter-spacing:.13em;
+    text-transform:uppercase;opacity:.55;line-height:1.5}
+
+  /* ── DESKTOP ────────────────────────────────────────────────────────────── */
+  @media(min-width:900px){
+    #ax-legal-{{ uid }}{padding:18px 28px 20px}
+    #ax-legal-{{ uid }} .ax-aviso{font-size:14px}
+    #ax-legal-{{ uid }} .ax-cols{grid-template-columns:1fr 1fr;gap:12px 40px}
+    #ax-legal-{{ uid }} .ax-pie{font-size:9px}
+  }
+</style>
+
+<div id="ax-legal-{{ uid }}">
+  <div class="ax-wrap">
+    {%- if section.settings.aviso != blank -%}
+      <p class="ax-aviso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+        </svg>
+        <span>{{ section.settings.aviso }}</span>
+      </p>
     {%- endif -%}
-    {%- if s.data_line != blank and s.line_below != true -%}<p class="gad-lg__line">{{ s.data_line }}</p>{%- endif -%}
-    {%- if section.blocks.size > 0 -%}
-      <details class="gad-lg__more"{% if s.open %} open{% endif %}>
-        <summary>{{ s.details_label | escape }}{%- render 'gad-icon', name: 'expand_more' -%}</summary>
-        <dl class="gad-lg__rows">
-          {%- for block in section.blocks -%}
-            {%- assign b = block.settings -%}
-            {%- if b.text != blank -%}
-              <div class="gad-lg__row" {{ block.shopify_attributes }}>
-                <dt>{{ b.title | escape }}</dt>
-                <dd class="rte">{{ b.text }}</dd>
-              </div>
-            {%- elsif b.required and request.design_mode -%}
-              <div class="gad-lg__row gad-lg__row--missing" {{ block.shopify_attributes }}>
-                <dt>{{ b.title | escape }}</dt>
-                <dd>{{ 'gadsden.legal.missing' | t }}</dd>
-              </div>
-            {%- endif -%}
-          {%- endfor -%}
-        </dl>
-      </details>
-    {%- endif -%}
-    {%- if s.data_line != blank and s.line_below -%}<p class="gad-lg__line gad-lg__line--below">{{ s.data_line }}</p>{%- endif -%}
+
+    <details>
+      <summary>{{ section.settings.titulo_detalle }}</summary>
+      <div class="ax-cols">
+        <div>
+          <h3>Advertencias</h3>
+          <p>{{ section.settings.advertencias }}</p>
+        </div>
+        <div>
+          <h3>Modo de uso</h3>
+          <p>{{ section.settings.modo_uso }}</p>
+        </div>
+        <div>
+          <h3>Ingredientes</h3>
+          <p{% if inci == pend %} class="ax-pend"{% endif %}>{{ inci }}</p>
+        </div>
+        <div>
+          <h3>Titular / Responsable</h3>
+          <p{% if titular == pend %} class="ax-pend"{% endif %}>{{ titular }}</p>
+          <h3 style="margin-top:8px">Inscripción ANMAT</h3>
+          <p{% if legajo == pend %} class="ax-pend"{% endif %}>{{ legajo }}</p>
+        </div>
+      </div>
+    </details>
+
+    <p class="ax-pie">
+      {{ section.settings.categoria }}
+      {%- if neto != blank %} · Cont. neto {{ neto }}{% endif -%}
+      {%- if section.settings.origen != blank %} · {{ section.settings.origen }}{% endif -%}
+    </p>
   </div>
 </div>
-
-{% stylesheet %}
-  .gad-lg {
-    font-size: 1.3rem;
-  }
-
-  .gad-lg__notice {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-weight: 600;
-  }
-
-  .gad-lg__notice .gad-icon {
-    flex: 0 0 auto;
-    font-size: 2rem;
-  }
-
-  .gad-lg__notice p {
-    margin: 0;
-  }
-
-  .gad-lg__line {
-    margin: 0.8rem 0 0;
-    opacity: 0.75;
-  }
-
-  .gad-lg__more {
-    margin-top: 1.2rem;
-    border-top: 0.1rem solid rgba(var(--color-foreground), 0.15);
-  }
-
-  .gad-lg__more summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 0;
-    font-weight: 600;
-    list-style: none;
-    cursor: pointer;
-  }
-
-  .gad-lg__more summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .gad-lg__more[open] summary .gad-icon {
-    transform: rotate(180deg);
-  }
-
-  .gad-lg__rows {
-    display: grid;
-    gap: 1.2rem;
-    margin: 0 0 1rem;
-  }
-
-  .gad-lg__row dt {
-    font-weight: 700;
-  }
-
-  .gad-lg__row dd {
-    margin: 0.2rem 0 0;
-  }
-
-  .gad-lg__row dd p {
-    margin: 0;
-  }
-
-  .gad-lg__row--missing dd {
-    color: rgb(200, 40, 40);
-  }
-  .gad-lg--label-accent .gad-lg__more summary {
-    color: rgb(var(--color-accent, var(--color-button)));
-    font-family: var(--font-heading-family);
-    font-weight: var(--font-heading-weight);
-    font-size: 1.1rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .gad-lg--line-upper .gad-lg__line {
-    font-family: var(--font-heading-family);
-    font-weight: var(--font-heading-weight);
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .gad-lg__icon-line {
-    display: inline-flex;
-    flex: 0 0 auto;
-    font-size: 2rem;
-    --gad-icon-color: rgb(var(--color-accent, var(--color-button)));
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
   "name": "Aviso y datos legales",
   "tag": "section",
-  "class": "section gad-section",
+  "class": "athlex-legal-section",
   "settings": [
-    {
-      "type": "richtext",
-      "id": "notice",
-      "label": "Aviso siempre visible",
-      "default": "<p>Uso externo. Leé las indicaciones antes de usar.</p>"
-    },
-    {
-      "type": "text",
-      "id": "notice_icon",
-      "label": "Ícono del aviso",
-      "default": "info",
-      "info": "Nombre en inglés de Material Symbols."
-    },
-    {
-      "type": "checkbox",
-      "id": "notice_icon_line",
-      "label": "Ícono de línea, en el color del acento",
-      "default": false
-    },
-    {
-      "type": "inline_richtext",
-      "id": "data_line",
-      "label": "Línea de datos",
-      "default": "Contenido neto · Origen · Registro"
-    },
-    {
-      "type": "text",
-      "id": "details_label",
-      "label": "Título del desplegable",
-      "default": "Información completa"
-    },
-    {
-      "type": "checkbox",
-      "id": "label_accent",
-      "label": "Título del desplegable en el acento y en mayúsculas",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "line_upper",
-      "label": "Línea de datos en mayúsculas",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "line_below",
-      "label": "Línea de datos debajo del desplegable",
-      "default": false
-    },
-    {
-      "type": "checkbox",
-      "id": "open",
-      "label": "Desplegable abierto de entrada",
-      "default": false
-    },
-    {
-      "type": "paragraph",
-      "content": "En una ficha, cada texto se puede conectar a un metacampo del producto con el botón de origen dinámico del editor."
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Combinación de colores",
-      "default": "scheme-1"
-    },
-    {
-      "type": "header",
-      "content": "Colores propios"
-    },
-    {
-      "type": "checkbox",
-      "id": "custom_colors",
-      "label": "Usar colores propios",
-      "default": false,
-      "info": "Pisan a la combinación de colores elegida arriba."
-    },
-    {
-      "type": "color",
-      "id": "cc_bg",
-      "label": "Fondo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color_background",
-      "id": "cc_bg_gradient",
-      "label": "Degradé de fondo",
-      "info": "Si cargás un degradé, reemplaza al color de fondo."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image",
-      "label": "Imagen de fondo",
-      "info": "Cubre todo el fondo y le gana al degradé."
-    },
-    {
-      "type": "image_picker",
-      "id": "cc_bg_image_mobile",
-      "label": "Imagen de fondo en mobile",
-      "info": "Vacía: usa la de desktop."
-    },
-    {
-      "type": "color",
-      "id": "cc_text",
-      "label": "Texto",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_accent",
-      "label": "Acento",
-      "default": "#334FB4"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_bg",
-      "label": "Fondo del botón lleno",
-      "default": "#121212"
-    },
-    {
-      "type": "color",
-      "id": "cc_btn_text",
-      "label": "Texto del botón lleno",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "cc_outline",
-      "label": "Botón de contorno y enlaces",
-      "default": "#121212"
-    },
-    {
-      "type": "header",
-      "content": "Espaciado"
-    },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno arriba",
-      "default": 16
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "label": "Relleno abajo",
-      "default": 16,
-      "info": "En mobile se aplica el 75 %."
-    },
-    {
-      "type": "header",
-      "content": "Visibilidad y ancla"
-    },
-    {
-      "type": "select",
-      "id": "visibility",
-      "label": "Mostrar en",
-      "options": [
-        {
-          "value": "all",
-          "label": "Todos los dispositivos"
-        },
-        {
-          "value": "mobile",
-          "label": "Sólo mobile"
-        },
-        {
-          "value": "desktop",
-          "label": "Sólo desktop"
-        }
-      ],
-      "default": "all",
-      "info": "Desktop empieza en el ancho que se elige en Configuración del tema > Gadsden · Carruseles."
-    },
-    {
-      "type": "text",
-      "id": "anchor",
-      "label": "Nombre del ancla",
-      "placeholder": "beneficios",
-      "info": "Para que un botón lleve hasta acá: poné como enlace del botón #beneficios (el nombre que elegiste)."
-    },
-    {
-      "type": "header",
-      "content": "Tamaño de la letra"
-    },
-    {
-      "type": "select",
-      "id": "title_scale",
-      "label": "Tamaño de los títulos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100"
-    },
-    {
-      "type": "select",
-      "id": "text_scale",
-      "label": "Tamaño de los textos",
-      "options": [
-        {
-          "value": "70",
-          "label": "70 %"
-        },
-        {
-          "value": "80",
-          "label": "80 %"
-        },
-        {
-          "value": "90",
-          "label": "90 %"
-        },
-        {
-          "value": "100",
-          "label": "Normal"
-        },
-        {
-          "value": "110",
-          "label": "110 %"
-        },
-        {
-          "value": "125",
-          "label": "125 %"
-        },
-        {
-          "value": "150",
-          "label": "150 %"
-        },
-        {
-          "value": "175",
-          "label": "175 %"
-        },
-        {
-          "value": "200",
-          "label": "200 %"
-        }
-      ],
-      "default": "100",
-      "info": "Agranda o achica los títulos y los textos de esta sección respecto del tamaño global."
-    }
+    { "type": "textarea", "id": "aviso", "label": "Aviso destacado (siempre visible)", "default": "Uso externo. Suspender su uso en caso de irritación. Mantener fuera del alcance de los niños." },
+    { "type": "text", "id": "titulo_detalle", "label": "Título del desplegable", "default": "Advertencias, ingredientes y datos del producto" },
+    { "type": "textarea", "id": "advertencias", "label": "Advertencias", "default": "Uso externo. Evitá el contacto con los ojos y las mucosas. Si aparece irritación, suspendé el uso. No apliques sobre piel lastimada. No exponer a temperaturas mayores a 30 °C." },
+    { "type": "textarea", "id": "modo_uso", "label": "Modo de uso", "default": "Agitá antes de usar. Aplicá a 15 cm sobre la piel limpia y seca. Dejá secar unos segundos. No requiere enjuague. Repetí cuando lo necesites." },
+    { "type": "text", "id": "neto", "label": "Contenido neto (si el producto no lo trae)", "default": "120 ml" },
+    { "type": "header", "content": "Pie" },
+    { "type": "text", "id": "categoria", "label": "Categoría", "default": "Producto cosmético de higiene y cuidado personal" },
+    { "type": "text", "id": "origen", "label": "Origen", "default": "Industria Argentina" }
   ],
-  "blocks": [
-    {
-      "type": "row",
-      "name": "Dato",
-      "settings": [
-        {
-          "type": "text",
-          "id": "title",
-          "label": "Título",
-          "default": "Advertencias"
-        },
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Texto"
-        },
-        {
-          "type": "checkbox",
-          "id": "required",
-          "label": "Obligatorio",
-          "default": false,
-          "info": "Si está vacío, el editor avisa. En la tienda no se muestra."
-        }
-      ]
-    }
-  ],
-  "presets": [
-    {
-      "name": "Aviso y datos legales",
-      "blocks": [
-        {
-          "type": "row",
-          "settings": {
-            "required": true
-          }
-        },
-        {
-          "type": "row",
-          "settings": {
-            "title": "Modo de uso"
-          }
-        },
-        {
-          "type": "row",
-          "settings": {
-            "title": "Composición"
-          }
-        }
-      ]
-    }
-  ]
+  "presets": [ { "name": "Aviso y datos legales" } ]
 }
 {% endschema %}
