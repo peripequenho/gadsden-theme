@@ -1,5 +1,24 @@
 # Cambios
 
+## 1.2.0
+
+Los widgets de landing pasan a ser el código propio original, tal cual (mismo código y mismos ajustes): una tienda que actualiza desde 1.1.x pierde los ajustes de estos widgets.
+
+### Widgets reemplazados por el código propio
+- Hero con palabra que rota, Pasos automáticos, Filas de reseñas, Tarjetas recortadas, Videos en coverflow, Garantía y Cierre.
+- Tarjetas desplegables, Sellos animados, Pasos con cronómetro, Pósters con texto, Capítulos en video, Muro de reseñas, Aviso y datos legales, Progreso de lectura, Cuestionario y Nota.
+- Íconos con contenido.
+
+### Widgets nuevos (código propio)
+- Antes y después barrido, Reseñas mini, Objeciones, Skin de la ficha, Tabla versus, Marquesina y Llamado final.
+
+### Estilo y ficha
+- Estilo base **Dawn**: la tipografía y los botones de Dawn sin cambios.
+- Tamaños del título de la ficha como el código propio (2,4/3, 3/4 y 4/5,2 rem).
+
+### Corregido
+- Estilo Clásico: un `h1` con clase `h0` (o un `h4` con otra clase de tamaño) tomaba el tamaño del `h1`.
+
 ## 1.1.3
 
 ### Corregido
