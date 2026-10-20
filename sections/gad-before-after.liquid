@@ -46,7 +46,7 @@
       <gad-before-after
         class="gad-ba gad-ba--{{ s.handle_style }}{% if s.handle_style == 'triangles' %} gad-ba--circle{% endif %}{% if s.elastic %} gad-ba--elastic{% endif %}{% if s.labels_style == 'corner' %} gad-ba--labels-corner{% endif %}{% if s.before_fit == 'part' %} gad-ba--before-part{% endif %}"
         data-start="{{ s.start }}"
-        style="--pos: {{ s.start }}%; --ratio: {{ ratio }}; --line: {% if s.line_custom != blank %}{{ s.line_custom }}{% else %}rgb(var(--color-{{ s.line_color }})){% endif %};{% if s.max_width > 0 %} max-width: {{ s.max_width }}px; margin-inline: auto;{% endif %}"
+        style="--pos: {{ s.start }}%; --ratio: {{ ratio }}; --line: {% if s.line_custom != blank %}{{ s.line_custom }}{% else %}rgb(var(--color-{{ s.line_color }})){% endif %};{% if s.handle_style == 'filled' %} --handle-fg: rgb(var(--color-{{ s.handle_arrows | default: 'background' }}));{% endif %}{% if s.max_width > 0 %} max-width: {{ s.max_width }}px; margin-inline: auto;{% endif %}"
       >
         <div class="gad-ba__img gad-ba__img--before">
           {%- if s.before_image != blank -%}
@@ -255,6 +255,26 @@
     background: rgba(0, 0, 0, 0.25);
     font-size: 2.2rem;
     backdrop-filter: blur(2px);
+  }
+
+  /* círculo relleno: el color de la línea, flechas en contraste, se achica al arrastrar */
+  .gad-ba--filled .gad-ba__handle {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    background: var(--line);
+    color: var(--handle-fg, rgb(var(--color-background)));
+    font-size: 2rem;
+    box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.25);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .gad-ba--filled.is-dragging .gad-ba__handle {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  html.gad-reduce .gad-ba--filled .gad-ba__handle {
+    transition: none;
   }
 
   .gad-ba__curve {
@@ -469,6 +489,7 @@
       if (e.button > 0) return;
       const start = { x: e.clientX, y: e.clientY, decided: e.pointerType === 'mouse' };
       if (start.decided) this.set(this.fromEvent(e), this.lastY);
+      this.classList.add('is-dragging');
       const move = (ev) => {
         if (!start.decided) {
           const dx = Math.abs(ev.clientX - start.x);
@@ -481,6 +502,7 @@
         this.set(this.fromEvent(ev), this.lastY);
       };
       const end = () => {
+        this.classList.remove('is-dragging');
         window.removeEventListener('pointermove', move);
         window.removeEventListener('pointerup', end);
         window.removeEventListener('pointercancel', end);
@@ -848,9 +870,31 @@
         {
           "value": "triangles",
           "label": "Círculo con triángulos"
+        },
+        {
+          "value": "filled",
+          "label": "Círculo relleno"
         }
       ],
       "default": "circle"
+    },
+    {
+      "type": "select",
+      "id": "handle_arrows",
+      "label": "Color de las flechas",
+      "default": "background",
+      "options": [
+        {
+          "value": "background",
+          "label": "Fondo de la sección"
+        },
+        {
+          "value": "foreground",
+          "label": "Texto de la sección"
+        }
+      ],
+      "info": "Con \"Círculo relleno\": el círculo toma el color de la línea.",
+      "visible_if": "{{ section.settings.handle_style == 'filled' }}"
     },
     {
       "type": "range",

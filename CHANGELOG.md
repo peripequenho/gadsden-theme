@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.1.1
+
+### Widgets
+- Antes y después: manija **círculo relleno** (toma el color de la línea, flechas con el fondo o el texto de la sección, sombra y se achica al arrastrar). Por defecto sigue "En círculo".
+
 ## 1.1.0
 
 Ajustes nuevos, todos apagados o con el valor de antes por defecto: una tienda que actualiza no cambia sola.
