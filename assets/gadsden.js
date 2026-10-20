@@ -766,7 +766,9 @@ class GadVideo extends HTMLElement {
   }
 
   decide() {
-    const shouldPlay = this.inView && this.slideVisible;
+    // Como el código propio: en un carrusel se reproducen todos los videos que están a la vista (copias del loop incluidas),
+    // no sólo el de la diapositiva activa. inView ya cuenta el recorte del carrusel.
+    const shouldPlay = this.inView;
     if (!shouldPlay) {
       if (!this.video.paused) this.video.pause();
       return;

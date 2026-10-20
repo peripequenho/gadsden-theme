@@ -1,5 +1,11 @@
 # Cambios
 
+## 1.2.2
+
+### Carrusel
+- Modo centrado como el código propio: centra la diapositiva activa sin achicar ni apagar las demás (no quedan espacios entre los ítems).
+- En un carrusel se reproducen todos los videos a la vista, también las copias del loop, no sólo el de la diapositiva activa.
+
 ## 1.2.1
 
 Widgets compartidos con el markup, el CSS y el JS del código propio, sobre sus mismos ajustes (los ids de Gadsden no cambian: una tienda que actualiza conserva lo que tenía).

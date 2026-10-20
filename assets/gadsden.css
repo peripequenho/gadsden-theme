@@ -1221,15 +1221,7 @@ gad-track-order {
   -webkit-line-clamp: var(--rv-lines, 2);
 }
 
-/* modo centrado: la diapositiva del medio queda marcada */
-gad-carousel.gad-carousel--center.is-active .gad-carousel__slide {
-  transition: opacity var(--duration-long) ease, transform var(--duration-long) ease;
-}
-
-gad-carousel.gad-carousel--center.is-active .gad-carousel__slide:not(.is-active) {
-  opacity: 0.55;
-  transform: scale(0.92);
-}
+/* modo centrado: como el código propio, sólo centra la diapositiva activa (sin achicar ni apagar las demás) */
 
 /* ---------- color de los íconos por nombre (barra de íconos, cinta, íconos con texto) ---------- */
 .gad-accent-accent {
