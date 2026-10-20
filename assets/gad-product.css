@@ -145,11 +145,16 @@
 }
 
 /* la etiqueta no crece con el tamaño de letra del bloque (el zoom va sobre .price): si no, no entra al costado */
+/* el precio anterior, a la mitad del tamaño del actual */
+.gad-price--compare_above .price--on-sale .price__sale .price-item--regular {
+  font-size: 0.5em;
+}
+
 /* la etiqueta va a la altura del precio actual (el de abajo), no entre los dos */
 .gad-price--compare_above .price--on-sale .price__badge-sale {
   flex: none;
   align-self: flex-end;
-  margin: 0 0 0.2rem;
+  margin: 0 0 0.85rem;
   white-space: nowrap;
 }
 

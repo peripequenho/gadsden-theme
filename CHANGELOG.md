@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.2.6
+
+### Ficha de producto
+- Precio anterior arriba: el precio anterior va a la mitad del tamaño del actual y la etiqueta queda centrada con el precio actual.
+
 ## 1.2.5
 
 ### Ficha de producto
