@@ -1,6 +1,6 @@
+{%- comment -%} Barra de íconos: tarjetas con ícono, título y texto, en grilla o carrusel. {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign card_key = section.id | append: '-card'
   case s.icon_size
     when 'small'
       assign icon_px = 28
@@ -9,155 +9,58 @@
     else
       assign icon_px = 40
   endcase
+  case s.icon_color
+    when 'text'
+      assign icon_color = 'rgb(var(--color-foreground))'
+    when 'accent'
+      assign icon_color = 'rgb(var(--color-accent, var(--color-button)))'
+    else
+      assign icon_color = 'rgb(var(--color-button))'
+  endcase
 -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
-{%- if s.card_style == 'custom' -%}
-  {%- render 'gad-colors', s: s, key: card_key, prefix: 'card_', force: true -%}
-{%- endif -%}
-
-<div
-  class="gad-icon-bar gad-pad{% if s.card_shadow %} gad-icon-bar--shadow{% endif %}{% if s.card_equal_height == false %} gad-icon-bar--natural{% endif %}{% if s.stack_narrow == false %} gad-icon-bar--no-stack{% endif %} {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --icon-px: {{ icon_px }}px;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="{% unless s.full_width %}page-width{% else %}gad-icon-bar__full{% endunless %}">
-    {%- if s.heading != blank or s.text != blank -%}
-      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
-        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
-      </div>
-    {%- endif -%}
-
+<style>
+  #GadIb-{{ section.id }} .gad-ib-pad{padding-top:{{ s.padding_top | times: 0.75 | round }}px;padding-bottom:{{ s.padding_bottom | times: 0.75 | round }}px}
+  @media(min-width:750px){#GadIb-{{ section.id }} .gad-ib-pad{padding-top:{{ s.padding_top }}px;padding-bottom:{{ s.padding_bottom }}px}}
+  #GadIb-{{ section.id }} .icon-bar__card{height:100%;display:flex;gap:1.4rem;align-items:center;padding:2rem;border-radius:var(--text-boxes-radius);text-align:center;flex-direction:column;justify-content:flex-start
+    {%- if s.card_style == 'custom' -%};background:{{ s.card_cc_bg_gradient | default: s.card_cc_bg }};color:{{ s.card_cc_text }}{%- elsif s.card_style == 'tint' -%};background:rgba(var(--color-foreground),.05){%- endif -%}
+    {%- if s.card_shadow -%};box-shadow:0 .4rem 1.6rem rgba(0,0,0,.08){%- endif -%}}
+  {% if s.layout == 'horizontal' %}#GadIb-{{ section.id }} .icon-bar__card{flex-direction:row;text-align:left}{% endif %}
+  #GadIb-{{ section.id }} .icon-bar__icon{font-size:{{ icon_px }}px;color:{{ icon_color }};flex:0 0 auto;line-height:1}
+  #GadIb-{{ section.id }} .icon-bar__icon .gad-icon{font-size:24px}{% comment %} como el código propio: el ícono queda en 24 px; el tamaño elegido rige para las imágenes {% endcomment %}
+  #GadIb-{{ section.id }} .icon-bar__title{margin:0;font-size:1.6rem;font-weight:700}
+  #GadIb-{{ section.id }} .icon-bar__text{margin:.4rem 0 0}
+  #GadIb-{{ section.id }} .icon-bar__text p:empty{display:none}
+  #GadIb-{{ section.id }} .icon-bar__card a{color:inherit;text-decoration:none}
+</style>
+<div id="GadIb-{{ section.id }}" class="{% render 'gad-scheme', s: s, key: section.id %}" {% render 'gad-section-attrs', s: s %}>
+  <div class="{% unless s.full_width %}page-width {% endunless %}gad-ib-pad">
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
     {%- capture slides -%}
       {%- for block in section.blocks -%}
         {%- assign b = block.settings -%}
-        <div class="gad-icon-bar__item" {{ block.shopify_attributes }}>
-          <div class="gad-icon-bar__card gad-icon-bar__card--{{ s.layout }} {% render 'gad-card-class', s: s, key: card_key %}">
-            {%- if b.icon_image != blank or b.icon != blank -%}
-              <span class="gad-icon-bar__icon gad-accent-{{ s.icon_color }}">
-                {%- render 'gad-icon', name: b.icon, filled: b.icon_filled, image: b.icon_image, size: icon_px -%}
-              </span>
+        <div {{ block.shopify_attributes }}>
+          <div class="icon-bar__card{% if s.card_style == 'scheme' %} color-{{ s.card_color_scheme }} gradient{% endif %}">
+            {%- if b.icon_image != blank -%}
+              {{ b.icon_image | image_url: width: 200 | image_tag: loading: 'lazy', style: 'width:' | append: icon_px | append: 'px;height:auto' }}
+            {%- elsif b.icon != blank -%}
+              <span class="icon-bar__icon">{%- render 'gad-icon', name: b.icon, filled: b.icon_filled -%}</span>
             {%- endif -%}
-            {%- if b.title != blank or b.text != blank -%}
-              <div class="gad-icon-bar__body">
-                {%- if b.title != blank -%}
-                  <h3 class="gad-icon-bar__title">
-                    {%- if b.link != blank -%}
-                      <a href="{{ b.link }}" class="full-unstyled-link">{{ b.title }}</a>
-                    {%- else -%}
-                      {{ b.title }}
-                    {%- endif -%}
-                  </h3>
-                {%- endif -%}
-                {%- if b.text != blank -%}
-                  <div class="gad-icon-bar__text rte">{{ b.text }}</div>
-                {%- endif -%}
-              </div>
-            {%- endif -%}
+            <div>
+              {%- if b.title != blank -%}
+                <h3 class="icon-bar__title">{% if b.link != blank %}<a href="{{ b.link }}">{% endif %}{{ b.title }}{% if b.link != blank %}</a>{% endif %}</h3>
+              {%- endif -%}
+              {%- if b.text != blank and b.text != '<p></p><p></p>' -%}
+                <div class="icon-bar__text rte">{{ b.text }}</div>
+              {%- endif -%}
+            </div>
           </div>
         </div>
       {%- endfor -%}
     {%- endcapture -%}
-
-    {%- if section.blocks.size > 0 -%}
-      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
-        {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading -%}
-      </div>
-    {%- endif -%}
+    {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading -%}
   </div>
 </div>
-
-{% stylesheet %}
-  .gad-icon-bar__full {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-icon-bar__full {
-      padding-left: 3rem;
-      padding-right: 3rem;
-    }
-  }
-
-  .gad-icon-bar__item {
-    display: flex;
-    min-width: 0;
-    container-type: inline-size;
-  }
-
-  /* Caja angosta (dos por fila en mobile): el ícono va arriba del texto para que no se pisen. */
-  @container (max-width: 24rem) {
-    .gad-icon-bar:not(.gad-icon-bar--no-stack) .gad-icon-bar__item .gad-icon-bar__card--horizontal {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .gad-icon-bar__item .gad-icon-bar__card.gad-card--box {
-      padding: 1.6rem 1.2rem;
-    }
-  }
-
-  .gad-icon-bar__card {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.2rem;
-    text-align: center;
-  }
-
-  .gad-icon-bar__card.gad-card--box {
-    padding: 2.4rem 2rem;
-    border-radius: var(--text-boxes-radius);
-  }
-
-  .gad-icon-bar__card--horizontal {
-    flex-direction: row;
-    align-items: center;
-    text-align: left;
-  }
-
-  .gad-icon-bar__icon {
-    display: inline-flex;
-    font-size: var(--icon-px);
-    line-height: 1;
-  }
-
-  .gad-icon-bar__icon .gad-icon {
-    font-size: var(--icon-px);
-  }
-
-  .gad-icon-bar__title {
-    margin: 0;
-    word-break: normal;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    font-size: 1.6rem;
-    font-weight: 700;
-    line-height: 1.3;
-  }
-
-  .gad-icon-bar__text {
-    margin-top: 0.4rem;
-    font-size: 1.4rem;
-  }
-
-  .gad-icon-bar__text p {
-    margin: 0;
-  }
-
-  .gad-icon-bar--shadow .gad-icon-bar__card.gad-card--box:not(.gad-card--same) {
-    box-shadow: var(--text-boxes-shadow-horizontal-offset) var(--text-boxes-shadow-vertical-offset) var(--text-boxes-shadow-blur-radius) rgba(var(--color-shadow), var(--text-boxes-shadow-opacity));
-  }
-
-  .gad-icon-bar--natural .gad-icon-bar__item {
-    align-self: flex-start;
-  }
-
-  .gad-icon-bar--natural .gad-icon-bar__card {
-    flex: 0 1 auto;
-  }
-{% endstylesheet %}
 
 {% schema %}
 {

@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.2.1
+
+Widgets compartidos con el markup, el CSS y el JS del código propio, sobre sus mismos ajustes (los ids de Gadsden no cambian: una tienda que actualiza conserva lo que tenía).
+
+### Widgets
+- **Tabla comparativa**: tabla del código propio (íconos en círculo, columna propia sin pestaña, primera columna al 46 %), con el precio anterior, la etiqueta de característica y la tilde parcial de Gadsden.
+- **Pestañas**: botones del código propio (con borde, con sombra o **llenos**, opción nueva) y panel con imagen o video.
+- **Testimonios**: tarjetas del código propio (comillas suaves, estrellas, autor con foto).
+- **Barra de íconos**: tarjetas del código propio; el ícono queda en 24 px y el tamaño elegido rige para las imágenes.
+
+### Colores propios
+- El texto de una sección con colores propios va con el color pleno (antes al 75 %), como en el código propio.
+
 ## 1.2.0
 
 Los widgets de landing pasan a ser el código propio original, tal cual (mismo código y mismos ajustes): una tienda que actualiza desde 1.1.x pierde los ajustes de estos widgets.

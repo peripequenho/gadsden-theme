@@ -1,484 +1,101 @@
+{%- comment -%} Pestañas de contenido: botones que muestran un panel (título, texto, imagen o video y botón). {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign show_nav = true
-  if section.blocks.size < 2 and request.design_mode == false
-    assign show_nav = false
-  endif
+  case s.width
+    when 'xs'
+      assign tabs_max = '60%'
+    when 's'
+      assign tabs_max = '80%'
+    when 'm'
+      assign tabs_max = '100%'
+    else
+      assign tabs_max = 'none'
+  endcase
 -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
-
-<div
-  class="gad-tabs-section gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="page-width">
-    {%- if s.heading != blank or s.text != blank -%}
-      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
-        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
+<style>
+  #GadTabs-{{ section.id }} .gad-tabs-pad{padding-top:{{ s.padding_top | times: 0.75 | round }}px;padding-bottom:{{ s.padding_bottom | times: 0.75 | round }}px}
+  @media(min-width:750px){#GadTabs-{{ section.id }} .gad-tabs-pad{padding-top:{{ s.padding_top }}px;padding-bottom:{{ s.padding_bottom }}px}}
+  #tabs-{{ section.id }}{max-width:{{ tabs_max }};margin:0 auto}
+  {% if s.nav_style == 'shadow' %}#tabs-{{ section.id }} .tabs__btn{border-color:transparent;box-shadow:0 2px 10px rgba(0,0,0,.12)}{% endif %}
+  {% if s.active_style == 'slide' %}#tabs-{{ section.id }} .tabs__btn.is-active{transform:translateY(-2px)}{% else %}#tabs-{{ section.id }} .tabs__btn{opacity:.55}#tabs-{{ section.id }} .tabs__btn.is-active{opacity:1}{% endif %}
+  #tabs-{{ section.id }} .tabs__nav{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-bottom:2.4rem}
+  {% if s.layout == 'vertical' %}@media(min-width:990px){#tabs-{{ section.id }}{display:grid;grid-template-columns:22rem 1fr;gap:3rem}#tabs-{{ section.id }} .tabs__nav{flex-direction:column;margin:0}}{% endif %}
+  #tabs-{{ section.id }} .tabs__btn{font-size:{{ s.font_size_m }}px;font-weight:600;padding:1rem 1.8rem;border-radius:{{ s.button_radius }}px;cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;transition:background .2s,color .2s;
+    --tab-bg:{% if s.custom_buttons %}{{ s.button_color }}{% else %}rgb(var(--color-button)){% endif %};--tab-fg:{% if s.custom_buttons %}{{ s.button_active_text }}{% else %}rgb(var(--color-button-text)){% endif %};
+    {%- if s.nav_style == 'solid' -%}background:var(--tab-bg);color:var(--tab-fg);border:2px solid var(--tab-bg);opacity:.75{%- else -%}background:transparent;color:var(--tab-bg);border:2px solid var(--tab-bg){%- endif -%}}
+  #tabs-{{ section.id }} .tabs__btn.is-active{background:var(--tab-bg);color:var(--tab-fg);opacity:1}
+  #tabs-{{ section.id }} .tabs__btn .gad-icon{font-size:20px}
+  {% if s.stretch_m %}@media(max-width:749px){#tabs-{{ section.id }} .tabs__btn{flex:1 1 100%;justify-content:center}}{% endif %}
+  @media(min-width:750px){#tabs-{{ section.id }} .tabs__btn{font-size:{{ s.font_size_d }}px}{% if s.stretch_d %}#tabs-{{ section.id }} .tabs__btn{flex:1}{% endif %}}
+  #tabs-{{ section.id }} .tabs__panel{display:none}
+  #tabs-{{ section.id }} .tabs__panel.is-active{display:grid;gap:2.4rem;align-items:center}
+  #tabs-{{ section.id }} .tabs__panel.has-media{grid-template-columns:1fr}
+  @media(min-width:990px){#tabs-{{ section.id }} .tabs__panel.has-media.w-half{grid-template-columns:1fr 1fr}#tabs-{{ section.id }} .tabs__panel.has-media.w-half.media-second .tabs__media{order:2}}
+  #tabs-{{ section.id }} .tabs__media img,#tabs-{{ section.id }} .tabs__media video{width:100%;height:auto;border-radius:var(--media-radius);display:block}
+  #tabs-{{ section.id }} .tabs__body{text-align:center}
+  #tabs-{{ section.id }} .tabs__body.left{text-align:left}#tabs-{{ section.id }} .tabs__body.right{text-align:right}
+  @media(max-width:989px){#tabs-{{ section.id }} .tabs__body.mobile-left{text-align:left}#tabs-{{ section.id }} .tabs__body.mobile-center{text-align:center}#tabs-{{ section.id }} .tabs__body.mobile-right{text-align:right}#tabs-{{ section.id }} .tabs__panel.m-media-second .tabs__media{order:2}}
+  #tabs-{{ section.id }} .tabs__title{margin:0 0 1.2rem}
+  #tabs-{{ section.id }} .tabs__title strong{color:var(--tab-hl)}
+  #tabs-{{ section.id }} .tabs__cta{margin-top:1.6rem}
+</style>
+<div id="GadTabs-{{ section.id }}" class="{% render 'gad-scheme', s: s, key: section.id %}" {% render 'gad-section-attrs', s: s %}>
+  <div class="page-width gad-tabs-pad">
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
+    <div id="tabs-{{ section.id }}" class="tabs">
+      <div class="tabs__nav" role="tablist">
+        {%- for block in section.blocks -%}
+          <button type="button" role="tab" class="tabs__btn{% if forloop.first %} is-active{% endif %}" aria-selected="{{ forloop.first }}" aria-controls="panel-{{ block.id }}" data-tab="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.icon != blank -%}{%- render 'gad-icon', name: block.settings.icon, filled: block.settings.icon_filled -%}{%- endif -%}
+            {{ block.settings.label }}
+          </button>
+        {%- endfor -%}
       </div>
-    {%- endif -%}
-
-    {%- if section.blocks.size > 0 -%}
-      <gad-tabs
-        class="gad-tabs gad-tabs--{{ s.width }} gad-tabs--d-{{ s.layout }} gad-tabs--{{ s.active_style }} gad-tabs--{{ s.nav_style }}{% if s.stretch_d %} gad-tabs--stretch-d{% endif %}{% if s.stretch_m %} gad-tabs--stretch-m{% endif %}{% if s.custom_buttons %} gad-tabs--custom{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-        style="--tab-radius: {{ s.button_radius }}px; --tab-size-d: {{ s.font_size_d }}px; --tab-size-m: {{ s.font_size_m }}px;{% if s.custom_buttons %} --tab-color: {{ s.button_color }}; --tab-active-text: {{ s.button_active_text }};{% endif %}"
-        {% if settings.animations_reveal_on_scroll %}
-          data-cascade
-        {% endif %}
-      >
-        {%- if show_nav -%}
-          <div class="gad-tabs__nav" role="tablist">
-            <span class="gad-tabs__indicator" aria-hidden="true"></span>
-            {%- for block in section.blocks -%}
-              <button
-                type="button"
-                role="tab"
-                id="GadTab-{{ block.id }}"
-                class="gad-tabs__btn{% if forloop.first %} is-active{% endif %}"
-                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-                aria-controls="GadTabPanel-{{ block.id }}"
-                tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
-                data-block-id="{{ block.id }}"
-              >
-                {%- if block.settings.icon != blank -%}
-                  {%- render 'gad-icon', name: block.settings.icon, filled: block.settings.icon_filled, class: 'gad-tabs__btn-icon' -%}
-                {%- endif -%}
-                <span>{{ block.settings.label | default: forloop.index }}</span>
-              </button>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-
-        <div class="gad-tabs__panels">
-          {%- for block in section.blocks -%}
-            {%- liquid
-              assign b = block.settings
-              assign has_media = false
-              if b.image != blank or b.video != blank
-                assign has_media = true
-              endif
-            -%}
-            <div
-              id="GadTabPanel-{{ block.id }}"
-              role="tabpanel"
-              aria-labelledby="GadTab-{{ block.id }}"
-              class="gad-tabs__panel{% if has_media %} has-media gad-tabs__panel--{{ b.media_width }} gad-tabs__panel--media-{{ b.media_position }} gad-tabs__panel--m-media-{{ b.m_media_position }}{% endif %}"
-              {% unless forloop.first %}
-                hidden
-              {% endunless %}
-              {{ block.shopify_attributes }}
-            >
-              {%- if has_media -%}
-                <div class="gad-tabs__media">
-                  {%- if b.video != blank -%}
-                    {%- render 'gad-video',
-                      video: b.video,
-                      poster: b.image,
-                      autoplay: b.autoplay,
-                      loop: b.loop,
-                      tap: true,
-                      pulse: b.pulse,
-                      button_scheme: b.play_scheme,
-                      width: 1500
-                    -%}
-                  {%- else -%}
-                    {%- assign img_alt = b.image.alt | default: '' -%}
-                    {{ b.image | image_url: width: 1500 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 50vw, 100vw', widths: '375, 550, 750, 1100, 1500' }}
-                  {%- endif -%}
-                </div>
-              {%- endif -%}
-              <div class="gad-tabs__body gad-tabs--a-{{ b.align }} gad-tabs--m-a-{{ b.m_align }}">
-                {%- if b.title != blank -%}
-                  <h3 class="gad-tabs__title gad-hl {{ b.title_size }}"{% if b.title_accent != blank %} style="--gad-hl: {{ b.title_accent }};"{% endif %}>{{ b.title }}</h3>
-                {%- endif -%}
-                {%- if b.text != blank -%}
-                  <div class="gad-tabs__text rte">{{ b.text }}</div>
-                {%- endif -%}
-                {%- if b.button_label != blank or b.atc_label != blank -%}
-                  <div class="gad-buttons gad-tabs__buttons">
-                    {%- if b.button_label != blank -%}
-                      <a
-                        {% if b.button_link == blank %}
-                          role="link" aria-disabled="true"
-                        {% else %}
-                          href="{{ b.button_link }}"
-                        {% endif %}
-                        class="button{% if b.button_outline %} button--secondary{% else %} button--primary{% endif %}"
-                      >
-                        {{- b.button_label | escape -}}
-                      </a>
-                    {%- endif -%}
-                    {%- render 'gad-atc-button', label: b.atc_label, product: b.atc_product, skip_cart: b.atc_skip_cart -%}
-                  </div>
+      <div class="tabs__panels">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign has_media = false
+            if b.image != blank or b.video != blank
+              assign has_media = true
+            endif
+          -%}
+          <div id="panel-{{ block.id }}" role="tabpanel" class="tabs__panel{% if forloop.first %} is-active{% endif %}{% if has_media %} has-media{% endif %}{% if b.media_width == 'half' %} w-half{% endif %}{% if b.media_position == 'second' %} media-second{% endif %}{% if b.m_media_position == 'second' %} m-media-second{% endif %}" style="--tab-hl:{{ b.title_accent | default: 'inherit' }}">
+            {%- if has_media -%}
+              <div class="tabs__media">
+                {%- if b.video != blank -%}
+                  {{ b.video | video_tag: image_size: '1100x', loop: b.loop, muted: b.autoplay, autoplay: b.autoplay, playsinline: true, controls: true }}
+                {%- else -%}
+                  {{ b.image | image_url: width: 1500 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 50vw, 100vw' }}
                 {%- endif -%}
               </div>
+            {%- endif -%}
+            <div class="tabs__body {{ b.align | default: 'center' }} mobile-{{ b.m_align | default: 'center' }}">
+              {%- if b.title != blank -%}<h3 class="tabs__title {{ b.title_size | default: 'h1' }}">{{ b.title }}</h3>{%- endif -%}
+              {%- if b.text != blank -%}<div class="rte">{{ b.text }}</div>{%- endif -%}
+              {%- if b.button_label != blank -%}<div class="tabs__cta"><a {% if b.button_link == blank %}role="link" aria-disabled="true"{% else %}href="{{ b.button_link }}"{% endif %} class="button{% if b.button_outline %} button--secondary{% endif %}">{{ b.button_label | escape }}</a></div>{%- endif -%}
+              {%- if b.atc_label != blank and b.atc_product != blank -%}<div class="tabs__cta">{%- render 'gad-atc-button', label: b.atc_label, product: b.atc_product, skip_cart: b.atc_skip_cart -%}</div>{%- endif -%}
             </div>
-          {%- endfor -%}
-        </div>
-      </gad-tabs>
-    {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
   </div>
 </div>
-
-{% stylesheet %}
-  gad-tabs {
-    display: block;
-    width: 100%;
-    margin: 0 auto;
-    --tab-color: rgb(var(--color-button));
-    --tab-active-text: rgb(var(--color-button-text));
-  }
-
-  .gad-tabs--xs {
-    max-width: 48rem;
-  }
-
-  .gad-tabs--s {
-    max-width: 72rem;
-  }
-
-  .gad-tabs--m {
-    max-width: 96rem;
-  }
-
-  .gad-tabs__nav {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem;
-    width: fit-content;
-    max-width: 100%;
-    margin: 0 auto 3.2rem;
-    padding: 0.4rem;
-    border: 0.1rem solid var(--tab-color);
-    border-radius: calc(var(--tab-radius) + 0.4rem);
-  }
-
-  .gad-tabs--shadow .gad-tabs__nav {
-    border-color: transparent;
-    box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.12);
-    background: rgb(var(--color-background));
-  }
-
-  .gad-tabs__indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    width: 0;
-    height: 0;
-    border-radius: var(--tab-radius);
-    background: var(--tab-color);
-    transition: transform var(--duration-long) var(--ease-out-slow), width var(--duration-long) var(--ease-out-slow),
-      height var(--duration-long) var(--ease-out-slow);
-    pointer-events: none;
-  }
-
-  .gad-tabs--fade .gad-tabs__indicator {
-    display: none;
-  }
-
-  .gad-tabs__btn {
-    position: relative;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 1rem 1.8rem;
-    border: 0;
-    border-radius: var(--tab-radius);
-    background: transparent;
-    color: var(--tab-color);
-    font-family: inherit;
-    font-size: var(--tab-size-m);
-    font-weight: 600;
-    cursor: pointer;
-    transition: color var(--duration-default) ease, opacity var(--duration-default) ease, background-color var(--duration-default) ease;
-  }
-
-  .gad-tabs__btn.is-active {
-    color: var(--tab-active-text);
-  }
-
-  .gad-tabs--fade .gad-tabs__btn {
-    background: var(--tab-color);
-    color: var(--tab-active-text);
-    opacity: 0.45;
-  }
-
-  .gad-tabs--fade .gad-tabs__btn.is-active {
-    opacity: 1;
-  }
-
-  .gad-tabs__btn-icon {
-    font-size: 1.3em;
-  }
-
-  .gad-tabs__btn p {
-    margin: 0;
-  }
-
-  @media screen and (max-width: 749px) {
-    .gad-tabs--stretch-m .gad-tabs__nav {
-      width: 100%;
-    }
-
-    .gad-tabs--stretch-m .gad-tabs__btn {
-      flex: 1 1 0;
-    }
-  }
-
-  .gad-tabs__panel {
-    display: grid;
-    gap: 2.4rem;
-    align-items: center;
-    animation: gadTabIn var(--duration-medium) ease;
-  }
-
-  .gad-tabs__panel[hidden] {
-    display: none;
-  }
-
-  html.gad-reduce .gad-tabs__panel {
-    animation: none;
-  }
-
-  @keyframes gadTabIn {
-    from {
-      opacity: 0;
-      transform: translateY(0.8rem);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  .gad-tabs__media {
-    overflow: hidden;
-    border-radius: var(--media-radius);
-  }
-
-  .gad-tabs__media img,
-  .gad-tabs__media video {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .gad-tabs__panel--m-media-second .gad-tabs__media {
-    order: 2;
-  }
-
-  .gad-tabs__title {
-    margin: 0 0 1.2rem;
-  }
-
-  .gad-tabs__text p:last-child {
-    margin-bottom: 0;
-  }
-
-  .gad-tabs__buttons {
-    margin-top: 2rem;
-  }
-
-  .gad-tabs--m-a-left {
-    text-align: left;
-  }
-
-  .gad-tabs--m-a-center {
-    text-align: center;
-  }
-
-  .gad-tabs--m-a-center .gad-buttons {
-    justify-content: center;
-  }
-
-  .gad-tabs--m-a-right {
-    text-align: right;
-  }
-
-  .gad-tabs--m-a-right .gad-buttons {
-    justify-content: flex-end;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-tabs__btn {
-      font-size: var(--tab-size-d);
-    }
-
-    .gad-tabs--stretch-d .gad-tabs__nav {
-      width: 100%;
-    }
-
-    .gad-tabs--stretch-d .gad-tabs__btn {
-      flex: 1 1 0;
-    }
-
-    .gad-tabs--a-left {
-      text-align: left;
-    }
-
-    .gad-tabs--a-center {
-      text-align: center;
-    }
-
-    .gad-tabs--a-right {
-      text-align: right;
-    }
-
-    .gad-tabs--a-left .gad-buttons {
-      justify-content: flex-start;
-    }
-
-    .gad-tabs--a-center .gad-buttons {
-      justify-content: center;
-    }
-
-    .gad-tabs--a-right .gad-buttons {
-      justify-content: flex-end;
-    }
-  }
-
-  @media screen and (min-width: 750px) {
-    :where(html[data-gad-bp='750']) .gad-tabs__panel--half {
-      grid-template-columns: 1fr 1fr;
-      gap: 4.8rem;
-    }
-
-    :where(html[data-gad-bp='750']) .gad-tabs__panel .gad-tabs__media {
-      order: 0;
-    }
-
-    :where(html[data-gad-bp='750']) .gad-tabs__panel--media-second .gad-tabs__media {
-      order: 2;
-    }
-
-    :where(html[data-gad-bp='750']) .gad-tabs--d-vertical {
-      display: grid;
-      grid-template-columns: minmax(16rem, 26rem) 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    :where(html[data-gad-bp='750']) .gad-tabs--d-vertical .gad-tabs__nav {
-      flex-direction: column;
-      flex-wrap: nowrap;
-      align-items: stretch;
-      width: 100%;
-      margin: 0;
-    }
-
-    :where(html[data-gad-bp='750']) .gad-tabs--d-vertical .gad-tabs__btn {
-      justify-content: flex-start;
-    }
-  }
-
-  @media screen and (min-width: 990px) {
-    :where(html:not([data-gad-bp='750'])) .gad-tabs__panel--half {
-      grid-template-columns: 1fr 1fr;
-      gap: 4.8rem;
-    }
-
-    :where(html:not([data-gad-bp='750'])) .gad-tabs__panel .gad-tabs__media {
-      order: 0;
-    }
-
-    :where(html:not([data-gad-bp='750'])) .gad-tabs__panel--media-second .gad-tabs__media {
-      order: 2;
-    }
-
-    :where(html:not([data-gad-bp='750'])) .gad-tabs--d-vertical {
-      display: grid;
-      grid-template-columns: minmax(16rem, 26rem) 1fr;
-      gap: 4rem;
-      align-items: start;
-    }
-
-    :where(html:not([data-gad-bp='750'])) .gad-tabs--d-vertical .gad-tabs__nav {
-      flex-direction: column;
-      flex-wrap: nowrap;
-      align-items: stretch;
-      width: 100%;
-      margin: 0;
-    }
-
-    :where(html:not([data-gad-bp='750'])) .gad-tabs--d-vertical .gad-tabs__btn {
-      justify-content: flex-start;
-    }
-  }
-{% endstylesheet %}
-
-{% javascript %}
-  class GadTabs extends HTMLElement {
-    connectedCallback() {
-      if (this._ready) return;
-      this._ready = true;
-      this.nav = this.querySelector('.gad-tabs__nav');
-      this.buttons = Array.from(this.querySelectorAll('.gad-tabs__btn'));
-      this.panels = Array.from(this.querySelectorAll('.gad-tabs__panel'));
-      this.indicator = this.querySelector('.gad-tabs__indicator');
-      this.buttons.forEach((btn, i) => {
-        btn.addEventListener('click', () => this.select(i, false));
-        btn.addEventListener('keydown', (e) => this.onKey(e, i));
-      });
-      this.addEventListener('shopify:block:select', (e) => {
-        const i = this.panels.findIndex((p) => p.contains(e.target));
-        if (i >= 0) this.select(i, false);
-      });
-      this.ro = new ResizeObserver(() => this.moveIndicator());
-      if (this.nav) this.ro.observe(this.nav);
-      this.moveIndicator();
-    }
-
-    disconnectedCallback() {
-      if (this.ro) this.ro.disconnect();
-      this._ready = false;
-    }
-
-    select(i, focus) {
-      this.buttons.forEach((btn, j) => {
-        const on = i === j;
-        btn.classList.toggle('is-active', on);
-        btn.setAttribute('aria-selected', String(on));
-        btn.tabIndex = on ? 0 : -1;
-        if (on && focus) btn.focus();
-      });
-      this.panels.forEach((panel, j) => {
-        panel.hidden = i !== j;
-        if (i !== j) panel.querySelectorAll('video').forEach((v) => v.pause());
-      });
-      this.moveIndicator();
-    }
-
-    onKey(e, i) {
-      const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'];
-      if (!keys.includes(e.key)) return;
-      e.preventDefault();
-      const n = this.buttons.length;
-      let next = i;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % n;
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + n) % n;
-      if (e.key === 'Home') next = 0;
-      if (e.key === 'End') next = n - 1;
-      this.select(next, true);
-    }
-
-    moveIndicator() {
-      if (!this.indicator) return;
-      const active = this.buttons.find((b) => b.classList.contains('is-active'));
-      if (!active) return;
-      this.indicator.style.width = `${active.offsetWidth}px`;
-      this.indicator.style.height = `${active.offsetHeight}px`;
-      this.indicator.style.transform = `translate(${active.offsetLeft}px, ${active.offsetTop}px)`;
-    }
-  }
-
-  if (!customElements.get('gad-tabs')) customElements.define('gad-tabs', GadTabs);
-{% endjavascript %}
+<script>
+  (function () {
+    var root = document.getElementById('tabs-{{ section.id }}');
+    if (!root) return;
+    root.addEventListener('click', function (e) {
+      var btn = e.target.closest('.tabs__btn');
+      if (!btn) return;
+      var i = btn.dataset.tab;
+      root.querySelectorAll('.tabs__btn').forEach(function (b, j) { var on = String(j) === i; b.classList.toggle('is-active', on); b.setAttribute('aria-selected', on); });
+      root.querySelectorAll('.tabs__panel').forEach(function (p, j) { p.classList.toggle('is-active', String(j) === i); });
+    });
+  })();
+</script>
 
 {% schema %}
 {
@@ -712,6 +329,10 @@
         {
           "value": "shadow",
           "label": "Con sombra"
+        },
+        {
+          "value": "solid",
+          "label": "Botones llenos"
         }
       ],
       "default": "border"

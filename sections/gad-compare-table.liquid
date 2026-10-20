@@ -1,584 +1,145 @@
+{%- comment -%} Tabla comparativa: la tienda contra hasta 3 competidores, filas con tilde o cruz. {%- endcomment -%}
 {%- liquid
   assign s = section.settings
-  assign n = s.competitors
+  assign n = s.competitors | default: 1
   if s.table_style == 'minimal'
     assign n = 1
   endif
-  assign has_text = false
-  if s.heading != blank or s.text != blank or s.button_label != blank or s.atc_label != blank
-    assign has_text = true
-  endif
   assign own_label = s.own_label | replace: '{tienda}', shop.name
-  if own_label == blank
+  if own_label == blank and s.own_logo == blank
     assign own_label = shop.name
   endif
-  if s.check_style == 'filled' or s.table_style == 'minimal'
-    assign check_filled = true
-  else
-    assign check_filled = false
+  assign hl_class = ''
+  if s.hl_style == 'scheme'
+    assign hl_class = ' color-' | append: s.hl_scheme
   endif
-  if s.cross_style == 'filled' or s.table_style == 'minimal'
-    assign cross_filled = true
-  else
-    assign cross_filled = false
+  assign reg_class = ''
+  if s.reg_style == 'scheme'
+    assign reg_class = ' color-' | append: s.reg_scheme
   endif
 -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
-
-{%- style -%}
-  #GadCompare-{{ section.id }} {
-    --cmp-radius: {{ s.radius }}px;
-    --chk: {{ s.check_color }};
-    --chk-bg: {{ s.check_bg }};
-    --crs: {{ s.cross_color }};
-    --crs-bg: {{ s.cross_bg }};
-    --hl-sep: {{ s.hl_separator | divided_by: 100.0 }};
-    --hl-zebra: {{ s.hl_zebra | divided_by: 100.0 }};
-    --reg-sep: {{ s.reg_separator | divided_by: 100.0 }};
-    --reg-zebra: {{ s.reg_zebra | divided_by: 100.0 }};
-    --min-line: {{ s.min_line | divided_by: 100.0 }};
-    --own-size: {{ s.own_size }}px;
-    {%- if s.partial_color != blank %}
-      --partial: {{ s.partial_color }};
-    {%- endif %}
-    --own-logo-d: {{ s.own_logo_width_d }}px;
-    --own-logo-m: {{ s.own_logo_width_m }}px;
-    {%- for i in (1..3) -%}
-      {%- assign k_size = 'c' | append: i | append: '_size' -%}
-      {%- assign k_ld = 'c' | append: i | append: '_logo_width_d' -%}
-      {%- assign k_lm = 'c' | append: i | append: '_logo_width_m' -%}
-      --c{{ i }}-size: {{ s[k_size] }}px;
-      --c{{ i }}-logo-d: {{ s[k_ld] }}px;
-      --c{{ i }}-logo-m: {{ s[k_lm] }}px;
-    {%- endfor -%}
-  }
+{%- capture check_icon -%}{%- render 'gad-icon', name: 'check', filled: true -%}{%- endcapture -%}
+{%- capture cross_icon -%}{%- render 'gad-icon', name: 'close', filled: true -%}{%- endcapture -%}
+{%- capture part_icon -%}{%- render 'gad-icon', name: 'remove', filled: true -%}{%- endcapture -%}
+<style>
+  #GadCompare-{{ section.id }} .gad-cmp-pad{padding-top:{{ s.padding_top | times: 0.75 | round }}px;padding-bottom:{{ s.padding_bottom | times: 0.75 | round }}px}
+  @media(min-width:750px){#GadCompare-{{ section.id }} .gad-cmp-pad{padding-top:{{ s.padding_top }}px;padding-bottom:{{ s.padding_bottom }}px}}
+  #cmp-{{ section.id }}{width:100%;max-width:90rem;margin:0 auto;border-collapse:separate;border-spacing:0;border-radius:{{ s.radius }}px;overflow:hidden;table-layout:fixed
+    {%- if s.table_style == 'minimal' -%};border:1px solid rgba(var(--color-foreground),{{ s.min_line | divided_by: 100.0 }}){%- endif -%}}
+  #cmp-{{ section.id }} th,#cmp-{{ section.id }} td{padding:1.4rem 1.2rem;border-bottom:1px solid rgba(var(--color-foreground),{{ s.reg_separator | divided_by: 100.0 }});vertical-align:middle}
+  #cmp-{{ section.id }} tr:last-child td{border-bottom:0}
+  #cmp-{{ section.id }} th{font-weight:700;text-align:center}
+  #cmp-{{ section.id }} th:first-child,#cmp-{{ section.id }} td:first-child{text-align:{{ s.m_align | default: 'left' }};width:46%}
+  #cmp-{{ section.id }} td:not(:first-child){text-align:center}
   {%- if s.hl_style == 'custom' %}
-    #GadCompare-{{ section.id }} .gad-cmp__own {
-      --color-background: {{ s.hl_bg.red }},{{ s.hl_bg.green }},{{ s.hl_bg.blue }};
-      --color-foreground: {{ s.hl_text.red }},{{ s.hl_text.green }},{{ s.hl_text.blue }};
-    }
+  #cmp-{{ section.id }} .cmp__us{background:{{ s.hl_bg }};color:{{ s.hl_text }}}
   {%- endif %}
   {%- if s.reg_style == 'custom' %}
-    #GadCompare-{{ section.id }} .gad-cmp__cell--reg {
-      --color-background: {{ s.reg_bg.red }},{{ s.reg_bg.green }},{{ s.reg_bg.blue }};
-      --color-foreground: {{ s.reg_text.red }},{{ s.reg_text.green }},{{ s.reg_text.blue }};
-    }
+  #cmp-{{ section.id }} .cmp__other{background:{{ s.reg_bg }};color:{{ s.reg_text }}}
   {%- endif %}
-{%- endstyle -%}
-
-{%- capture check_icon -%}{%- render 'gad-icon', name: 'check', class: 'gad-cmp__glyph' -%}{%- endcapture -%}
-{%- capture cross_icon -%}{%- render 'gad-icon', name: 'close', class: 'gad-cmp__glyph' -%}{%- endcapture -%}
-
-<div
-  id="GadCompare-{{ section.id }}"
-  class="gad-cmp-section gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px;"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="page-width gad-cmp-layout{% if has_text %} gad-cmp-layout--text gad-cmp-layout--table-{{ s.position }}{% endif %}">
-    {%- if has_text -%}
-      <div class="gad-cmp-layout__text gad-cmp--a-{{ s.align }} gad-cmp--m-a-{{ s.m_align }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 1;"{% endif %}>
-        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text -%}
-        {%- if s.button_label != blank or s.atc_label != blank -%}
-          <div class="gad-buttons">
-            {%- if s.button_label != blank -%}
-              <a
-                {% if s.button_link == blank %}
-                  role="link" aria-disabled="true"
-                {% else %}
-                  href="{{ s.button_link }}"
-                {% endif %}
-                class="button{% if s.button_outline %} button--secondary{% else %} button--primary{% endif %}"
-              >
-                {{- s.button_label | escape -}}
-              </a>
-            {%- endif -%}
-            {%- render 'gad-atc-button', label: s.atc_label, product: s.atc_product, skip_cart: s.atc_skip_cart -%}
-          </div>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
-
-    <div class="gad-cmp-layout__table{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
-      <table class="gad-cmp gad-cmp--{{ s.table_style }}{% if s.own_tab %} gad-cmp--own-tab{% endif %} gad-cmp--n{{ n }}{% if s.inverted %} gad-cmp--inverted{% endif %}{% if check_filled %} gad-cmp--check-filled{% endif %}{% if cross_filled %} gad-cmp--cross-filled{% endif %}">
-        <thead>
-          <tr>
-            <th class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__corner gad-cmp__first {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}" scope="col">
-              {%- if s.feature_label != blank -%}
-                <span class="gad-cmp__feature-label">{{ s.feature_label | escape }}</span>
-              {%- else -%}
-                <span class="visually-hidden">{{ 'gadsden.compare.benefit' | t }}</span>
-              {%- endif -%}
+  #cmp-{{ section.id }} .cmp__logo{max-width:{{ s.own_logo_width_m }}px;height:auto;display:inline-block}
+  #cmp-{{ section.id }} .cmp__logo--other{max-width:{{ s.c1_logo_width_m }}px}
+  #cmp-{{ section.id }} .cmp__label{font-size:{{ s.own_size | times: 0.85 }}px;display:block}
+  #cmp-{{ section.id }} .cmp__label--other{font-size:{{ s.c1_size | times: 0.85 }}px}
+  #cmp-{{ section.id }} .cmp__ic{display:inline-grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:50%}
+  #cmp-{{ section.id }} .cmp__ic .gad-icon{font-size:1.8rem;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24}
+  #cmp-{{ section.id }} .cmp__ic--yes{background:{{ s.check_bg }};color:{{ s.check_color }}}
+  #cmp-{{ section.id }} .cmp__ic--part{background:{{ s.partial_color | default: s.check_bg }};color:{{ s.check_color }}}
+  {% if s.check_style == 'simple' %}#cmp-{{ section.id }} .cmp__ic--yes{background:transparent;color:{{ s.check_bg }}}#cmp-{{ section.id }} .cmp__ic--yes .gad-icon{font-size:2.6rem}{% endif %}
+  #cmp-{{ section.id }} .cmp__us{box-shadow:inset 0 0 0 100vmax rgba(0,0,0,{{ s.hl_zebra | divided_by: 100.0 }})}
+  #cmp-{{ section.id }} .cmp__other{box-shadow:inset 0 0 0 100vmax rgba(0,0,0,{{ s.reg_zebra | divided_by: 100.0 }})}
+  #cmp-{{ section.id }} td.cmp__us{border-bottom-color:rgba(255,255,255,{{ s.hl_separator | divided_by: 100.0 }})}
+  {% if s.table_style == 'classic' %}#cmp-{{ section.id }} thead th{border-bottom:2px solid rgba(var(--color-foreground),.2)}#cmp-{{ section.id }}{border:0}{% endif %}
+  {% comment %} Como el código propio: la regla general de la cruz va después, así que la cruz simple sólo agranda el glifo. {% endcomment %}{% if s.cross_style == 'simple' %}#cmp-{{ section.id }} .cmp__ic--no{background:transparent;color:{{ s.cross_bg }}}#cmp-{{ section.id }} .cmp__ic--no .gad-icon{font-size:2.6rem}{% endif %}
+  #cmp-{{ section.id }} .cmp__ic--no{background:{{ s.cross_bg }};color:{{ s.cross_color }}}
+  {% if s.inverted %}
+  #cmp-{{ section.id }} .cmp__other .cmp__ic--yes{background:{{ s.cross_bg }};color:{{ s.cross_color }}}
+  #cmp-{{ section.id }} .cmp__other .cmp__ic--no{background:{{ s.check_bg }};color:{{ s.check_color }}}
+  {% endif %}
+  #cmp-{{ section.id }} .cmp__feature{font-weight:700}
+  @media(min-width:750px){
+    #cmp-{{ section.id }} th:first-child,#cmp-{{ section.id }} td:first-child{text-align:{{ s.align | default: 'left' }}}
+    #cmp-{{ section.id }} .cmp__logo{max-width:{{ s.own_logo_width_d }}px}
+    #cmp-{{ section.id }} .cmp__logo--other{max-width:{{ s.c1_logo_width_d }}px}
+    #cmp-{{ section.id }} .cmp__label{font-size:{{ s.own_size }}px}
+    #cmp-{{ section.id }} .cmp__label--other{font-size:{{ s.c1_size }}px}
+  }
+  #GadCompare-{{ section.id }} .cmp__footer{text-align:center;margin-top:2.4rem}
+  #GadCompare-{{ section.id }} .cmp__footer .gad-buttons{justify-content:center}
+</style>
+<div id="GadCompare-{{ section.id }}" class="{% render 'gad-scheme', s: s, key: section.id %}" {% render 'gad-section-attrs', s: s %}>
+  <div class="page-width gad-cmp-pad">
+    {%- capture cmp_heading -%}
+      {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: 'center' -%}
+    {%- endcapture -%}
+    {%- if s.position != 'first' -%}{{ cmp_heading }}{%- endif -%}
+    <table id="cmp-{{ section.id }}" class="cmp cmp--{{ s.table_style }}">
+      <thead>
+        <tr>
+          <th class="cmp__other{{ reg_class }}">
+            {%- if s.feature_label != blank -%}<span class="cmp__feature">{{ s.feature_label | escape }}</span>{%- else -%}<span class="visually-hidden">{{ 'gadsden.compare.benefit' | t }}</span>{%- endif -%}
+          </th>
+          <th class="cmp__us{{ hl_class }}">
+            {%- if s.own_logo != blank -%}{{ s.own_logo | image_url: width: 300 | image_tag: class: 'cmp__logo', loading: 'lazy', alt: own_label }}{%- endif -%}
+            {%- if own_label != blank -%}<span class="cmp__label">{{ own_label }}</span>{%- endif -%}
+          </th>
+          {%- for i in (1..n) -%}
+            {%- liquid
+              assign k_label = 'c' | append: i | append: '_label'
+              assign k_logo = 'c' | append: i | append: '_logo'
+            -%}
+            <th class="cmp__other{{ reg_class }}">
+              {%- if s[k_logo] != blank -%}{{ s[k_logo] | image_url: width: 300 | image_tag: class: 'cmp__logo cmp__logo--other', loading: 'lazy', alt: s[k_label] }}{%- endif -%}
+              {%- if s[k_label] != blank -%}<span class="cmp__label cmp__label--other">{{ s[k_label] }}</span>{%- endif -%}
             </th>
-            <th class="gad-cmp__cell gad-cmp__own gad-cmp__head {% if s.hl_style == 'scheme' %}color-{{ s.hl_scheme }}{% endif %}" scope="col">
-              {%- if s.own_logo != blank -%}
-                {{ s.own_logo | image_url: width: 300 | image_tag: loading: 'lazy', class: 'gad-cmp__logo gad-cmp__logo--own', alt: own_label }}
+          {%- endfor -%}
+        </tr>
+      </thead>
+      <tbody>
+        {%- for block in section.blocks -%}
+          {%- assign b = block.settings -%}
+          <tr {{ block.shopify_attributes }}>
+            <td class="cmp__other{{ reg_class }}">{{ b.benefit }}</td>
+            <td class="cmp__us{{ hl_class }}">
+              {%- if b.own and b.own_partial -%}
+                <span class="cmp__ic cmp__ic--part">{{ part_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
+              {%- elsif b.own -%}
+                <span class="cmp__ic cmp__ic--yes">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
               {%- else -%}
-                <span class="gad-cmp__label gad-cmp__label--own">{{ own_label }}</span>
+                <span class="cmp__ic cmp__ic--no">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
               {%- endif -%}
-            </th>
+            </td>
             {%- for i in (1..n) -%}
-              {%- liquid
-                assign k_label = 'c' | append: i | append: '_label'
-                assign k_logo = 'c' | append: i | append: '_logo'
-              -%}
-              <th class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__head gad-cmp__other gad-cmp__other--{{ i }} {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}" scope="col">
-                {%- if s[k_logo] != blank -%}
-                  {{ s[k_logo] | image_url: width: 300 | image_tag: loading: 'lazy', class: 'gad-cmp__logo', alt: s[k_label] }}
+              {%- assign k_val = 'c' | append: i -%}
+              {%- assign k_partial = 'c' | append: i | append: '_partial' -%}
+              <td class="cmp__other{{ reg_class }}">
+                {%- if b[k_val] and b[k_partial] -%}
+                  <span class="cmp__ic cmp__ic--part">{{ part_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
+                {%- elsif b[k_val] -%}
+                  <span class="cmp__ic cmp__ic--yes">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
                 {%- else -%}
-                  <span class="gad-cmp__label">{{ s[k_label] }}</span>
-                {%- endif -%}
-              </th>
-            {%- endfor -%}
-          </tr>
-        </thead>
-        <tbody>
-          {%- for block in section.blocks -%}
-            {%- assign b = block.settings -%}
-            <tr class="gad-cmp__row" {{ block.shopify_attributes }}>
-              <th class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__benefit {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}" scope="row">
-                {{- b.benefit -}}
-              </th>
-              <td class="gad-cmp__cell gad-cmp__own {% if s.hl_style == 'scheme' %}color-{{ s.hl_scheme }}{% endif %}">
-                {%- if b.own and b.own_partial -%}
-                  <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--partial">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
-                {%- elsif b.own -%}
-                  <span class="gad-cmp__icon gad-cmp__icon--check">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
-                {%- else -%}
-                  <span class="gad-cmp__icon gad-cmp__icon--cross gad-cmp__icon--odd">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
+                  <span class="cmp__ic cmp__ic--no">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
                 {%- endif -%}
               </td>
-              {%- for i in (1..n) -%}
-                {%- assign k_val = 'c' | append: i -%}
-                {%- assign k_partial = 'c' | append: i | append: '_partial' -%}
-                <td class="gad-cmp__cell gad-cmp__cell--reg gad-cmp__other {% if s.reg_style == 'scheme' %}color-{{ s.reg_scheme }}{% endif %}">
-                  {%- if b[k_val] and b[k_partial] -%}
-                    <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--partial">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.partial' | t }}</span></span>
-                  {%- elsif b[k_val] -%}
-                    <span class="gad-cmp__icon gad-cmp__icon--check gad-cmp__icon--odd">{{ check_icon }}<span class="visually-hidden">{{ 'gadsden.compare.yes' | t }}</span></span>
-                  {%- else -%}
-                    <span class="gad-cmp__icon gad-cmp__icon--cross">{{ cross_icon }}<span class="visually-hidden">{{ 'gadsden.compare.no' | t }}</span></span>
-                  {%- endif -%}
-                </td>
-              {%- endfor -%}
-            </tr>
-          {%- endfor -%}
-        </tbody>
-      </table>
-    </div>
+            {%- endfor -%}
+          </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+    {%- if s.position == 'first' -%}<div style="margin-top:2.4rem">{{ cmp_heading }}</div>{%- endif -%}
+    {%- if s.button_label != blank or s.atc_label != blank -%}
+      <div class="cmp__footer">
+        <div class="gad-buttons">
+          {%- if s.button_label != blank -%}
+            <a {% if s.button_link == blank %}role="link" aria-disabled="true"{% else %}href="{{ s.button_link }}"{% endif %} class="button{% if s.button_outline %} button--secondary{% endif %}">{{ s.button_label | escape }}</a>
+          {%- endif -%}
+          {%- render 'gad-atc-button', label: s.atc_label, product: s.atc_product, skip_cart: s.atc_skip_cart -%}
+        </div>
+      </div>
+    {%- endif -%}
   </div>
 </div>
-
-{% stylesheet %}
-  .gad-cmp-layout {
-    display: grid;
-    gap: 3.2rem;
-    align-items: center;
-  }
-
-  .gad-cmp-layout__text .gad-heading {
-    margin-bottom: 2rem;
-  }
-
-  .gad-cmp-layout:not(.gad-cmp-layout--text) .gad-cmp-layout__table {
-    width: 100%;
-    max-width: 80rem;
-    margin: 0 auto;
-  }
-
-  .gad-cmp--m-a-left {
-    text-align: left;
-  }
-
-  .gad-cmp--m-a-center {
-    text-align: center;
-  }
-
-  .gad-cmp--m-a-center .gad-buttons {
-    justify-content: center;
-  }
-
-  .gad-cmp--m-a-right {
-    text-align: right;
-  }
-
-  .gad-cmp--m-a-right .gad-buttons {
-    justify-content: flex-end;
-  }
-
-  .gad-cmp-layout__text .gad-heading {
-    text-align: inherit;
-  }
-
-  @media screen and (min-width: 990px) {
-    .gad-cmp-layout--text {
-      grid-template-columns: 1fr 1fr;
-      gap: 6rem;
-    }
-
-    .gad-cmp-layout--table-first .gad-cmp-layout__table {
-      order: -1;
-    }
-
-    .gad-cmp-layout--table-top {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 3.2rem;
-    }
-
-    .gad-cmp-layout--table-top > .gad-cmp-layout__text {
-      max-width: 80rem;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .gad-cmp-layout--table-top > .gad-cmp-layout__text .gad-buttons {
-      justify-content: center;
-    }
-
-    .gad-cmp-layout--table-top > .gad-cmp-layout__table {
-      width: 100%;
-      max-width: 80rem;
-      margin: 0 auto;
-    }
-
-    .gad-cmp--a-left {
-      text-align: left;
-    }
-
-    .gad-cmp--a-center {
-      text-align: center;
-    }
-
-    .gad-cmp--a-right {
-      text-align: right;
-    }
-
-    .gad-cmp--a-left .gad-buttons {
-      justify-content: flex-start;
-    }
-
-    .gad-cmp--a-center .gad-buttons {
-      justify-content: center;
-    }
-
-    .gad-cmp--a-right .gad-buttons {
-      justify-content: flex-end;
-    }
-  }
-
-  .gad-cmp {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: fixed;
-  }
-
-  .gad-cmp__cell {
-    padding: 1.2rem 0.4rem;
-    background: rgb(var(--color-background));
-    color: rgb(var(--color-foreground));
-    text-align: center;
-    vertical-align: middle;
-    font-weight: 400;
-    line-height: 1.35;
-  }
-
-  .gad-cmp__first {
-    width: 40%;
-  }
-
-  .gad-cmp--n2 .gad-cmp__first {
-    width: 34%;
-  }
-
-  .gad-cmp--n3 .gad-cmp__first {
-    width: 30%;
-  }
-
-  .gad-cmp__benefit {
-    padding-left: 1rem;
-    text-align: left;
-    font-size: 1.3rem;
-    hyphens: auto;
-  }
-
-  .gad-cmp__benefit p {
-    margin: 0;
-  }
-
-  .gad-cmp__corner {
-    background: transparent;
-  }
-
-  .gad-cmp__feature-label {
-    display: block;
-    font-weight: 700;
-    text-align: left;
-  }
-
-  .gad-cmp__label {
-    display: block;
-    font-weight: 700;
-    font-size: calc(var(--c1-size) * 0.65);
-    line-height: 1.2;
-    word-break: normal;
-    overflow-wrap: break-word;
-    hyphens: auto;
-  }
-
-  .gad-cmp__other--2 .gad-cmp__label {
-    font-size: calc(var(--c2-size) * 0.65);
-  }
-
-  .gad-cmp__other--3 .gad-cmp__label {
-    font-size: calc(var(--c3-size) * 0.65);
-  }
-
-  .gad-cmp__label--own {
-    font-size: calc(var(--own-size) * 0.65);
-  }
-
-  .gad-cmp__logo {
-    display: inline-block;
-    width: var(--c1-logo-m);
-    max-width: 100%;
-    height: auto;
-    vertical-align: middle;
-  }
-
-  .gad-cmp__other--2 .gad-cmp__logo {
-    width: var(--c2-logo-m);
-  }
-
-  .gad-cmp__other--3 .gad-cmp__logo {
-    width: var(--c3-logo-m);
-  }
-
-  .gad-cmp__logo--own {
-    width: var(--own-logo-m);
-  }
-
-  .gad-cmp__icon {
-    display: inline-grid;
-    place-items: center;
-    width: 2.6rem;
-    height: 2.6rem;
-    border-radius: 50%;
-    font-size: 2.4rem;
-  }
-
-  .gad-cmp__glyph {
-    font-variation-settings: 'FILL' 1, 'wght' 700;
-  }
-
-  .gad-cmp__icon--check {
-    color: var(--chk);
-  }
-
-  .gad-cmp__icon--cross {
-    color: var(--crs);
-  }
-
-  .gad-cmp--check-filled .gad-cmp__icon--check {
-    background: var(--chk-bg);
-    font-size: 1.8rem;
-  }
-
-  .gad-cmp--cross-filled .gad-cmp__icon--cross {
-    background: var(--crs-bg);
-    font-size: 1.8rem;
-  }
-
-  .gad-cmp--inverted .gad-cmp__icon--check.gad-cmp__icon--odd {
-    color: var(--crs);
-  }
-
-  .gad-cmp--inverted.gad-cmp--check-filled .gad-cmp__icon--check.gad-cmp__icon--odd {
-    background: var(--crs-bg);
-  }
-
-  .gad-cmp--inverted .gad-cmp__icon--cross.gad-cmp__icon--odd {
-    color: var(--chk);
-  }
-
-  .gad-cmp--inverted.gad-cmp--cross-filled .gad-cmp__icon--cross.gad-cmp__icon--odd {
-    background: var(--chk-bg);
-  }
-
-  /* tilde parcial: la misma tilde en el color de "parcial" (llena: el fondo) */
-  .gad-cmp__icon--partial {
-    --chk: var(--partial, rgba(var(--color-foreground), 0.45));
-  }
-
-  .gad-cmp--check-filled .gad-cmp__icon--partial {
-    --chk: inherit;
-    --chk-bg: var(--partial, rgba(var(--color-foreground), 0.3));
-  }
-
-  /* clásico y centrado: columna propia destacada con esquinas redondeadas, separadores y cebra */
-  .gad-cmp--classic .gad-cmp__row .gad-cmp__cell--reg,
-  .gad-cmp--centered .gad-cmp__row .gad-cmp__cell--reg {
-    border-top: 0.1rem solid rgba(var(--color-foreground), var(--reg-sep));
-  }
-
-  .gad-cmp--classic .gad-cmp__row .gad-cmp__own,
-  .gad-cmp--centered .gad-cmp__row .gad-cmp__own {
-    border-top: 0.1rem solid rgba(var(--color-foreground), var(--hl-sep));
-  }
-
-  .gad-cmp--classic .gad-cmp__row:nth-child(even) .gad-cmp__cell--reg,
-  .gad-cmp--centered .gad-cmp__row:nth-child(even) .gad-cmp__cell--reg {
-    background-image: linear-gradient(rgba(var(--color-foreground), var(--reg-zebra)), rgba(var(--color-foreground), var(--reg-zebra)));
-  }
-
-  .gad-cmp--classic .gad-cmp__row:nth-child(even) .gad-cmp__own,
-  .gad-cmp--centered .gad-cmp__row:nth-child(even) .gad-cmp__own {
-    background-image: linear-gradient(rgba(var(--color-foreground), var(--hl-zebra)), rgba(var(--color-foreground), var(--hl-zebra)));
-  }
-
-  .gad-cmp--classic thead .gad-cmp__own,
-  .gad-cmp--centered thead .gad-cmp__own {
-    border-radius: var(--cmp-radius) var(--cmp-radius) 0 0;
-  }
-
-  .gad-cmp--classic tbody tr:last-child .gad-cmp__own,
-  .gad-cmp--centered tbody tr:last-child .gad-cmp__own {
-    border-radius: 0 0 var(--cmp-radius) var(--cmp-radius);
-  }
-
-  .gad-cmp--classic thead .gad-cmp__cell--reg {
-    background: transparent;
-  }
-
-  /* centrado: tabla en tarjeta, beneficios centrados, encabezado completo destacado */
-  .gad-cmp--centered {
-    overflow: hidden;
-    border-radius: var(--cmp-radius);
-  }
-
-  .gad-cmp--centered .gad-cmp__benefit {
-    text-align: center;
-    padding-left: 0.8rem;
-    background-image: linear-gradient(rgba(var(--color-foreground), 0.04), rgba(var(--color-foreground), 0.04));
-  }
-
-  .gad-cmp--centered thead .gad-cmp__cell {
-    padding-top: 1.8rem;
-    padding-bottom: 1.8rem;
-  }
-
-  .gad-cmp--centered .gad-cmp__corner {
-    background: rgb(var(--color-background));
-  }
-
-  /* minimalista: sin fondos, líneas finas, un competidor */
-  .gad-cmp--minimal .gad-cmp__cell {
-    background: transparent;
-    color: inherit;
-  }
-
-  .gad-cmp--minimal .gad-cmp__row .gad-cmp__cell {
-    border-top: 0.1rem solid rgba(var(--color-foreground), var(--min-line));
-  }
-
-  .gad-cmp--minimal .gad-cmp__benefit {
-    padding-left: 0;
-  }
-
-  @media screen and (min-width: 750px) {
-    .gad-cmp__cell {
-      padding: 1.6rem 1.2rem;
-    }
-
-    .gad-cmp__benefit {
-      padding-left: 1.6rem;
-      font-size: 1.6rem;
-    }
-
-    .gad-cmp__first {
-      width: 46%;
-    }
-
-    .gad-cmp--n2 .gad-cmp__first {
-      width: 38%;
-    }
-
-    .gad-cmp--n3 .gad-cmp__first {
-      width: 34%;
-    }
-
-    .gad-cmp__label {
-      font-size: var(--c1-size);
-    }
-
-    .gad-cmp__other--2 .gad-cmp__label {
-      font-size: var(--c2-size);
-    }
-
-    .gad-cmp__other--3 .gad-cmp__label {
-      font-size: var(--c3-size);
-    }
-
-    .gad-cmp__label--own {
-      font-size: var(--own-size);
-    }
-
-    /* Tabla al costado del texto: las columnas quedan angostas, las etiquetas van más chicas. */
-    .gad-cmp-layout--text .gad-cmp__label {
-      font-size: calc(var(--c1-size) * 0.75);
-    }
-
-    .gad-cmp-layout--text .gad-cmp__other--2 .gad-cmp__label {
-      font-size: calc(var(--c2-size) * 0.75);
-    }
-
-    .gad-cmp-layout--text .gad-cmp__other--3 .gad-cmp__label {
-      font-size: calc(var(--c3-size) * 0.75);
-    }
-
-    .gad-cmp-layout--text .gad-cmp__label--own {
-      font-size: calc(var(--own-size) * 0.75);
-    }
-
-    .gad-cmp__logo {
-      width: var(--c1-logo-d);
-    }
-
-    .gad-cmp__other--2 .gad-cmp__logo {
-      width: var(--c2-logo-d);
-    }
-
-    .gad-cmp__other--3 .gad-cmp__logo {
-      width: var(--c3-logo-d);
-    }
-
-    .gad-cmp__logo--own {
-      width: var(--own-logo-d);
-    }
-
-    .gad-cmp__icon {
-      width: 3.2rem;
-      height: 3.2rem;
-    }
-  }
-
-  .gad-cmp--own-tab tbody tr:last-child .gad-cmp__own {
-    position: relative;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .gad-cmp--own-tab tbody tr:last-child .gad-cmp__own::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 1.2rem;
-    background: inherit;
-    border-radius: 0 0 var(--cmp-radius) var(--cmp-radius);
-  }
-{% endstylesheet %}
 
 {% schema %}
 {

@@ -1,239 +1,62 @@
-{%- liquid
-  assign s = section.settings
-  assign card_key = section.id | append: '-card'
-  assign star_class = ''
-  if s.empty_stars == 'outline'
-    assign star_class = ' gad-stars--outline'
-  elsif s.empty_stars == 'hidden'
-    assign star_class = ' gad-stars--hide-empty'
-  endif
--%}
+{%- comment -%} Testimonios: tarjetas con estrellas, título, texto, autor y foto, en grilla o carrusel. {%- endcomment -%}
+{%- assign s = section.settings -%}
 {%- render 'gad-colors', s: s, key: section.id -%}
-{%- if s.card_style == 'custom' -%}
-  {%- render 'gad-colors', s: s, key: card_key, prefix: 'card_', force: true -%}
-{%- endif -%}
-
-<div
-  class="gad-testimonials gad-pad {% render 'gad-scheme', s: s, key: section.id %}"
-  style="--pt: {{ s.padding_top }}px; --pb: {{ s.padding_bottom }}px; --star: {{ s.star_color }}; --star-off: {{ s.star_empty_color }};{% if s.quotes_color != blank %} --quote: {{ s.quotes_color }};{% endif %}"
-  {% render 'gad-section-attrs', s: s %}
->
-  <div class="{% if s.full_width %}gad-testimonials__full{% else %}page-width{% endif %}">
-    {%- if s.heading != blank or s.text != blank -%}
-      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}">
-        {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
-      </div>
-    {%- endif -%}
-
+{%- liquid
+  assign t_align = s.text_align | default: 'center'
+  assign t_items = t_align | replace: 'left', 'flex-start' | replace: 'right', 'flex-end'
+  case s.media_width
+    when 'half'
+      assign t_img_w = '50%'
+    when 'full'
+      assign t_img_w = '100%'
+    else
+      assign t_img_w = '33%'
+  endcase
+-%}
+<style>
+  #GadTm-{{ section.id }} .gad-tm-pad{padding-top:{{ s.padding_top | times: 0.75 | round }}px;padding-bottom:{{ s.padding_bottom | times: 0.75 | round }}px}
+  @media(min-width:750px){#GadTm-{{ section.id }} .gad-tm-pad{padding-top:{{ s.padding_top }}px;padding-bottom:{{ s.padding_bottom }}px}}
+  #GadTm-{{ section.id }} .tm__card{height:100%;display:flex;flex-direction:column;gap:1.2rem;padding:2.4rem;border-radius:var(--text-boxes-radius);text-align:{{ t_align }};align-items:{{ t_items }};position:relative
+    {%- if s.card_style == 'custom' -%};background:{{ s.card_cc_bg_gradient | default: s.card_cc_bg }};color:{{ s.card_cc_text }}{%- elsif s.card_style == 'tint' -%};background:rgba(var(--color-foreground),.05){%- endif -%}}
+  #GadTm-{{ section.id }} .tm__quote{position:absolute;top:1rem;{% if t_align == 'left' %}right:1.6rem{% else %}left:1.6rem{% endif %};font-size:5rem;line-height:1;opacity:.35;font-family:Georgia,serif;color:{{ s.quotes_color | default: 'currentColor' }}}
+  #GadTm-{{ section.id }} .tm__img{border-radius:{% if s.media_ratio == 'circle' %}50%{% else %}var(--media-radius){% endif %};overflow:hidden;width:{{ t_img_w }};aspect-ratio:{% if s.media_ratio == 'portrait' %}3/4{% elsif s.media_ratio == 'adapt' %}auto{% else %}1{% endif %}}
+  #GadTm-{{ section.id }} .tm__img img{width:100%;height:100%;object-fit:cover;display:block}
+  #GadTm-{{ section.id }} .tm__title{margin:0;font-weight:700;font-size:1.7rem}
+  #GadTm-{{ section.id }} .tm__text{margin:0}
+  #GadTm-{{ section.id }} .tm__author{margin-top:auto;font-size:1.4rem;display:flex;align-items:center;gap:.8rem;justify-content:{{ t_items }}}
+  #GadTm-{{ section.id }} .tm__avatar{width:3.2rem;height:3.2rem;border-radius:50%;object-fit:cover}
+  #GadTm-{{ section.id }} .tm__img--video video{width:100%;height:100%;object-fit:cover}
+  #GadTm-{{ section.id }} .tm__stars{display:inline-flex;gap:.2rem}
+  #GadTm-{{ section.id }} .tm__stars .gad-icon{font-size:2rem;color:{{ s.star_empty_color }}}
+  #GadTm-{{ section.id }} .tm__stars .gad-icon.on{color:{{ s.star_color }}}
+  {% if s.empty_stars == 'hidden' %}#GadTm-{{ section.id }} .tm__stars .gad-icon:not(.on){display:none}{% elsif s.empty_stars == 'outline' %}#GadTm-{{ section.id }} .tm__stars .gad-icon:not(.on){font-variation-settings:'FILL' 0;color:{{ s.star_color }}}{% endif %}
+</style>
+<div id="GadTm-{{ section.id }}" class="{% render 'gad-scheme', s: s, key: section.id %}" {% render 'gad-section-attrs', s: s %}>
+  <div class="{% unless s.full_width %}page-width {% endunless %}gad-tm-pad">
+    {%- render 'gad-heading', caption: s.caption, caption_color: s.caption_color, title: s.heading, size: s.heading_size, accent: s.heading_accent, text: s.text, align: s.heading_align, align_m: s.heading_align_m -%}
     {%- capture slides -%}
       {%- for block in section.blocks -%}
         {%- assign b = block.settings -%}
-        <div class="gad-testimonials__item" {{ block.shopify_attributes }}>
-          <figure class="gad-testimonials__card{% if s.image_bleed %} gad-testimonials__card--bleed{% endif %} gad-testimonials--align-{{ s.text_align }} {% render 'gad-card-class', s: s, key: card_key %}">
-            {%- if s.show_quotes -%}
-              <span class="gad-testimonials__quote" aria-hidden="true">&ldquo;</span>
-            {%- endif -%}
-            {%- if b.video != blank or b.image != blank -%}
-              <div class="gad-testimonials__media gad-testimonials__media--{{ s.media_width }} gad-testimonials__media--{{ s.media_ratio }}">
-                {%- if b.video != blank -%}
-                  {%- render 'gad-video', video: b.video, poster: b.image, autoplay: false, loop: true, tap: true, width: 800 -%}
-                {%- else -%}
-                  {%- assign img_alt = b.image.alt | default: '' -%}
-                  {{ b.image | image_url: width: 900 | image_tag: loading: 'lazy', alt: img_alt, sizes: '(min-width: 990px) 33vw, 90vw', widths: '300, 450, 600, 900' }}
-                {%- endif -%}
-              </div>
-            {%- endif -%}
-            {%- if s.show_stars -%}
-              <span class="gad-stars{{ star_class }}" role="img" aria-label="{{ 'gadsden.reviews.stars' | t: count: b.rating }}">
-                {%- for i in (1..5) -%}
-                  <span class="gad-stars__star{% if i <= b.rating %} is-on{% endif %}" aria-hidden="true">
-                    {%- render 'gad-icon', name: 'star', filled: true -%}
-                  </span>
-                {%- endfor -%}
+        <div {{ block.shopify_attributes }}>
+          <div class="tm__card{% if s.card_style == 'scheme' %} color-{{ s.card_color_scheme }} gradient{% endif %}">
+            {%- if s.show_quotes -%}<span class="tm__quote" aria-hidden="true">“</span>{%- endif -%}
+            {%- if b.video != blank -%}<div class="tm__img tm__img--video">{{ b.video | video_tag: image_size: '800x', loop: true, muted: true, autoplay: false, playsinline: true, controls: true, poster: b.image }}</div>
+            {%- elsif b.image != blank -%}<div class="tm__img">{{ b.image | image_url: width: 600 | image_tag: loading: 'lazy' }}</div>{%- endif -%}
+            {%- if s.show_stars and b.rating > 0 -%}
+              <span class="tm__stars" role="img" aria-label="{{ b.rating }} / 5">
+                {%- for i in (1..5) -%}{%- if i <= b.rating -%}{%- render 'gad-icon', name: 'star', filled: true, class: 'on' -%}{%- else -%}{%- render 'gad-icon', name: 'star', filled: true -%}{%- endif -%}{%- endfor -%}
               </span>
             {%- endif -%}
-            <blockquote class="gad-testimonials__quote-body">
-              {%- if b.title != blank -%}
-                <p class="gad-testimonials__title h4">{{ b.title }}</p>
-              {%- endif -%}
-              {%- if b.text != blank -%}
-                <div class="gad-testimonials__text rte">{{ b.text }}</div>
-              {%- endif -%}
-            </blockquote>
-            {%- if b.author != blank or b.avatar != blank -%}
-              <figcaption class="gad-testimonials__author">
-                {%- if b.avatar != blank -%}
-                  {{ b.avatar | image_url: width: 96 | image_tag: loading: 'lazy', class: 'gad-testimonials__avatar', alt: '' }}
-                {%- endif -%}
-                {%- if b.author != blank -%}<span>{{ b.author }}</span>{%- endif -%}
-              </figcaption>
-            {%- endif -%}
-          </figure>
+            {%- if b.title != blank -%}<h3 class="tm__title">{{ b.title }}</h3>{%- endif -%}
+            {%- if b.text != blank -%}<div class="tm__text rte">{{ b.text }}</div>{%- endif -%}
+            {%- if b.author != blank or b.avatar != blank -%}<div class="tm__author">{% if b.avatar != blank %}{{ b.avatar | image_url: width: 80 | image_tag: class: 'tm__avatar', loading: 'lazy' }}{% endif %}{{ b.author }}</div>{%- endif -%}
+          </div>
         </div>
       {%- endfor -%}
     {%- endcapture -%}
-
-    {%- if section.blocks.size > 0 -%}
-      <div class="{% if settings.animations_reveal_on_scroll %}scroll-trigger animate--slide-in{% endif %}" {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
-        {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, m_per_view: 1 -%}
-      </div>
-    {%- endif -%}
+    {%- render 'gad-carousel', s: s, key: section.id, slides: slides, label: s.heading, m_per_view: 1 -%}
   </div>
 </div>
-
-{% stylesheet %}
-  .gad-testimonials__full {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    :where(html[data-gad-bp='750']) .gad-testimonials__full {
-      padding-left: 5rem;
-      padding-right: 5rem;
-    }
-  }
-
-  @media screen and (min-width: 990px) {
-    :where(html:not([data-gad-bp='750'])) .gad-testimonials__full {
-      padding-left: 5rem;
-      padding-right: 5rem;
-    }
-  }
-
-  .gad-testimonials__item {
-    display: flex;
-  }
-
-  .gad-testimonials__card {
-    position: relative;
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    gap: 1.2rem;
-    margin: 0;
-    padding: 2.8rem 2.4rem;
-  }
-
-  .gad-testimonials__card.gad-card--box {
-    border-radius: var(--text-boxes-radius);
-  }
-
-  .gad-testimonials__card.gad-card--plain {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .gad-testimonials--align-left {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .gad-testimonials--align-center {
-    align-items: center;
-    text-align: center;
-  }
-
-  .gad-testimonials--align-right {
-    align-items: flex-end;
-    text-align: right;
-  }
-
-  .gad-testimonials__quote {
-    position: absolute;
-    top: 0.4rem;
-    left: 1.6rem;
-    color: var(--quote, rgb(var(--color-accent)));
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 6.4rem;
-    line-height: 1;
-    pointer-events: none;
-  }
-
-  .gad-testimonials--align-left .gad-testimonials__quote {
-    left: auto;
-    right: 1.6rem;
-  }
-
-  .gad-testimonials__media {
-    overflow: hidden;
-    width: 33%;
-    border-radius: var(--media-radius);
-  }
-
-  .gad-testimonials__media--half {
-    width: 50%;
-  }
-
-  .gad-testimonials__media--full {
-    width: 100%;
-  }
-
-  .gad-testimonials__media img,
-  .gad-testimonials__media gad-video,
-  .gad-testimonials__media video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .gad-testimonials__media--portrait {
-    aspect-ratio: 3 / 4;
-  }
-
-  .gad-testimonials__media--square {
-    aspect-ratio: 1;
-  }
-
-  .gad-testimonials__media--circle {
-    aspect-ratio: 1;
-    border-radius: 50%;
-  }
-
-  .gad-testimonials__quote-body {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-style: normal;
-  }
-
-  .gad-testimonials__title {
-    margin: 0 0 0.6rem;
-    font-weight: 700;
-  }
-
-  .gad-testimonials__text p {
-    margin: 0;
-  }
-
-  .gad-testimonials__author {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-top: auto;
-    font-size: 1.4rem;
-    font-weight: 600;
-  }
-
-  .gad-testimonials__avatar {
-    width: 3.6rem;
-    height: 3.6rem;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-
-  .gad-testimonials__card--bleed {
-    overflow: hidden;
-  }
-
-  .gad-testimonials__card--bleed.gad-card--box .gad-testimonials__media--full {
-    width: calc(100% + 4.8rem);
-    max-width: none;
-    margin: -2.8rem -2.4rem 0;
-    border-radius: 0;
-  }
-{% endstylesheet %}
 
 {% schema %}
 {
