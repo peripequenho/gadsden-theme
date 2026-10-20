@@ -1,5 +1,10 @@
 # Cambios
 
+## 1.2.3
+
+### Corregido
+- Precio anterior arriba: la etiqueta va al borde derecho del bloque y los dos precios quedan sin espacio entre sí.
+
 ## 1.2.2
 
 ### Carrusel
