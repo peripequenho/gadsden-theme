@@ -1,5 +1,11 @@
 # Cambios
 
+## 1.2.4
+
+### Ficha de producto
+- Barra fija: opción **botón abajo, a todo el ancho** en mobile (foto, título y precio arriba; el botón más grande en su propia fila).
+- Precio anterior arriba: la etiqueta queda centrada respecto de los dos precios (sin el margen de abajo de Dawn).
+
 ## 1.2.3
 
 ### Corregido

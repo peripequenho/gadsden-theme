@@ -147,6 +147,7 @@
 /* la etiqueta no crece con el tamaño de letra del bloque (el zoom va sobre .price): si no, no entra al costado */
 .gad-price--compare_above .price--on-sale .price__badge-sale {
   flex: none;
+  margin: 0;
   white-space: nowrap;
 }
 
@@ -414,6 +415,24 @@ html.gad-reduce gad-sticky-bar {
 
   .gad-sticky--m-full .gad-sticky__btn {
     flex: 1 1 auto;
+  }
+
+  /* botón abajo a todo el ancho; los datos del producto arriba */
+  .gad-sticky--m-stack {
+    flex-wrap: wrap;
+    row-gap: 0.8rem;
+  }
+
+  .gad-sticky--m-stack .gad-sticky__info {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .gad-sticky--m-stack .gad-sticky__btn {
+    flex: 1 1 100%;
+    order: 10;
+    min-height: 5rem;
+    font-size: 1.6rem;
   }
 
   .gad-sticky--m-btn-price .gad-sticky__btn-price {

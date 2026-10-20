@@ -85,6 +85,9 @@
       if b.m_full_button
         assign cls = cls | append: ' gad-sticky--m-full'
       endif
+      if b.m_stack
+        assign cls = cls | append: ' gad-sticky--m-stack'
+      endif
       if b.d_price_in_button
         assign cls = cls | append: ' gad-sticky--d-btn-price'
       endif
